@@ -21,17 +21,24 @@ class MainScene extends Phaser.Scene {
         // 创建背景
         this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
         this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
+        this.bg.setDepth(0);
+
+        // 创建变暗的遮罩
+        this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);
+        this.darkMask.setOrigin(0, 0);
+        this.darkMask.setDepth(1);
 
         // 创建中层背景
         this.midGround = this.add.tileSprite(
             this.sys.game.config.width / 2,
-            this.sys.game.config.height - 180, // 调整这个值以改变中层背景的垂直位置
+            this.sys.game.config.height - 180,
             this.sys.game.config.width,
-            200, // 调整这个值以改变中层背景的高度
+            200,
             'midGround'
         );
         this.midGround.setOrigin(0.5, 1);
-        this.midGround.setScale(1.2); // 调整这个值以改变中层背景的缩放
+        this.midGround.setScale(1.2);
+        this.midGround.setDepth(2);
 
         // 创建地面
         const groundHeight = 200;
@@ -42,10 +49,11 @@ class MainScene extends Phaser.Scene {
             groundHeight,
             'ground'
         );
-        this.ground.setScale(1.5); // 将地面放大 1.5 倍
+        this.ground.setScale(1.5);
+        this.ground.setDepth(3);
         this.physics.add.existing(this.ground, true);
 
-        // 调整地面的物��体积大小以匹配视觉大小
+        // 调整地面的物体积大小以匹配视觉大小
         this.ground.body.setSize(this.ground.width, this.ground.height / 1.5);
         this.ground.body.setOffset(0, this.ground.height / 3);
 
@@ -54,6 +62,8 @@ class MainScene extends Phaser.Scene {
         const bugOffset = 100; // 增加虫子穿过地面的程度
         this.bug = this.physics.add.sprite(50, groundTop + bugOffset, 'bug');
         this.enemyBug = this.physics.add.sprite(30, groundTop + bugOffset, 'enemyBug');
+        this.bug.setDepth(4);
+        this.enemyBug.setDepth(4);
 
         // 设置虫子属性
         this.setupBugs();
@@ -88,6 +98,15 @@ class MainScene extends Phaser.Scene {
         // 添加碰撞
         this.physics.add.collider(this.bug, this.ground);
         this.physics.add.collider(this.enemyBug, this.ground);
+
+        // 确保问题文本和按钮在最上层
+        this.questionText.setDepth(5);
+        this.button1.setDepth(5);
+        this.button2.setDepth(5);
+        this.answer1Text.setDepth(6);
+        this.answer2Text.setDepth(6);
+        this.scoreText.setDepth(6);
+        this.wrong.setDepth(7);  // 将 "you are wrong" 显示设置为最高深度
     }
 
     setupBugs() {
@@ -117,7 +136,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createButtons() {
-        // 创建按钮和问题文本
+        // 创建问题文本
         this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
             fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '70px',
@@ -130,32 +149,39 @@ class MainScene extends Phaser.Scene {
         // 添加阴影效果
         this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
-        this.button1 = this.add.image(this.cameras.main.width * 0.3, this.cameras.main.height * 0.75, 'button')
-            .setInteractive();
-        this.button2 = this.add.image(this.cameras.main.width * 0.7, this.cameras.main.height * 0.75, 'button')
-            .setInteractive();
+        // 创建答案按钮背景和文本
+        const buttonWidth = 300;
+        const buttonHeight = 80;
+        const buttonY = this.cameras.main.height * 0.75;
 
-        this.answer1Text = this.add.text(this.button1.x, this.button1.y, '', {
+        this.button1 = this.add.graphics();
+        this.button2 = this.add.graphics();
+
+        this.button1.fillStyle(0xffffff, 1);
+        this.button2.fillStyle(0xffffff, 1);
+
+        this.button1.fillRoundedRect(this.cameras.main.width * 0.3 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight, 15);
+        this.button2.fillRoundedRect(this.cameras.main.width * 0.7 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight, 15);
+
+        this.answer1Text = this.add.text(this.cameras.main.width * 0.3, buttonY, '', {
             fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '20px',
+            fontSize: '30px',
             fontWeight: 'bold',
-            fill: '#ffffff',
+            fill: '#000000',
             align: 'center',
-            wordWrap: { width: this.button1.displayWidth * 0.8 }
         }).setOrigin(0.5);
 
-        this.answer2Text = this.add.text(this.button2.x, this.button2.y, '', {
+        this.answer2Text = this.add.text(this.cameras.main.width * 0.7, buttonY, '', {
             fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '20px',
+            fontSize: '30px',
             fontWeight: 'bold',
-            fill: '#ffffff',
+            fill: '#000000',
             align: 'center',
-            wordWrap: { width: this.button2.displayWidth * 0.8 }
         }).setOrigin(0.5);
 
-        // 确保文本在按钮之上
-        this.answer1Text.setDepth(1);
-        this.answer2Text.setDepth(1);
+        // 设置按钮交互
+        this.button1.setInteractive(new Phaser.Geom.Rectangle(this.cameras.main.width * 0.3 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        this.button2.setInteractive(new Phaser.Geom.Rectangle(this.cameras.main.width * 0.7 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
 
         // 设置按钮点击事件
         this.button1.on('pointerdown', () => this.answer(this.button1));
@@ -209,6 +235,10 @@ class MainScene extends Phaser.Scene {
                 this.correctAnswer = this.button2;
             }
             
+            // 调整文本换行
+            this.answer1Text.setWordWrapWidth(280);
+            this.answer2Text.setWordWrapWidth(280);
+            
             // 启用按钮交互
             this.button1.setInteractive();
             this.button2.setInteractive();
@@ -240,6 +270,11 @@ class MainScene extends Phaser.Scene {
         // 移动中层背景以创造视差效果
         this.midGround.tilePositionX += 0.5; // 调整这个值以改变移动速度
 
+        // 持续检查问题文本的可见性
+        if (this.questionText) {
+            console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
+        }
+
         // ... 其他更新逻辑 ...
     }
 
@@ -248,6 +283,12 @@ class MainScene extends Phaser.Scene {
         this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
         this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
         this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
+        
+        // 设置反馈图标的深度
+        this.tick.setDepth(6);
+        this.cross.setDepth(6);
+        this.correct.setDepth(7);
+        this.wrong.setDepth(7);  // 确保 "you are wrong" 显示在最上层
     }
 
     answer(button) {
