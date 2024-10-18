@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+    <title>Runrun Bug</title>
+    <style>
+        body {margin: 0 auto;}
+        #turn {
+            width:100%;
+            height:100%;
+            position:fixed;
+            top:0px;
+            left:0px;
+            background-color: rgba(255,255,255,0.7);
+            background-image:url('../assets/playportrait.png');
+            background-size: contain;
+            background-repeat:no-repeat;
+            background-position: center center;
+            display:none;
+        }
+    </style>
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="phaser-ce.min.js"></script>
+    <script type="text/javascript" src="phaser-scroll.js"></script>  
+    <script type="text/javascript" src="load.js"></script>
+    <script type="text/javascript" src="menu.js"></script>  
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="end.js"></script>
+</head>
+<body>
+    <div id="game_div"></div>
+    <div id="turn"></div>
+</body>
+<script>
+// 游戏初始化代码
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, 'game_div');
+
+game.state.add('load', load_state); 
+game.state.add('menu', menu_state);
+game.state.add('main', main_state); 
+game.state.add('end',  end_state);
+
+game.state.start('load');
+</script>
+</html>

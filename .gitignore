@@ -1,0 +1,19 @@
+# Ignore audio and assets folders
+/audio/
+/assets/
+
+# Ignore common files
+.DS_Store
+Thumbs.db
+
+# Ignore node modules if you're using npm
+/node_modules/
+
+# Ignore any log files
+*.log
+
+# Ignore PHP configuration files
+*.ini
+
+# Ignore any sensitive or environment-specific files
+config.php
