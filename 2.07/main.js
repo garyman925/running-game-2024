@@ -64,8 +64,8 @@ class MainScene extends Phaser.Scene {
         });
 
         // 创建虫子
-        this.bug = this.physics.add.sprite(0, 100, 'bug');
-        this.enemyBug = this.physics.add.sprite(150, 100, 'enemyBug');
+        this.bug = this.physics.add.sprite(50, this.sys.game.config.height - 150, 'bug');
+        this.enemyBug = this.physics.add.sprite(50, this.sys.game.config.height - 150, 'enemyBug');
 
         // 设置虫子属性
         this.setupBugs();
@@ -147,29 +147,31 @@ class MainScene extends Phaser.Scene {
     }
 
     setupBugs() {
-        // 设虫子的物理属性和动画
         [this.bug, this.enemyBug].forEach(bug => {
             bug.setCollideWorldBounds(true);
             bug.setBounce(0.2);
             bug.setGravityY(1000);
 
             this.anims.create({
-                key: 'run',
+                key: 'run_' + bug.texture.key,
                 frames: this.anims.generateFrameNumbers(bug.texture.key, { start: 1, end: 4 }),
                 frameRate: 15,
                 repeat: -1
             });
 
             this.anims.create({
-                key: 'fail',
+                key: 'fail_' + bug.texture.key,
                 frames: [{ key: bug.texture.key, frame: 9 }],
                 frameRate: 15
             });
 
-            bug.play('run');
-            bug.setScale(0.9);
-            bug.setAngle(10);
+            bug.play('run_' + bug.texture.key);
+            bug.setScale(0.8); // 将缩放从 0.5 调整为 0.8
+            bug.setOrigin(0.5, 1);
         });
+
+        // 将敌人虫子放在稍微靠后的位置
+        this.enemyBug.x = 30;
     }
 
     createButtons() {
@@ -188,8 +190,8 @@ class MainScene extends Phaser.Scene {
     createFeedbackIcons() {
         this.tick = this.add.image(0, 0, 'tick').setVisible(false).setScale(0.2);
         this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
-        this.correct = this.add.image(0, 0, 'correct').setVisible(false);
-        this.wrong = this.add.image(0, 0, 'wrong').setVisible(false);
+        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
+        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
     }
 
     showNextQuestion() {
@@ -243,14 +245,14 @@ class MainScene extends Phaser.Scene {
 
         if (button === this.correctAnswer) {
             // 正确答案的处理
-            console.log("Correct answer!");
+            console.log("正确答案！");
             score++;
-            this.scoreText.setText('Score: ' + score);
+            this.scoreText.setText('得分: ' + score);
             this.showCorrectFeedback(button);
             this.moveBugForward();
         } else {
-            //误答案的处理
-            console.log("Wrong answer!");
+            // 错误答案的处理
+            console.log("错误答案！");
             this.showWrongFeedback(button);
             this.moveEnemyBugForward();
         }
@@ -267,19 +269,52 @@ class MainScene extends Phaser.Scene {
     }
 
     showCorrectFeedback(button) {
-        // ... (保持原有的逻辑，但使用 Phaser 3 的方法)
+        this.tick.setPosition(button.x, button.y).setVisible(true);
+        this.correct.setVisible(true);
+        this.yeah.play();
+
+        // 2秒后隐藏反馈
+        this.time.delayedCall(2000, () => {
+            this.tick.setVisible(false);
+            this.correct.setVisible(false);
+        });
     }
 
     showWrongFeedback(button) {
-        // ... (保持原有的逻辑，但使用 Phaser 3 的方法)
+        this.cross.setPosition(button.x, button.y).setVisible(true);
+        this.wrong.setVisible(true);
+        this.fail.play();
+
+        // 显示正确答案
+        const correctButton = (button === this.button1) ? this.button2 : this.button1;
+        this.tick.setPosition(correctButton.x, correctButton.y).setVisible(true);
+
+        // 2秒后隐藏反馈
+        this.time.delayedCall(2000, () => {
+            this.cross.setVisible(false);
+            this.tick.setVisible(false);
+            this.wrong.setVisible(false);
+        });
     }
 
     moveBugForward() {
-        // ... (保持原有的逻辑，但使用 Phaser 3 的方法)
+        this.tweens.add({
+            targets: this.bug,
+            x: this.bug.x + 50,
+            duration: 1000,
+            ease: 'Power2'
+        });
+        this.running.play();
     }
 
     moveEnemyBugForward() {
-        // ... (保持原有的逻辑，但使用 Phaser 3 的方法)
+        this.tweens.add({
+            targets: this.enemyBug,
+            x: this.enemyBug.x + 50,
+            duration: 1000,
+            ease: 'Power2'
+        });
+        this.running.play();
     }
 
     endGame() {
@@ -296,10 +331,10 @@ class MainScene extends Phaser.Scene {
 
         // 确保虫子始终在运行动画
         if (!this.bug.anims.isPlaying) {
-            this.bug.play('run');
+            this.bug.play('run_bug');
         }
         if (!this.enemyBug.anims.isPlaying) {
-            this.enemyBug.play('run');
+            this.enemyBug.play('run_enemyBug');
         }
 
         // ... 其他更新逻辑 ...
