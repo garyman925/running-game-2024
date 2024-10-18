@@ -21,7 +21,7 @@ class MainScene extends Phaser.Scene {
         this.load.spritesheet('ground', '../assets/ground.png', { frameWidth: 128, frameHeight: 128 });
         this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
         this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
-        this.load.image('bg', '../assets/bg4.png');
+        this.load.image('bg', '../assets/plant-world-map.jpg');
         this.load.image('button', '../assets/button.png');
         this.load.image('tick', '../assets/tick.png');
         this.load.image('cross', '../assets/cross.png');
@@ -41,34 +41,33 @@ class MainScene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, this.sys.game.config.width, this.sys.game.config.height);
 
         // 创建背景
-        this.bg = this.add.tileSprite(0, 0, this.sys.game.config.width, this.sys.game.config.height, 'bg').setOrigin(0);
+        this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
+        
+        // 调整背景图片以适应屏幕，同时保持宽高比
+        this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
 
         // 创建地面
-        this.ground = this.physics.add.staticImage(this.sys.game.config.width / 2, this.sys.game.config.height - 50, 'ground');
-        this.ground.setDisplaySize(this.sys.game.config.width, 100);
-
-        // 创建草地
-        this.grass = this.add.tileSprite(0, this.sys.game.config.height - 150, this.sys.game.config.width, 128, 'grass').setOrigin(0);
-
-        // 创建树
-        this.tree = this.physics.add.staticImage(550, this.sys.game.config.height - 250, 'tree');
-
-        // 创建鸟
-        this.bird = this.add.image(50, 50, 'bird');
-        this.tweens.add({
-            targets: this.bird,
-            y: 100,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1
-        });
+        const groundHeight = 100;
+        this.ground = this.add.tileSprite(
+            this.sys.game.config.width / 2,  // 将 x 坐标设置为屏幕宽度的一半
+            this.sys.game.config.height - groundHeight / 2,  // 调整 y 坐标
+            this.sys.game.config.width,  // 设置宽度为屏幕宽度
+            groundHeight,
+            'ground'
+        );
+        this.physics.add.existing(this.ground, true);  // 添加到物理系统，设置为静态
 
         // 创建虫子
-        this.bug = this.physics.add.sprite(50, this.sys.game.config.height - 150, 'bug');
-        this.enemyBug = this.physics.add.sprite(50, this.sys.game.config.height - 150, 'enemyBug');
+        const groundTop = this.sys.game.config.height - groundHeight;
+        this.bug = this.physics.add.sprite(50, groundTop, 'bug');
+        this.enemyBug = this.physics.add.sprite(30, groundTop, 'enemyBug');
 
         // 设置虫子属性
         this.setupBugs();
+
+        // 添加碰撞
+        this.physics.add.collider(this.bug, this.ground);
+        this.physics.add.collider(this.enemyBug, this.ground);
 
         // 创建按钮和文本
         this.createButtons();
@@ -150,7 +149,7 @@ class MainScene extends Phaser.Scene {
         [this.bug, this.enemyBug].forEach(bug => {
             bug.setCollideWorldBounds(true);
             bug.setBounce(0.2);
-            bug.setGravityY(1000);
+            bug.setGravityY(300); // 添加一些重力，但不要太大
 
             this.anims.create({
                 key: 'run_' + bug.texture.key,
@@ -166,12 +165,9 @@ class MainScene extends Phaser.Scene {
             });
 
             bug.play('run_' + bug.texture.key);
-            bug.setScale(0.8); // 将缩放从 0.5 调整为 0.8
-            bug.setOrigin(0.5, 1);
+            bug.setScale(0.8);
+            bug.setOrigin(0.5, 1); // 设置原点为底部中心
         });
-
-        // 将敌人虫子放在稍微靠后的位置
-        this.enemyBug.x = 30;
     }
 
     createButtons() {
@@ -273,7 +269,7 @@ class MainScene extends Phaser.Scene {
         this.correct.setVisible(true);
         this.yeah.play();
 
-        // 2秒后隐藏反馈
+        // 2秒后藏反馈
         this.time.delayedCall(2000, () => {
             this.tick.setVisible(false);
             this.correct.setVisible(false);
@@ -325,9 +321,9 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // 游戏更新逻辑
-        this.physics.collide(this.bug, this.ground);
-        this.physics.collide(this.enemyBug, this.ground);
+        // 移除这些行，让物理引擎处理碰撞
+        // this.physics.collide(this.bug, this.ground);
+        // this.physics.collide(this.enemyBug, this.ground);
 
         // 确保虫子始终在运行动画
         if (!this.bug.anims.isPlaying) {
@@ -336,6 +332,15 @@ class MainScene extends Phaser.Scene {
         if (!this.enemyBug.anims.isPlaying) {
             this.enemyBug.play('run_enemyBug');
         }
+
+        // 移除这些行，让物理引擎处理位置
+        // const groundTop = this.sys.game.config.height - 50 - this.ground.displayHeight / 2;
+        // this.bug.y = groundTop;
+        // this.enemyBug.y = groundTop;
+
+        // 移除这些行，我们现在使用重力
+        // this.bug.setGravityY(0);
+        // this.enemyBug.setGravityY(0);
 
         // ... 其他更新逻辑 ...
 
@@ -347,6 +352,9 @@ class MainScene extends Phaser.Scene {
         // 添加调试信息
         if (this.questionText && this.answer1Text && this.answer2Text) {
         }
+
+        // 移除地面移动代码
+        // this.ground.tilePositionX += 2;  // 这行被删除
     }
 }
 
