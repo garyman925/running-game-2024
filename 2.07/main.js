@@ -14,60 +14,38 @@ class MainScene extends Phaser.Scene {
         this.qIds = [1, 2, 3];
     }
 
-    preload() {
-        this.load.image('bird', '../assets/bird.png');
-        this.load.spritesheet('bug', '../assets/bug.png', { frameWidth: 190, frameHeight: 170 });
-        this.load.spritesheet('enemyBug', '../assets/enemyBug.png', { frameWidth: 190, frameHeight: 170 });
-        this.load.spritesheet('ground', '../assets/ground.png', { frameWidth: 128, frameHeight: 128 });
-        this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
-        this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
-        this.load.image('bg', '../assets/plant-world-map.jpg');
-        this.load.image('button', '../assets/button.png');
-        this.load.image('tick', '../assets/tick.png');
-        this.load.image('cross', '../assets/cross.png');
-        this.load.image('correct', '../assets/correct.png');
-        this.load.image('wrong', '../assets/wrong.png');
-        this.load.audio('bgm', '../audio/bgm1.mp3');
-        this.load.audio('fail', '../audio/felldown2.wav');
-        this.load.audio('endbgm', '../audio/complete2.mp3');
-        this.load.audio('running', '../audio/run.wav');
-        this.load.audio('aruready', '../audio/aruready.wav');
-        this.load.audio('yeah', '../audio/yeah.mp3');
-        this.load.audio('step', '../audio/step.wav');
-    }
-
     create() {
         // 设置物理系统
         this.physics.world.setBounds(0, 0, this.sys.game.config.width, this.sys.game.config.height);
 
         // 创建背景
         this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
-        
-        // 调整背景图片以适应屏幕，同时保持宽高比
         this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
 
         // 创建地面
-        const groundHeight = 100;
+        const groundHeight = 200;
         this.ground = this.add.tileSprite(
-            this.sys.game.config.width / 2,  // 将 x 坐标设置为屏幕宽度的一半
-            this.sys.game.config.height - groundHeight / 2,  // 调整 y 坐标
-            this.sys.game.config.width,  // 设置宽度为屏幕宽度
+            this.sys.game.config.width / 2,
+            this.sys.game.config.height - groundHeight / 2,
+            this.sys.game.config.width,
             groundHeight,
             'ground'
         );
-        this.physics.add.existing(this.ground, true);  // 添加到物理系统，设置为静态
+        this.ground.setScale(1.5); // 将地面放大 1.5 倍
+        this.physics.add.existing(this.ground, true);
+
+        // 调整地面的物理体积大小以匹配视觉大小
+        this.ground.body.setSize(this.ground.width, this.ground.height / 1.5);
+        this.ground.body.setOffset(0, this.ground.height / 3);
 
         // 创建虫子
-        const groundTop = this.sys.game.config.height - groundHeight;
-        this.bug = this.physics.add.sprite(50, groundTop, 'bug');
-        this.enemyBug = this.physics.add.sprite(30, groundTop, 'enemyBug');
+        const groundTop = this.sys.game.config.height - groundHeight * 1.5;
+        const bugOffset = 100; // 增加虫子穿过地面的程度
+        this.bug = this.physics.add.sprite(50, groundTop + bugOffset, 'bug');
+        this.enemyBug = this.physics.add.sprite(30, groundTop + bugOffset, 'enemyBug');
 
         // 设置虫子属性
         this.setupBugs();
-
-        // 添加碰撞
-        this.physics.add.collider(this.bug, this.ground);
-        this.physics.add.collider(this.enemyBug, this.ground);
 
         // 创建按钮和文本
         this.createButtons();
@@ -88,68 +66,23 @@ class MainScene extends Phaser.Scene {
         // 创建反馈图标
         this.createFeedbackIcons();
 
-        // 创建问题文本
-        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
-            fontSize: '24px',
-            fill: '#ffffff',
-            align: 'center',
-            wordWrap: { width: this.cameras.main.width - 100 }
-        }).setOrigin(0.5);
-
-        // 创建答案按钮和文本
-        this.button1 = this.add.image(this.cameras.main.width * 0.3, this.cameras.main.height * 0.75, 'button')
-            .setInteractive();
-        this.button2 = this.add.image(this.cameras.main.width * 0.7, this.cameras.main.height * 0.75, 'button')
-            .setInteractive();
-
-        this.answer1Text = this.add.text(this.button1.x, this.button1.y, '', {
-            fontSize: '20px',
-            fill: '#000000',
-            align: 'center',
-            wordWrap: { width: this.button1.displayWidth * 0.8 }
-        }).setOrigin(0.5);
-
-        this.answer2Text = this.add.text(this.button2.x, this.button2.y, '', {
-            fontSize: '20px',
-            fill: '#000000',
-            align: 'center',
-            wordWrap: { width: this.button2.displayWidth * 0.8 }
-        }).setOrigin(0.5);
-
-        // 确保文本在按钮之上
-        this.answer1Text.setDepth(1);
-        this.answer2Text.setDepth(1);
-
-        // 设置按钮点击事件
-        this.button1.on('pointerdown', () => this.answer(this.button1));
-        this.button2.on('pointerdown', () => this.answer(this.button2));
-
-        // 初始化游戏
-        this.initializeGame();
-
-        console.log('Answer1 Text:', this.answer1Text);
-        console.log('Answer2 Text:', this.answer2Text);
-
         // 添加得分显示
         this.scoreText = this.add.text(20, 20, 'Score: 0', {
             fontSize: '24px',
             fill: '#ffffff'
         });
 
-        console.log('Button1 size:', this.button1.width, this.button1.height);
-        console.log('Button1 scale:', this.button1.scaleX, this.button1.scaleY);
-        console.log('Button1 position:', this.button1.x, this.button1.y);
-
-        console.log('Question Text:', this.questionText);
-        console.log('Answer1 Text:', this.answer1Text);
-        console.log('Answer2 Text:', this.answer2Text);
+        // 添加碰撞
+        this.physics.add.collider(this.bug, this.ground);
+        this.physics.add.collider(this.enemyBug, this.ground);
     }
 
     setupBugs() {
+        // 设置虫子的物理属性和动画
         [this.bug, this.enemyBug].forEach(bug => {
             bug.setCollideWorldBounds(true);
             bug.setBounce(0.2);
-            bug.setGravityY(300); // 添加一些重力，但不要太大
+            bug.setGravityY(800); // 增加重力，使虫子更快落到地面
 
             this.anims.create({
                 key: 'run_' + bug.texture.key,
@@ -165,14 +98,46 @@ class MainScene extends Phaser.Scene {
             });
 
             bug.play('run_' + bug.texture.key);
-            bug.setScale(0.8);
-            bug.setOrigin(0.5, 1); // 设置原点为底部中心
+            bug.setScale(1); // 稍微缩小虫子
+            bug.setOrigin(0.5, 0.4); // 调整原点，使虫子更多部分穿过地面
         });
     }
 
     createButtons() {
-        // 创按钮和问题文本
-        // ... (保持原有的按钮创建逻辑，但使用 Phaser 3 的方法)
+        // 创建按钮和问题文本
+        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            align: 'center',
+            wordWrap: { width: this.cameras.main.width - 100 }
+        }).setOrigin(0.5);
+
+        this.button1 = this.add.image(this.cameras.main.width * 0.3, this.cameras.main.height * 0.75, 'button')
+            .setInteractive();
+        this.button2 = this.add.image(this.cameras.main.width * 0.7, this.cameras.main.height * 0.75, 'button')
+            .setInteractive();
+
+        this.answer1Text = this.add.text(this.button1.x, this.button1.y, '', {
+            fontSize: '20px',
+            fill: '#ffffff',
+            align: 'center',
+            wordWrap: { width: this.button1.displayWidth * 0.8 }
+        }).setOrigin(0.5);
+
+        this.answer2Text = this.add.text(this.button2.x, this.button2.y, '', {
+            fontSize: '20px',
+            fill: '#ffffff',
+            align: 'center',
+            wordWrap: { width: this.button2.displayWidth * 0.8 }
+        }).setOrigin(0.5);
+
+        // 确保文本在按钮之上
+        this.answer1Text.setDepth(1);
+        this.answer2Text.setDepth(1);
+
+        // 设置按钮点击事件
+        this.button1.on('pointerdown', () => this.answer(this.button1));
+        this.button2.on('pointerdown', () => this.answer(this.button2));
     }
 
     initializeGame() {
@@ -181,13 +146,6 @@ class MainScene extends Phaser.Scene {
         this.enemyBugScore = 0;
         this.collectResult = [];
         this.showNextQuestion();
-    }
-
-    createFeedbackIcons() {
-        this.tick = this.add.image(0, 0, 'tick').setVisible(false).setScale(0.2);
-        this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
-        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
-        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
     }
 
     showNextQuestion() {
@@ -206,11 +164,6 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        if (!this.questionText || !this.answer1Text || !this.answer2Text) {
-            console.error('Text objects not initialized');
-            return;
-        }
-
         this.questionText.setText(question);
         
         if (Math.random() < 0.5) {
@@ -222,16 +175,38 @@ class MainScene extends Phaser.Scene {
             this.answer2Text.setText(answers[0]);
             this.correctAnswer = this.button2;
         }
+    }
 
-        // 确保文本可见
-        this.questionText.setVisible(true);
-        this.answer1Text.setVisible(true);
-        this.answer2Text.setVisible(true);
+    endGame() {
+        console.log("Game Over. Score: " + score);
+        console.log("Questions: " + JSON.stringify(this.qIds));
+        console.log("User Answers: " + JSON.stringify(this.collectResult));
+        this.scene.start('EndScene');
+    }
 
-        console.log('Question:', question);
-        console.log('Answers:', answers);
-        console.log('Answer1Text:', this.answer1Text.text);
-        console.log('Answer2Text:', this.answer2Text.text);
+    update() {
+        // 确保虫子始终部分穿过地面
+        const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
+        const bugOffset = 100; // 与创建虫子时使用相同的值
+        const maxY = groundTop + bugOffset;
+
+        if (this.bug.y > maxY) {
+            this.bug.y = maxY;
+            this.bug.setVelocityY(0);
+        }
+        if (this.enemyBug.y > maxY) {
+            this.enemyBug.y = maxY;
+            this.enemyBug.setVelocityY(0);
+        }
+
+        // ... 其他更新逻辑 ...
+    }
+
+    createFeedbackIcons() {
+        this.tick = this.add.image(0, 0, 'tick').setVisible(false).setScale(0.2);
+        this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
+        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
+        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
     }
 
     answer(button) {
@@ -269,7 +244,7 @@ class MainScene extends Phaser.Scene {
         this.correct.setVisible(true);
         this.yeah.play();
 
-        // 2秒后藏反馈
+        // 2秒后隐藏反馈
         this.time.delayedCall(2000, () => {
             this.tick.setVisible(false);
             this.correct.setVisible(false);
@@ -311,50 +286,6 @@ class MainScene extends Phaser.Scene {
             ease: 'Power2'
         });
         this.running.play();
-    }
-
-    endGame() {
-        console.log("Game Over. Score: " + score);
-        console.log("Questions: " + JSON.stringify(qIds));
-        console.log("User Answers: " + JSON.stringify(this.collectResult));
-        this.scene.start('EndScene');
-    }
-
-    update() {
-        // 移除这些行，让物理引擎处理碰撞
-        // this.physics.collide(this.bug, this.ground);
-        // this.physics.collide(this.enemyBug, this.ground);
-
-        // 确保虫子始终在运行动画
-        if (!this.bug.anims.isPlaying) {
-            this.bug.play('run_bug');
-        }
-        if (!this.enemyBug.anims.isPlaying) {
-            this.enemyBug.play('run_enemyBug');
-        }
-
-        // 移除这些行，让物理引擎处理位置
-        // const groundTop = this.sys.game.config.height - 50 - this.ground.displayHeight / 2;
-        // this.bug.y = groundTop;
-        // this.enemyBug.y = groundTop;
-
-        // 移除这些行，我们现在使用重力
-        // this.bug.setGravityY(0);
-        // this.enemyBug.setGravityY(0);
-
-        // ... 其他更新逻辑 ...
-
-        // 移除不必要的控制台日志，以提高性能
-        // 只在调试时使用控制台日志
-        // console.log('Answer1 visible:', this.answer1Text.visible, 'text:', this.answer1Text.text);
-        // console.log('Answer2 visible:', this.answer2Text.visible, 'text:', this.answer2Text.text);
-
-        // 添加调试信息
-        if (this.questionText && this.answer1Text && this.answer2Text) {
-        }
-
-        // 移除地面移动代码
-        // this.ground.tilePositionX += 2;  // 这行被删除
     }
 }
 
