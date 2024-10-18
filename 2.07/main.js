@@ -45,7 +45,7 @@ class MainScene extends Phaser.Scene {
         this.ground.setScale(1.5); // 将地面放大 1.5 倍
         this.physics.add.existing(this.ground, true);
 
-        // 调整地面的物理体积大小以匹配视觉大小
+        // 调整地面的物��体积大小以匹配视觉大小
         this.ground.body.setSize(this.ground.width, this.ground.height / 1.5);
         this.ground.body.setOffset(0, this.ground.height / 3);
 
@@ -79,7 +79,9 @@ class MainScene extends Phaser.Scene {
 
         // 添加得分显示
         this.scoreText = this.add.text(20, 20, 'Score: 0', {
+            fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '24px',
+            fontWeight: 'bold',
             fill: '#ffffff'
         });
 
@@ -117,11 +119,16 @@ class MainScene extends Phaser.Scene {
     createButtons() {
         // 创建按钮和问题文本
         this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
-            fontSize: '24px',
+            fontFamily: '"IM Fell DW Pica", serif',
+            fontSize: '70px',
+            fontWeight: 'bold',
             fill: '#ffffff',
             align: 'center',
             wordWrap: { width: this.cameras.main.width - 100 }
         }).setOrigin(0.5);
+
+        // 添加阴影效果
+        this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
         this.button1 = this.add.image(this.cameras.main.width * 0.3, this.cameras.main.height * 0.75, 'button')
             .setInteractive();
@@ -129,14 +136,18 @@ class MainScene extends Phaser.Scene {
             .setInteractive();
 
         this.answer1Text = this.add.text(this.button1.x, this.button1.y, '', {
+            fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '20px',
+            fontWeight: 'bold',
             fill: '#ffffff',
             align: 'center',
             wordWrap: { width: this.button1.displayWidth * 0.8 }
         }).setOrigin(0.5);
 
         this.answer2Text = this.add.text(this.button2.x, this.button2.y, '', {
+            fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '20px',
+            fontWeight: 'bold',
             fill: '#ffffff',
             align: 'center',
             wordWrap: { width: this.button2.displayWidth * 0.8 }
@@ -175,17 +186,33 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        this.questionText.setText(question);
-        
-        if (Math.random() < 0.5) {
-            this.answer1Text.setText(answers[0]);
-            this.answer2Text.setText(answers[1]);
-            this.correctAnswer = this.button1;
-        } else {
-            this.answer1Text.setText(answers[1]);
-            this.answer2Text.setText(answers[0]);
-            this.correctAnswer = this.button2;
+        // 确保问题以问号结尾
+        if (!question.endsWith('?')) {
+            question += '?';
         }
+
+        // 清空问题文本
+        this.questionText.setText('');
+        
+        // 使用打字机效果显示问题
+        this.typewriterEffect(this.questionText, question);
+        
+        // 延迟显示答案，等待问题完全显示
+        this.time.delayedCall(question.length * 50 + 500, () => {
+            if (Math.random() < 0.5) {
+                this.answer1Text.setText(answers[0]);
+                this.answer2Text.setText(answers[1]);
+                this.correctAnswer = this.button1;
+            } else {
+                this.answer1Text.setText(answers[1]);
+                this.answer2Text.setText(answers[0]);
+                this.correctAnswer = this.button2;
+            }
+            
+            // 启用按钮交互
+            this.button1.setInteractive();
+            this.button2.setInteractive();
+        });
     }
 
     endGame() {
@@ -245,7 +272,7 @@ class MainScene extends Phaser.Scene {
         // 记录答案
         this.collectResult.push(button === this.correctAnswer ? 0 : 1);
 
-        // 延迟后显示下一个问题
+        // 延迟后显下一个问题
         this.time.delayedCall(2000, () => {
             this.showNextQuestion();
             this.button1.setInteractive();
@@ -300,6 +327,19 @@ class MainScene extends Phaser.Scene {
             ease: 'Power2'
         });
         this.running.play();
+    }
+
+    typewriterEffect(text, targetText) {
+        const length = targetText.length;
+        let i = 0;
+        this.time.addEvent({
+            callback: () => {
+                text.setText(targetText.slice(0, i + 1));  // 改为 i + 1
+                ++i;
+            },
+            repeat: length - 1,
+            delay: 50 // 你可以调整这个值来改变打字速度
+        });
     }
 }
 
