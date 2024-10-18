@@ -11,6 +11,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
 		this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
 		this.load.image('bg', '../assets/space-map-bg.png');
+		this.load.image('midGround', '../assets/space-map-mid-ground.png');
 		this.load.image('button', '../assets/button.png');
 		this.load.image('tick', '../assets/tick.png');
 		this.load.image('cross', '../assets/cross.png');

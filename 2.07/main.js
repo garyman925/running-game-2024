@@ -22,6 +22,17 @@ class MainScene extends Phaser.Scene {
         this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
         this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
 
+        // 创建中层背景
+        this.midGround = this.add.tileSprite(
+            this.sys.game.config.width / 2,
+            this.sys.game.config.height - 180, // 调整这个值以改变中层背景的垂直位置
+            this.sys.game.config.width,
+            200, // 调整这个值以改变中层背景的高度
+            'midGround'
+        );
+        this.midGround.setOrigin(0.5, 1);
+        this.midGround.setScale(1.2); // 调整这个值以改变中层背景的缩放
+
         // 创建地面
         const groundHeight = 200;
         this.ground = this.add.tileSprite(
@@ -198,6 +209,9 @@ class MainScene extends Phaser.Scene {
             this.enemyBug.y = maxY;
             this.enemyBug.setVelocityY(0);
         }
+
+        // 移动中层背景以创造视差效果
+        this.midGround.tilePositionX += 0.5; // 调整这个值以改变移动速度
 
         // ... 其他更新逻辑 ...
     }
