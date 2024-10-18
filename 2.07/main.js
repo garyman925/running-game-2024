@@ -28,7 +28,7 @@ class MainScene extends Phaser.Scene {
         this.darkMask.setOrigin(0, 0);
         this.darkMask.setDepth(1);
 
-        // 创建中层背景
+        // 创建中背景
         this.midGround = this.add.tileSprite(
             this.sys.game.config.width / 2,
             this.sys.game.config.height - 180,
@@ -88,12 +88,13 @@ class MainScene extends Phaser.Scene {
         this.createFeedbackIcons();
 
         // 添加得分显示
-        this.scoreText = this.add.text(20, 20, 'Score: 0', {
-            fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '24px',
-            fontWeight: 'bold',
+        this.scoreText = this.add.text(this.sys.game.config.width / 2, 60, 'Your Score: 0', {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '30px',
             fill: '#ffffff'
-        });
+        }).setOrigin(0.5, 0.5);  // 设置原点为中心
+        this.scoreText.setDepth(6);
+        this.scoreText.setPadding(0, 15, 0, 0);
 
         // 添加碰撞
         this.physics.add.collider(this.bug, this.ground);
@@ -270,7 +271,7 @@ class MainScene extends Phaser.Scene {
         // 移动中层背景以创造视差效果
         this.midGround.tilePositionX += 0.5; // 调整这个值以改变移动速度
 
-        // 持续检查问题文本的可见性
+        // 持续检查问题文的可见性
         if (this.questionText) {
             console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
         }
@@ -299,13 +300,12 @@ class MainScene extends Phaser.Scene {
         if (button === this.correctAnswer) {
             // 正确答案的处理
             console.log("正确答案！");
-            score++;
-            this.scoreText.setText('得分: ' + score);
+            this.updateScore(score + 1);
             this.showCorrectFeedback(button);
             this.moveBugForward();
         } else {
             // 错误答案的处理
-            console.log("错误答案！");
+            console.log("错误案！");
             this.showWrongFeedback(button);
             this.moveEnemyBugForward();
         }
@@ -380,6 +380,46 @@ class MainScene extends Phaser.Scene {
             },
             repeat: length - 1,
             delay: 50 // 你可以调整这个值来改变打字速度
+        });
+    }
+
+    updateScore(newScore) {
+        score = newScore;
+        this.scoreText.setText('Your Score: ' + score);
+        
+        // 添加缩放动画
+        this.tweens.add({
+            targets: this.scoreText,
+            scale: 1.3,
+            duration: 200,
+            yoyo: true,
+            ease: 'Quad.easeInOut',
+            onComplete: () => {
+                this.scoreText.setScale(1);
+            }
+        });
+
+        // 添加颜色变化动画
+        this.tweens.addCounter({
+            from: 0,
+            to: 100,
+            duration: 200,
+            onUpdate: (tween) => {
+                const value = Math.floor(tween.getValue());
+                this.scoreText.setColor(`rgb(255, ${255 - value}, ${255 - value})`);
+            },
+            onComplete: () => {
+                this.scoreText.setColor('#ffffff');
+            }
+        });
+
+        // 添加上下移动动画
+        this.tweens.add({
+            targets: this.scoreText,
+            y: 50,  // 稍微向上移动
+            duration: 100,
+            yoyo: true,
+            ease: 'Quad.easeInOut'
         });
     }
 }
