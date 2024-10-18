@@ -22,7 +22,7 @@ class MainScene extends Phaser.Scene {
         this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
         this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
         this.load.image('bg', '../assets/bg4.png');
-        this.load.image('button', '../assets/button1.png');
+        this.load.image('button', '../assets/button.png');
         this.load.image('tick', '../assets/tick.png');
         this.load.image('cross', '../assets/cross.png');
         this.load.image('correct', '../assets/correct.png');
@@ -90,34 +90,31 @@ class MainScene extends Phaser.Scene {
         this.createFeedbackIcons();
 
         // 创建问题文本
-        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, '', {
+        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
             fontSize: '24px',
             fill: '#ffffff',
             align: 'center',
             wordWrap: { width: this.cameras.main.width - 100 }
         }).setOrigin(0.5);
 
-        // 创建答案按钮
+        // 创建答案按钮和文本
         this.button1 = this.add.image(this.cameras.main.width * 0.3, this.cameras.main.height * 0.75, 'button')
-            .setInteractive()
-            .setScale(0.5);
+            .setInteractive();
         this.button2 = this.add.image(this.cameras.main.width * 0.7, this.cameras.main.height * 0.75, 'button')
-            .setInteractive()
-            .setScale(0.5);
+            .setInteractive();
 
-        // 创建答案文本
         this.answer1Text = this.add.text(this.button1.x, this.button1.y, '', {
             fontSize: '20px',
             fill: '#000000',
             align: 'center',
-            wordWrap: { width: this.button1.width * 0.8 }
+            wordWrap: { width: this.button1.displayWidth * 0.8 }
         }).setOrigin(0.5);
 
         this.answer2Text = this.add.text(this.button2.x, this.button2.y, '', {
             fontSize: '20px',
             fill: '#000000',
             align: 'center',
-            wordWrap: { width: this.button2.width * 0.8 }
+            wordWrap: { width: this.button2.displayWidth * 0.8 }
         }).setOrigin(0.5);
 
         // 确保文本在按钮之上
@@ -131,6 +128,20 @@ class MainScene extends Phaser.Scene {
         // 初始化游戏
         this.initializeGame();
 
+        console.log('Answer1 Text:', this.answer1Text);
+        console.log('Answer2 Text:', this.answer2Text);
+
+        // 添加得分显示
+        this.scoreText = this.add.text(20, 20, 'Score: 0', {
+            fontSize: '24px',
+            fill: '#ffffff'
+        });
+
+        console.log('Button1 size:', this.button1.width, this.button1.height);
+        console.log('Button1 scale:', this.button1.scaleX, this.button1.scaleY);
+        console.log('Button1 position:', this.button1.x, this.button1.y);
+
+        console.log('Question Text:', this.questionText);
         console.log('Answer1 Text:', this.answer1Text);
         console.log('Answer2 Text:', this.answer2Text);
     }
@@ -162,7 +173,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createButtons() {
-        // 创建按钮和问题文本
+        // 创按钮和问题文本
         // ... (保持原有的按钮创建逻辑，但使用 Phaser 3 的方法)
     }
 
@@ -197,34 +208,32 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        if (this.questionText) {
-            this.questionText.setText(question);
-        } else {
-            console.error('questionText is not defined');
+        if (!this.questionText || !this.answer1Text || !this.answer2Text) {
+            console.error('Text objects not initialized');
+            return;
         }
 
-        if (this.answer1Text && this.answer2Text) {
-            if (Math.random() < 0.5) {
-                this.answer1Text.setText(answers[0]);
-                this.answer2Text.setText(answers[1]);
-                this.correctAnswer = this.button1;
-            } else {
-                this.answer1Text.setText(answers[1]);
-                this.answer2Text.setText(answers[0]);
-                this.correctAnswer = this.button2;
-            }
-
-            // 确保文本更新并可见
-            this.answer1Text.setVisible(true);
-            this.answer2Text.setVisible(true);
+        this.questionText.setText(question);
+        
+        if (Math.random() < 0.5) {
+            this.answer1Text.setText(answers[0]);
+            this.answer2Text.setText(answers[1]);
+            this.correctAnswer = this.button1;
         } else {
-            console.error('answer1Text or answer2Text is not defined');
+            this.answer1Text.setText(answers[1]);
+            this.answer2Text.setText(answers[0]);
+            this.correctAnswer = this.button2;
         }
+
+        // 确保文本可见
+        this.questionText.setVisible(true);
+        this.answer1Text.setVisible(true);
+        this.answer2Text.setVisible(true);
 
         console.log('Question:', question);
         console.log('Answers:', answers);
-        console.log('Answer1Text:', this.answer1Text ? this.answer1Text.text : 'undefined');
-        console.log('Answer2Text:', this.answer2Text ? this.answer2Text.text : 'undefined');
+        console.log('Answer1Text:', this.answer1Text.text);
+        console.log('Answer2Text:', this.answer2Text.text);
     }
 
     answer(button) {
@@ -236,10 +245,11 @@ class MainScene extends Phaser.Scene {
             // 正确答案的处理
             console.log("Correct answer!");
             score++;
+            this.scoreText.setText('Score: ' + score);
             this.showCorrectFeedback(button);
             this.moveBugForward();
         } else {
-            // 错误答案的处理
+            //误答案的处理
             console.log("Wrong answer!");
             this.showWrongFeedback(button);
             this.moveEnemyBugForward();
@@ -294,10 +304,13 @@ class MainScene extends Phaser.Scene {
 
         // ... 其他更新逻辑 ...
 
+        // 移除不必要的控制台日志，以提高性能
+        // 只在调试时使用控制台日志
+        // console.log('Answer1 visible:', this.answer1Text.visible, 'text:', this.answer1Text.text);
+        // console.log('Answer2 visible:', this.answer2Text.visible, 'text:', this.answer2Text.text);
+
         // 添加调试信息
-        if (this.answer1Text && this.answer2Text) {
-            console.log('Answer1 visible:', this.answer1Text.visible, 'text:', this.answer1Text.text);
-            console.log('Answer2 visible:', this.answer2Text.visible, 'text:', this.answer2Text.text);
+        if (this.questionText && this.answer1Text && this.answer2Text) {
         }
     }
 }
