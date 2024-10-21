@@ -282,7 +282,7 @@ class MainScene extends Phaser.Scene {
         // 更新陨石效果
         this.updateMeteors();
 
-        // ... 其他更新逻辑 ...
+        // ... 其��更新逻辑 ...
     }
 
     createFeedbackIcons() {
@@ -309,9 +309,10 @@ class MainScene extends Phaser.Scene {
             this.updateScore(score + 1);
             this.showCorrectFeedback(button);
             this.moveBugForward();
+            this.createStarEffect();  // 添加星星特效
         } else {
             // 错误答案的处理
-            console.log("错误案！");
+            console.log("错误答案！");
             this.showWrongFeedback(button);
             this.moveEnemyBugForward();
         }
@@ -451,6 +452,54 @@ class MainScene extends Phaser.Scene {
 
     updateMeteors() {
         // 可以在这里添加额外的更新逻辑，如果需要的话
+    }
+
+    createStarEffect() {
+        const star = this.add.image(this.bug.x, this.bug.y + 50, 'star').setScale(0);
+        star.setDepth(10);  // 确保星星在最上层
+        star.setBlendMode(Phaser.BlendModes.ADD);  // 设置混合模式为ADD
+
+        // 第一阶段：星星从角色底部升起
+        this.tweens.add({
+            targets: star,
+            y: this.bug.y - 70,  // 升到头顶略高位置
+            scale: 1.5,
+            duration: 500,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                // 第二阶段：星星在头顶停留并轻微放大缩小
+                this.tweens.add({
+                    targets: star,
+                    scale: 2,
+                    duration: 500,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => {
+                        // 第三阶段：星星飞向得分文本
+                        this.tweens.add({
+                            targets: star,
+                            x: this.scoreText.x,
+                            y: this.scoreText.y,
+                            scale: 0.1,
+                            alpha: { from: 1, to: 0.6 },
+                            duration: 1000,
+                            ease: 'Cubic.easeOut',
+                            onComplete: () => {
+                                star.destroy();
+                                // 添加得分文本的缩放效果
+                                this.tweens.add({
+                                    targets: this.scoreText,
+                                    scale: 1.2,
+                                    duration: 200,
+                                    yoyo: true
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 }
 
