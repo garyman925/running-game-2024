@@ -4,14 +4,32 @@ class MainScene extends Phaser.Scene {
         this.questions = [
             "What is the capital of France?",
             "Which planet is known as the Red Planet?",
-            "What is the largest mammal in the world?"
+            "What is the largest mammal in the world?",
+            "What is the smallest country in the world?",
+            "What is the currency of Japan?",
+            "Who wrote 'Romeo and Juliet'?",
+            "What is the boiling point of water?",
+            "Which gas do plants absorb from the atmosphere?",
+            "What is the hardest natural substance on Earth?",
+            "Who painted the Mona Lisa?"
         ];
         this.answers = [
             ["Paris", "London"],
             ["Mars", "Venus"],
-            ["Blue Whale", "African Elephant"]
+            ["Blue Whale", "African Elephant"],
+            ["Vatican City", "Monaco"],
+            ["Yen", "Won"],
+            ["William Shakespeare", "Charles Dickens"],
+            ["100 degrees Celsius", "90 degrees Celsius"],
+            ["Carbon Dioxide", "Oxygen"],
+            ["Diamond", "Gold"],
+            ["Leonardo da Vinci", "Pablo Picasso"]
         ];
-        this.qIds = [1, 2, 3];
+        this.qIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        this.initialMidGroundSpeed = 0.8;  // 增加初始速度
+        this.maxMidGroundSpeed = 3.0;  // 增加最大速度
+        this.currentQuestionIndex = 0;
+        this.meteorEmitter = null;
     }
 
     create() {
@@ -115,6 +133,8 @@ class MainScene extends Phaser.Scene {
         // 创建玩家旗子，但初始设置为不可见
         this.createPlayerFlag();
         this.playerFlag.setVisible(false);
+
+        this.midGroundSpeed = this.initialMidGroundSpeed;
     }
 
     setupBugs() {
@@ -205,14 +225,15 @@ class MainScene extends Phaser.Scene {
     }
 
     showNextQuestion() {
-        if (this.totalQuestion < this.questions.length) {
-            let q = this.questions[this.totalQuestion];
-            let a = this.answers[this.totalQuestion];
+        if (this.currentQuestionIndex < this.questions.length) {
+            let q = this.questions[this.currentQuestionIndex];
+            let a = this.answers[this.currentQuestionIndex];
             if (q && a) {
                 this.showQuestion(q, a);
-                this.totalQuestion++;
+                this.currentQuestionIndex++;
+                this.updateGameSpeed();
             } else {
-                console.error('Question or answer is undefined', this.totalQuestion);
+                console.error('Question or answer is undefined', this.currentQuestionIndex);
             }
         } else {
             this.endGame();
@@ -220,7 +241,7 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        // 确保问题以问号结尾
+        // 确保问以问号结尾
         if (!question.endsWith('?')) {
             question += '?';
         }
@@ -276,11 +297,11 @@ class MainScene extends Phaser.Scene {
         }
 
         // 移动中层背景以创造视差效果
-        this.midGround.tilePositionX += 0.5; // 调整这个值以改变移动速度
+        this.midGround.tilePositionX += this.midGroundSpeed;
 
         // 持续检查问题文的可见性
         if (this.questionText) {
-            console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
+            //console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
         }
 
         // 更新陨石效果
@@ -449,20 +470,20 @@ class MainScene extends Phaser.Scene {
         this.meteorParticles = this.add.particles('meteor');
 
         this.meteorEmitter = this.meteorParticles.createEmitter({
-            x: { min: 0, max: this.sys.game.config.width },  // 在整个屏幕宽度范围内生成
-            y: -50,  // 从屏幕顶部稍微上方开始
-            speedX: { min: -150, max: -100 },  // 向左移动，速度稍微减小
-            speedY: { min: 100, max: 150 },    // 向下移动
-            scale: { min: 0.1, max: 0.6 },     // 随机大小，围从0.2到0.5
-            alpha: { start: 1, end: 0 },     // 保持透明度变化
-            lifespan: { min: 4000, max: 8000 },// 增加生命周期，确保陨石有足够时间穿过屏幕
+            x: { min: 0, max: this.sys.game.config.width },
+            y: -50,
+            speedX: { min: -150, max: -100 },  // 固定的水平速度
+            speedY: { min: 100, max: 150 },    // 固定的垂直速度
+            scale: { min: 0.1, max: 0.6 },
+            alpha: { start: 1, end: 0 },
+            lifespan: { min: 4000, max: 8000 },
             quantity: 1,
-            frequency: 500,  // 每0.5秒生成一个陨石
+            frequency: 500,  // 固定的生成频率
             blendMode: 'ADD',
-            rotate: 0  // 保持固定角度，不旋转
+            rotate: 0
         });
 
-        this.meteorParticles.setDepth(1);  // 保持深度设置
+        this.meteorParticles.setDepth(1);
     }
 
     updateMeteors() {
@@ -502,7 +523,7 @@ class MainScene extends Phaser.Scene {
                             ease: 'Cubic.easeOut',
                             onComplete: () => {
                                 star.destroy();
-                                // 添加得分文本的缩放效果
+                                // 添加得分本的缩放效果
                                 this.tweens.add({
                                     targets: this.scoreText,
                                     scale: 1.2,
@@ -542,6 +563,40 @@ class MainScene extends Phaser.Scene {
         // 3秒后隐藏旗子
         this.time.delayedCall(3000, () => {
             this.playerFlag.setVisible(false);
+        });
+    }
+
+    updateGameSpeed() {
+        // 使用指数函数来计算新的中层背景速度，这会使速度增加更快
+        let progress = this.currentQuestionIndex / this.questions.length;
+        this.midGroundSpeed = this.initialMidGroundSpeed + (this.maxMidGroundSpeed - this.initialMidGroundSpeed) * Math.pow(progress, 5);
+
+        // 更频繁地显示速度提示
+        if (this.currentQuestionIndex > 1 && this.currentQuestionIndex % 2 === 0) {  // 每两个问题显示一次
+            this.showSpeedUpText();
+        }
+
+        // 陨石速度和频率保持不变
+        // 如果你想在游戏开始时设置陨石的速度和频率，可以在 createMeteors 方法中进行设置
+    }
+
+    showSpeedUpText() {
+        let speedUpText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'Speed Up!', {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '40px',
+            fill: '#ff0000'
+        }).setOrigin(0.5).setDepth(10).setAlpha(0);
+
+        this.tweens.add({
+            targets: speedUpText,
+            alpha: 1,
+            y: this.sys.game.config.height / 2 - 50,
+            duration: 500,
+            ease: 'Power2',
+            yoyo: true,
+            onComplete: () => {
+                speedUpText.destroy();
+            }
         });
     }
 }
