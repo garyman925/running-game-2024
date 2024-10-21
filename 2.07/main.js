@@ -84,15 +84,15 @@ class MainScene extends Phaser.Scene {
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
         const bugOffset = 120; // 增加偏移量以适应更大的 bug
-        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 20, 'bug');
-        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug');
+        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 40, 'bug'); // 将主角虫子稍微提高
+        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
         // 设置虫子属性
         this.setupBugs();
 
-        // 创建按钮和文本
+        // 创建钮和文本
         this.createButtons();
  
         // 初始化游戏数据
@@ -332,19 +332,20 @@ class MainScene extends Phaser.Scene {
     update() {
         // 确保虫子始终部分穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
-        const bugOffset = 100; // 与创建子时使用相同的值
-        const maxY = groundTop + bugOffset;
+        const bugOffset = 120; // 与创建虫子时使用相同的值
+        const maxYBug = groundTop + bugOffset - 40;
+        const maxYEnemyBug = groundTop + bugOffset + 20;
 
-        if (this.bug.y > maxY) {
-            this.bug.y = maxY;
+        if (this.bug.y > maxYBug) {
+            this.bug.y = maxYBug;
             this.bug.setVelocityY(0);
         }
-        if (this.enemyBug.y > maxY) {
-            this.enemyBug.y = maxY;
+        if (this.enemyBug.y > maxYEnemyBug) {
+            this.enemyBug.y = maxYEnemyBug;
             this.enemyBug.setVelocityY(0);
         }
 
-        // 移动中层背景以创造视差��果
+        // 移动中层背景以创造视差果
         this.midGround.tilePositionX += this.midGroundSpeed;
 
         // 移动地面
@@ -392,7 +393,7 @@ class MainScene extends Phaser.Scene {
     }
 
     answer(button) {
-        // 禁用按钮，防止多次点击
+        // 禁用钮，防止多次点击
         this.button1.disableInteractive();
         this.button2.disableInteractive();
 
@@ -457,8 +458,8 @@ class MainScene extends Phaser.Scene {
     moveBugForward() {
         this.tweens.add({
             targets: this.bug,
-            x: this.bug.x + 80, // 增加移动距离
-            y: this.bug.y - 15, // 稍微增加向上移动的距离
+            x: this.bug.x + 80,
+            y: this.bug.y - 15, // 保持向上移动
             duration: 1000,
             ease: 'Power2'
         });
@@ -468,8 +469,8 @@ class MainScene extends Phaser.Scene {
     moveEnemyBugForward() {
         this.tweens.add({
             targets: this.enemyBug,
-            x: this.enemyBug.x + 40, // 稍微慢一些
-            y: this.enemyBug.y + 10, // 稍微向下移动
+            x: this.enemyBug.x + 40,
+            y: this.enemyBug.y + 5, // 稍微向下移动，但幅度减小
             duration: 1000,
             ease: 'Power2'
         });
@@ -665,7 +666,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 设置飞龙的固定位置，例如屏幕度的3/4处
+        // 设置飞龙的固定位��，例如屏幕度的3/4处
         const dragonX = this.sys.game.config.width * 3 / 4;
         
         this.dragon = this.add.image(dragonX, this.sys.game.config.height / 2, 'dragon');
