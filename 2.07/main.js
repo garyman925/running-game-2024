@@ -108,6 +108,9 @@ class MainScene extends Phaser.Scene {
         this.answer2Text.setDepth(6);
         this.scoreText.setDepth(6);
         this.wrong.setDepth(7);  // 将 "you are wrong" 显示设置为最高深度
+
+        // 创建陨石粒子系统
+        this.createMeteors();
     }
 
     setupBugs() {
@@ -276,6 +279,9 @@ class MainScene extends Phaser.Scene {
             console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
         }
 
+        // 更新陨石效果
+        this.updateMeteors();
+
         // ... 其他更新逻辑 ...
     }
 
@@ -422,6 +428,30 @@ class MainScene extends Phaser.Scene {
             ease: 'Quad.easeInOut'
         });
     }
+
+    createMeteors() {
+        this.meteorParticles = this.add.particles('meteor');
+
+        this.meteorEmitter = this.meteorParticles.createEmitter({
+            x: { min: 0, max: this.sys.game.config.width },  // 在整个屏幕宽度范围内生成
+            y: -50,  // 从屏幕顶部稍微上方开始
+            speedX: { min: -150, max: -100 },  // 向左移动，速度稍微减小
+            speedY: { min: 100, max: 150 },    // 向下移动
+            scale: { start: 0.4, end: 0.2 },   // 保持大小变化
+            alpha: { start: 1, end: 0.8 },     // 保持透明度变化
+            lifespan: { min: 4000, max: 8000 },// 增加生命周期，确保陨石有足够时间穿过屏幕
+            quantity: 1,
+            frequency: 500,  // 每0.5秒生成一个陨石，增加数量
+            blendMode: 'ADD',
+            rotate: 0  // 不旋转，保持原有角度
+        });
+
+        this.meteorParticles.setDepth(1);  // 保持深度设置
+    }
+
+    updateMeteors() {
+        // 可以在这里添加额外的更新逻辑，如果需要的话
+    }
 }
 
 // 全局变量
@@ -442,3 +472,4 @@ var answers = [
     ["Mars", "Venus"],
     ["Blue Whale", "African Elephant"]
 ];
+

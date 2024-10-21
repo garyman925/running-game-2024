@@ -24,6 +24,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio('aruready', '../audio/aruready.wav');
 		this.load.audio('yeah', '../audio/yeah.mp3');
 		this.load.audio('step', '../audio/step.wav');
+		this.load.image('meteor', '../assets/meteor-3.png');  // 添加这行
 	}
 
 	create() {
