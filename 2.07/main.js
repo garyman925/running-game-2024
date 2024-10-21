@@ -83,9 +83,9 @@ class MainScene extends Phaser.Scene {
 
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
-        const bugOffset = 100; // 增加虫子穿过地面的程度
-        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 20, 'bug'); // 稍微提高位置
-        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug'); // 稍微降低位置
+        const bugOffset = 120; // 增加偏移量以适应更大的 bug
+        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 20, 'bug');
+        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug');
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
@@ -145,29 +145,50 @@ class MainScene extends Phaser.Scene {
     }
 
     setupBugs() {
-        // 设置虫子的物理属性和动画
-        [this.bug, this.enemyBug].forEach(bug => {
-            bug.setCollideWorldBounds(true);
-            bug.setBounce(0.2);
-            bug.setGravityY(800); // 增加重力，使虫子更快落到地面
+        // 设置 bug 的动画
+        this.bug.setCollideWorldBounds(true);
+        this.bug.setBounce(0.2);
+        this.bug.setGravityY(800);
 
-            this.anims.create({
-                key: 'run_' + bug.texture.key,
-                frames: this.anims.generateFrameNumbers(bug.texture.key, { start: 1, end: 4 }),
-                frameRate: 15,
-                repeat: -1
-            });
-
-            this.anims.create({
-                key: 'fail_' + bug.texture.key,
-                frames: [{ key: bug.texture.key, frame: 9 }],
-                frameRate: 15
-            });
-
-            bug.play('run_' + bug.texture.key);
-            bug.setScale(1); // 稍微缩小虫子
-            bug.setOrigin(0.5, 0.4); // 调整原点，使虫子更多部分穿过地面
+        this.anims.create({
+            key: 'run_bug',
+            frames: this.anims.generateFrameNumbers('bugRun', { start: 0, end: 10 }),
+            frameRate: 15,
+            repeat: -1
         });
+
+        this.anims.create({
+            key: 'action_bug',
+            frames: this.anims.generateFrameNumbers('bugAction', { start: 0, end: 6 }),
+            frameRate: 15,
+            repeat: 0
+        });
+
+        this.bug.play('run_bug');
+        this.bug.setScale(0.8); // 将缩放比例从 0.5 增加到 0.8
+        this.bug.setOrigin(0.5, 0.4);
+
+        // enemyBug 的设置保持不变
+        this.enemyBug.setCollideWorldBounds(true);
+        this.enemyBug.setBounce(0.2);
+        this.enemyBug.setGravityY(800);
+
+        this.anims.create({
+            key: 'run_enemyBug',
+            frames: this.anims.generateFrameNumbers('enemyBug', { start: 1, end: 4 }),
+            frameRate: 15,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'fail_enemyBug',
+            frames: [{ key: 'enemyBug', frame: 9 }],
+            frameRate: 15
+        });
+
+        this.enemyBug.play('run_enemyBug');
+        this.enemyBug.setScale(1);
+        this.enemyBug.setOrigin(0.5, 0.4);
     }
 
     createButtons() {
@@ -291,7 +312,7 @@ class MainScene extends Phaser.Scene {
     update() {
         // 确保虫子始终部分穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
-        const bugOffset = 100; // 与创建虫子时使用相同的值
+        const bugOffset = 100; // 与创建���子时使用相同的值
         const maxY = groundTop + bugOffset;
 
         if (this.bug.y > maxY) {
@@ -415,8 +436,8 @@ class MainScene extends Phaser.Scene {
     moveBugForward() {
         this.tweens.add({
             targets: this.bug,
-            x: this.bug.x + 50,
-            y: this.bug.y - 10, // 稍微向上移动
+            x: this.bug.x + 80, // 增加移动距离
+            y: this.bug.y - 15, // 稍微增加向上移动的距离
             duration: 1000,
             ease: 'Power2'
         });
@@ -623,7 +644,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 设置飞龙的固定位置，例如屏幕宽度的3/4处
+        // 设置飞龙的固定位置，例如屏幕度的3/4处
         const dragonX = this.sys.game.config.width * 3 / 4;
         
         this.dragon = this.add.image(dragonX, this.sys.game.config.height / 2, 'dragon');

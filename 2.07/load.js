@@ -5,7 +5,18 @@ class LoadScene extends Phaser.Scene {
 
 	preload() {
 		this.load.image('bird', '../assets/bird.png');
-		this.load.spritesheet('bug', '../assets/bug.png', { frameWidth: 190, frameHeight: 170 });
+		this.load.spritesheet('bugRun', '../assets/bugbug-running.png', { 
+			frameWidth: 170, 
+			frameHeight: 247, 
+			startFrame: 0, 
+			endFrame: 10 
+		});
+		this.load.spritesheet('bugAction', '../assets/bug.png', { 
+			frameWidth: 240, 
+			frameHeight: 247, 
+			startFrame: 13, 
+			endFrame: 19 
+		});
 		this.load.spritesheet('enemyBug', '../assets/enemyBug.png', { frameWidth: 190, frameHeight: 170 });
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
 		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
