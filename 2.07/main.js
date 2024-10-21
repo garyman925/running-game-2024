@@ -112,8 +112,9 @@ class MainScene extends Phaser.Scene {
         // 创建陨石粒子系统
         this.createMeteors();
 
-        // 创建玩家旗子
+        // 创建玩家旗子，但初始设置为不可见
         this.createPlayerFlag();
+        this.playerFlag.setVisible(false);
     }
 
     setupBugs() {
@@ -285,10 +286,10 @@ class MainScene extends Phaser.Scene {
         // 更新陨石效果
         this.updateMeteors();
 
-        // 更新旗子位置
-        if (this.playerFlag && this.bug) {
+        // 更新旗子位置（仅当旗子可见时）
+        if (this.playerFlag && this.playerFlag.visible) {
             this.playerFlag.x = this.bug.x;
-            // 不需要更新y坐标，因为补间动画会处理垂直移动
+            // y坐标由补间动画处理
         }
 
         // ... 其更新逻辑 ...
@@ -326,10 +327,13 @@ class MainScene extends Phaser.Scene {
             this.moveEnemyBugForward();
         }
 
+        // 显示旗子
+        this.showFlag();
+
         // 记录答案
         this.collectResult.push(button === this.correctAnswer ? 0 : 1);
 
-        // 延迟后显下一个问题
+        // 延迟后显示下一个问题
         this.time.delayedCall(2000, () => {
             this.showNextQuestion();
             this.button1.setInteractive();
@@ -520,29 +524,24 @@ class MainScene extends Phaser.Scene {
         this.playerFlag.setDepth(this.bug.depth + 1);  // 确保旗子在虫子上方
 
         // 添加上下移动的动画
-        this.tweens.add({
+        this.flagTween = this.tweens.add({
             targets: this.playerFlag,
             y: '+=10',  // 向下移动10像素
-            duration: 500,  // 动画持续1秒
+            duration: 500,  // 动画持续0.5秒
             yoyo: true,  // 动画会来回进行
             repeat: -1,  // 无限重复
             ease: 'Sine.easeInOut'  // 使用正弦曲线使动画更平滑
         });
     }
 
-    createPlayerHalo() {
-        this.playerHalo = this.add.circle(0, 0, 30, 0xffff00, 0.3);
-        this.playerHalo.setOrigin(0.5, 0.5);
-        this.bug.add(this.playerHalo);
+    showFlag() {
+        // 设置旗子位置并显示
+        this.playerFlag.setPosition(this.bug.x, this.bug.y - 30);
+        this.playerFlag.setVisible(true);
 
-        // 添加光环的脉动效果
-        this.tweens.add({
-            targets: this.playerHalo,
-            scale: 1.2,
-            alpha: 0.1,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1
+        // 3秒后隐藏旗子
+        this.time.delayedCall(3000, () => {
+            this.playerFlag.setVisible(false);
         });
     }
 }
