@@ -26,6 +26,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio('step', '../audio/step.wav');
 		this.load.image('meteor', '../assets/meteor-3.png');  // 添加这行
 		this.load.image('star', '../assets/star.png');  // 确保你有一个星星的图片资源
+		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
 	}
 
 	create() {

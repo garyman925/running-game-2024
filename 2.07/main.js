@@ -60,8 +60,8 @@ class MainScene extends Phaser.Scene {
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
         const bugOffset = 100; // 增加虫子穿过地面的程度
-        this.bug = this.physics.add.sprite(50, groundTop + bugOffset, 'bug');
-        this.enemyBug = this.physics.add.sprite(30, groundTop + bugOffset, 'enemyBug');
+        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 20, 'bug'); // 稍微提高位置
+        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug'); // 稍微降低位置
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
@@ -111,6 +111,9 @@ class MainScene extends Phaser.Scene {
 
         // 创建陨石粒子系统
         this.createMeteors();
+
+        // 创建玩家旗子
+        this.createPlayerFlag();
     }
 
     setupBugs() {
@@ -282,7 +285,13 @@ class MainScene extends Phaser.Scene {
         // 更新陨石效果
         this.updateMeteors();
 
-        // ... 其��更新逻辑 ...
+        // 更新旗子位置
+        if (this.playerFlag && this.bug) {
+            this.playerFlag.x = this.bug.x;
+            // 不需要更新y坐标，因为补间动画会处理垂直移动
+        }
+
+        // ... 其更新逻辑 ...
     }
 
     createFeedbackIcons() {
@@ -361,6 +370,7 @@ class MainScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + 50,
+            y: this.bug.y - 10, // 稍微向上移动
             duration: 1000,
             ease: 'Power2'
         });
@@ -370,7 +380,8 @@ class MainScene extends Phaser.Scene {
     moveEnemyBugForward() {
         this.tweens.add({
             targets: this.enemyBug,
-            x: this.enemyBug.x + 50,
+            x: this.enemyBug.x + 40, // 稍微慢一些
+            y: this.enemyBug.y + 10, // 稍微向下移动
             duration: 1000,
             ease: 'Power2'
         });
@@ -438,7 +449,7 @@ class MainScene extends Phaser.Scene {
             y: -50,  // 从屏幕顶部稍微上方开始
             speedX: { min: -150, max: -100 },  // 向左移动，速度稍微减小
             speedY: { min: 100, max: 150 },    // 向下移动
-            scale: { min: 0.1, max: 0.6 },     // 随机大小，范围从0.2到0.5
+            scale: { min: 0.1, max: 0.6 },     // 随机大小，围从0.2到0.5
             alpha: { start: 1, end: 0 },     // 保持透明度变化
             lifespan: { min: 4000, max: 8000 },// 增加生命周期，确保陨石有足够时间穿过屏幕
             quantity: 1,
@@ -499,6 +510,39 @@ class MainScene extends Phaser.Scene {
                     }
                 });
             }
+        });
+    }
+
+    createPlayerFlag() {
+        this.playerFlag = this.add.image(this.bug.x, this.bug.y - 30, 'flag');
+        this.playerFlag.setScale(1);  // 调整大小
+        this.playerFlag.setOrigin(0.5, 1);  // 设置原点为底部中心
+        this.playerFlag.setDepth(this.bug.depth + 1);  // 确保旗子在虫子上方
+
+        // 添加上下移动的动画
+        this.tweens.add({
+            targets: this.playerFlag,
+            y: '+=10',  // 向下移动10像素
+            duration: 500,  // 动画持续1秒
+            yoyo: true,  // 动画会来回进行
+            repeat: -1,  // 无限重复
+            ease: 'Sine.easeInOut'  // 使用正弦曲线使动画更平滑
+        });
+    }
+
+    createPlayerHalo() {
+        this.playerHalo = this.add.circle(0, 0, 30, 0xffff00, 0.3);
+        this.playerHalo.setOrigin(0.5, 0.5);
+        this.bug.add(this.playerHalo);
+
+        // 添加光环的脉动效果
+        this.tweens.add({
+            targets: this.playerHalo,
+            scale: 1.2,
+            alpha: 0.1,
+            duration: 1000,
+            yoyo: true,
+            repeat: -1
         });
     }
 }
