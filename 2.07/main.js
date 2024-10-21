@@ -210,6 +210,16 @@ class MainScene extends Phaser.Scene {
         const buttonHeight = 80;
         const buttonY = this.cameras.main.height * 0.75;
 
+        // 创建阴影
+        this.button1Shadow = this.add.graphics();
+        this.button2Shadow = this.add.graphics();
+
+        this.button1Shadow.fillStyle(0x000000, 0.3);
+        this.button2Shadow.fillStyle(0x000000, 0.3);
+
+        this.button1Shadow.fillRoundedRect(this.cameras.main.width * 0.3 - buttonWidth / 2 + 5, buttonY - buttonHeight / 2 + 5, buttonWidth, buttonHeight, 15);
+        this.button2Shadow.fillRoundedRect(this.cameras.main.width * 0.7 - buttonWidth / 2 + 5, buttonY - buttonHeight / 2 + 5, buttonWidth, buttonHeight, 15);
+
         this.button1 = this.add.graphics();
         this.button2 = this.add.graphics();
 
@@ -242,6 +252,14 @@ class MainScene extends Phaser.Scene {
         // 设置按钮点击事件
         this.button1.on('pointerdown', () => this.answer(this.button1));
         this.button2.on('pointerdown', () => this.answer(this.button2));
+
+        // 设置深度
+        this.button1Shadow.setDepth(4);
+        this.button2Shadow.setDepth(4);
+        this.button1.setDepth(5);
+        this.button2.setDepth(5);
+        this.answer1Text.setDepth(6);
+        this.answer2Text.setDepth(6);
     }
 
     initializeGame() {
@@ -269,13 +287,16 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        // 确保问以问号结尾
+        // 确保问题以问号结尾
         if (!question.endsWith('?')) {
             question += '?';
         }
 
         // 清空问题文本
         this.questionText.setText('');
+        
+        // 隐藏答案按钮和文本
+        this.hideAnswers();
         
         // 使用打字机效果显示问题
         this.typewriterEffect(this.questionText, question);
@@ -296,9 +317,8 @@ class MainScene extends Phaser.Scene {
             this.answer1Text.setWordWrapWidth(280);
             this.answer2Text.setWordWrapWidth(280);
             
-            // 启用按钮交互
-            this.button1.setInteractive();
-            this.button2.setInteractive();
+            // 显示答案按钮和文本
+            this.showAnswers();
         });
     }
 
@@ -312,7 +332,7 @@ class MainScene extends Phaser.Scene {
     update() {
         // 确保虫子始终部分穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
-        const bugOffset = 100; // 与创建���子时使用相同的值
+        const bugOffset = 100; // 与创建子时使用相同的值
         const maxY = groundTop + bugOffset;
 
         if (this.bug.y > maxY) {
@@ -324,7 +344,7 @@ class MainScene extends Phaser.Scene {
             this.enemyBug.setVelocityY(0);
         }
 
-        // 移动中层背景以创造视差效果
+        // 移动中层背景以创造视差��果
         this.midGround.tilePositionX += this.midGroundSpeed;
 
         // 移动地面
@@ -396,11 +416,12 @@ class MainScene extends Phaser.Scene {
         // 记录答案
         this.collectResult.push(button === this.correctAnswer ? 0 : 1);
 
+        // 隐藏答案按钮和文本
+        this.hideAnswers();
+
         // 延迟后显示下一个问题
         this.time.delayedCall(2000, () => {
             this.showNextQuestion();
-            this.button1.setInteractive();
-            this.button2.setInteractive();
         });
     }
 
@@ -663,6 +684,50 @@ class MainScene extends Phaser.Scene {
 
         // 如果飞龙图片面向左边，可能需要翻转图片
         // this.dragon.setFlipX(true);
+    }
+
+    // 新增方法：隐藏答案按钮和文本
+    hideAnswers() {
+        this.answer1Text.setVisible(false);
+        this.answer2Text.setVisible(false);
+        this.button1.setVisible(false);
+        this.button2.setVisible(false);
+        this.button1Shadow.setVisible(false);
+        this.button2Shadow.setVisible(false);
+    }
+
+    // 新增方法：显示答案按钮和文本
+    showAnswers() {
+        // 首先设置所有元素为可见，但透明度为0
+        this.answer1Text.setVisible(true).setAlpha(0);
+        this.answer2Text.setVisible(true).setAlpha(0);
+        this.button1.setVisible(true).setAlpha(0);
+        this.button2.setVisible(true).setAlpha(0);
+        this.button1Shadow.setVisible(true).setAlpha(0);
+        this.button2Shadow.setVisible(true).setAlpha(0);
+
+        // 创建一个稍微延迟的效果，让按钮一个接一个地出现
+        this.tweens.add({
+            targets: [this.button1Shadow, this.button1, this.answer1Text, this.button2Shadow, this.button2, this.answer2Text],
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2',
+            delay: this.tweens.stagger(100), // 每个元素之间有100ms的延迟
+            onComplete: () => {
+                // 启用按钮交互
+                this.button1.setInteractive();
+                this.button2.setInteractive();
+            }
+        });
+
+        // 添加轻微的上移效果
+        this.tweens.add({
+            targets: [this.button1Shadow, this.button1, this.answer1Text, this.button2Shadow, this.button2, this.answer2Text],
+            y: '-=10',
+            duration: 500,
+            ease: 'Power2',
+            delay: this.tweens.stagger(100)
+        });
     }
 }
 
