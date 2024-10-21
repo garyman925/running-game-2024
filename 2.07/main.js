@@ -28,8 +28,11 @@ class MainScene extends Phaser.Scene {
         this.qIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         this.initialMidGroundSpeed = 0.8;  // 增加初始速度
         this.maxMidGroundSpeed = 3.0;  // 增加最大速度
+        this.initialGroundSpeed = 1;  // 初始地面速度
+        this.maxGroundSpeed = 4;  // 最大地面速度
         this.currentQuestionIndex = 0;
         this.meteorEmitter = null;
+        this.dragon = null;
     }
 
     create() {
@@ -57,6 +60,9 @@ class MainScene extends Phaser.Scene {
         this.midGround.setOrigin(0.5, 1);
         this.midGround.setScale(1.2);
         this.midGround.setDepth(2);
+
+        // 创建飞龙
+        this.createDragon();
 
         // 创建地面
         const groundHeight = 200;
@@ -135,6 +141,7 @@ class MainScene extends Phaser.Scene {
         this.playerFlag.setVisible(false);
 
         this.midGroundSpeed = this.initialMidGroundSpeed;
+        this.groundSpeed = this.initialGroundSpeed;
     }
 
     setupBugs() {
@@ -299,6 +306,9 @@ class MainScene extends Phaser.Scene {
         // 移动中层背景以创造视差效果
         this.midGround.tilePositionX += this.midGroundSpeed;
 
+        // 移动地面
+        this.ground.tilePositionX += this.groundSpeed;
+
         // 持续检查问题文的可见性
         if (this.questionText) {
             //console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
@@ -312,6 +322,17 @@ class MainScene extends Phaser.Scene {
             this.playerFlag.x = this.bug.x;
             // y坐标由补间动画处理
         }
+
+        // 更新飞龙的位置（如果需要的话）
+        // 注意：如果使用 tweens 来移动飞龙，这里可能不需要额外的更新代码
+
+        // 调整飞龙的位置以模拟背景移动
+        // if (this.dragon) {
+        //     this.dragon.x -= this.midGroundSpeed * 0.5;
+        //     if (this.dragon.x < -this.dragon.width) {
+        //         this.dragon.x = this.sys.game.config.width + this.dragon.width;
+        //     }
+        // }
 
         // ... 其更新逻辑 ...
     }
@@ -422,7 +443,7 @@ class MainScene extends Phaser.Scene {
                 ++i;
             },
             repeat: length - 1,
-            delay: 50 // 你可以调整这个值来改变打字速度
+            delay: 50 // 你可以调整这个值改变打字速度
         });
     }
 
@@ -541,7 +562,7 @@ class MainScene extends Phaser.Scene {
     createPlayerFlag() {
         this.playerFlag = this.add.image(this.bug.x, this.bug.y - 30, 'flag');
         this.playerFlag.setScale(1);  // 调整大小
-        this.playerFlag.setOrigin(0.5, 1);  // 设置原点为底部中心
+        this.playerFlag.setOrigin(0.5, 1);  // 设置原点为部中心
         this.playerFlag.setDepth(this.bug.depth + 1);  // 确保旗子在虫子上方
 
         // 添加上下移动的动画
@@ -567,9 +588,10 @@ class MainScene extends Phaser.Scene {
     }
 
     updateGameSpeed() {
-        // 使用指数函数来计算新的中层背景速度，这会使速度增加更快
+        // 使用指数函数来计算新的中层背景速度和地面速度
         let progress = this.currentQuestionIndex / this.questions.length;
         this.midGroundSpeed = this.initialMidGroundSpeed + (this.maxMidGroundSpeed - this.initialMidGroundSpeed) * Math.pow(progress, 5);
+        this.groundSpeed = this.initialGroundSpeed + (this.maxGroundSpeed - this.initialGroundSpeed) * Math.pow(progress, 5);
 
         // 更频繁地显示速度提示
         if (this.currentQuestionIndex > 1 && this.currentQuestionIndex % 2 === 0) {  // 每两个问题显示一次
@@ -598,6 +620,28 @@ class MainScene extends Phaser.Scene {
                 speedUpText.destroy();
             }
         });
+    }
+
+    createDragon() {
+        // 设置飞龙的固定位置，例如屏幕宽度的3/4处
+        const dragonX = this.sys.game.config.width * 3 / 4;
+        
+        this.dragon = this.add.image(dragonX, this.sys.game.config.height / 2, 'dragon');
+        this.dragon.setScale(1);  // 调整大小
+        this.dragon.setDepth(1.5);  // 设置深度在中层背景之后，地面之前
+
+        // 添加飞龙的上下浮动动画
+        this.tweens.add({
+            targets: this.dragon,
+            y: '+=50',  // 上下浮动50像素
+            duration: 2000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // 如果飞龙图片面向左边，可能需要翻转图片
+        // this.dragon.setFlipX(true);
     }
 }
 
