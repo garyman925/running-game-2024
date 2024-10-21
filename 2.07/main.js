@@ -437,13 +437,13 @@ class MainScene extends Phaser.Scene {
             y: -50,  // 从屏幕顶部稍微上方开始
             speedX: { min: -150, max: -100 },  // 向左移动，速度稍微减小
             speedY: { min: 100, max: 150 },    // 向下移动
-            scale: { start: 0.4, end: 0.2 },   // 保持大小变化
-            alpha: { start: 1, end: 0.8 },     // 保持透明度变化
+            scale: { min: 0.1, max: 0.6 },     // 随机大小，范围从0.2到0.5
+            alpha: { start: 1, end: 0 },     // 保持透明度变化
             lifespan: { min: 4000, max: 8000 },// 增加生命周期，确保陨石有足够时间穿过屏幕
             quantity: 1,
-            frequency: 500,  // 每0.5秒生成一个陨石，增加数量
+            frequency: 500,  // 每0.5秒生成一个陨石
             blendMode: 'ADD',
-            rotate: 0  // 不旋转，保持原有角度
+            rotate: 0  // 保持固定角度，不旋转
         });
 
         this.meteorParticles.setDepth(1);  // 保持深度设置
