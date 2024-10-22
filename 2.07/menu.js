@@ -27,6 +27,9 @@ class MenuScene extends Phaser.Scene {
         // 调整背景位置以确保覆盖整个屏幕
         this.bg.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
 
+        // 创建飞龙
+        this.createDragon();
+
         // 添加 logo 文本，使用 Mountains of Christmas 字体
         const logoText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, 'Run! BUG BUG!', {
             fontFamily: '"Mountains of Christmas", cursive',
@@ -64,6 +67,36 @@ class MenuScene extends Phaser.Scene {
 
         // 使整个场景可点击
         this.input.on('pointerdown', () => this.startGame());
+    }
+
+    createDragon() {
+        // 设置飞龙的位置，例如屏幕右侧
+        const dragonX = this.cameras.main.width * 0.8;
+        const dragonY = this.cameras.main.height * 0.4;
+        
+        this.dragon = this.add.image(dragonX, dragonY, 'dragon');
+        this.dragon.setScale(0.8);  // 调整大小
+        this.dragon.setDepth(1);  // 确保飞龙在背景之上
+
+        // 添加飞龙的上下浮动动画
+        this.tweens.add({
+            targets: this.dragon,
+            y: dragonY + 30,  // 上下浮动30像素
+            duration: 2000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // 添加飞龙的轻微旋转动画
+        this.tweens.add({
+            targets: this.dragon,
+            angle: 5,  // 轻微旋转5度
+            duration: 3000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
     }
 
     startGame() {
