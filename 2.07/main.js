@@ -83,12 +83,13 @@ class MainScene extends Phaser.Scene {
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
         const bugOffset = 120; // 增加偏移量以适应更大的 bug
-        this.bug = this.physics.add.sprite(100, groundTop + bugOffset - 40, 'bug'); // 将主角虫子稍微提高
-        this.enemyBug = this.physics.add.sprite(50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低
+        const bugStartX = this.sys.game.config.width * 0.2; // 將虫子的初始 X 坐標設置為屏幕寬度的 20%
+        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 40, 'bug'); // 將主角虫子稍微提高
+        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低，並稍微靠左
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
-        // 设置虫子属性
+        // 设置虫子性
         this.setupBugs();
 
         // 创建钮和文本
@@ -222,7 +223,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createButtons() {
-        // 创建问题文本
+        // 创文本
         this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
             fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '70px',
@@ -389,13 +390,24 @@ class MainScene extends Phaser.Scene {
         // 更新陨石效果
         this.updateMeteors();
 
-        // 更新旗子位置（仅当旗子可见时��
+        // 更新旗子位置（仅当旗子可见时
         if (this.playerFlag && this.playerFlag.visible) {
             this.playerFlag.x = this.bug.x;
             // y坐标由补间动画处理
         }
 
-  
+        // 移除或註釋掉這部分代碼
+        /*
+        // 讓龍緩慢向右移動
+        if (this.dragon) {
+            this.dragon.x += 0.5; // 每幀向右移動 0.5 像素，可以根據需要調整
+
+            // 如果龍移出畫面，將其重置到左側
+            if (this.dragon.x > this.sys.game.config.width + this.dragon.width / 2) {
+                this.dragon.x = -this.dragon.width / 2;
+            }
+        }
+        */
     }
 
     createFeedbackIcons() {
@@ -667,7 +679,7 @@ class MainScene extends Phaser.Scene {
     }
 
     showFlag() {
-        // 设置旗子位置并显示
+        // 设置旗子位置并示
         this.playerFlag.setPosition(this.bug.x, this.bug.y - 30);
         this.playerFlag.setVisible(true);
 
@@ -718,13 +730,13 @@ class MainScene extends Phaser.Scene {
             this.dragon.destroy();
         }
 
-        // 設置飛龍的位置
-        const dragonX = this.sys.game.config.width * 3 / 4;
-        const dragonY = this.sys.game.config.height * 1 / 3;
+        // 設置飛龍的位置在畫面左邊
+        const dragonX = this.sys.game.config.width * 1 / 8; // 將龍移到屏幕寬度的1/8處
+        const dragonY = this.sys.game.config.height * 1 / 2; // 將龍移到屏幕高度��中間
         
         this.dragon = this.add.sprite(dragonX, dragonY, 'dragon');
-        this.dragon.setScale(0.8);  // 由於新的sprite尺寸較大，我們需要進一步縮小
-        this.dragon.setDepth(1.5);  // 設置深度在中層背景之後，地面之前
+        this.dragon.setScale(1.2);  // 調整大小，可能需要根據實際情況調整
+        this.dragon.setDepth(2.5);  // 設置深度在中層背景之後，但在地面之前
 
         // 播放飛行動畫
         this.dragon.play('dragon_fly');
@@ -732,14 +744,14 @@ class MainScene extends Phaser.Scene {
         // 添加飛龍的上下浮動動畫
         this.tweens.add({
             targets: this.dragon,
-            y: '+=20',  // 減小浮動範圍
+            y: '+=30',  // 增加浮動範圍
             duration: 2000,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
 
-        // 如果飛龍圖片面向右邊，需要翻轉圖片
+        // 將龍翻轉向右
         this.dragon.setFlipX(true);
 
         // 添加這行來檢查龍的大小
@@ -772,7 +784,7 @@ class MainScene extends Phaser.Scene {
             alpha: 1,
             duration: 500,
             ease: 'Power2',
-            delay: this.tweens.stagger(100), // 每个元素之间有100ms的延迟
+            delay: this.tweens.stagger(100), // 每个元素之间100ms的延迟
             onComplete: () => {
                 // 启用按钮交互
                 this.button1.setInteractive();
