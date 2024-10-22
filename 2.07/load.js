@@ -19,7 +19,7 @@ class LoadScene extends Phaser.Scene {
 		});
 		// 加载 bugbug 精灵图集
 		this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
-		this.load.spritesheet('enemyBug', '../assets/enemyBug.png', { frameWidth: 190, frameHeight: 170 });
+		this.load.atlas('enemyBug', '../assets/enemy-sprite.png', '../assets/enemy-sprite.json');
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
 		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
 		this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
@@ -47,6 +47,9 @@ class LoadScene extends Phaser.Scene {
 			frameHeight: 147 // 根据你的实际图片调整
 		});
 		//this.load.image('fireball', '../assets/fireball.png');
+		
+		// 加载 enemyBug 的燃烧 sprite sheet
+		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 	}
 
 	create() {

@@ -207,32 +207,54 @@ class MainScene extends Phaser.Scene {
         this.bug.setScale(0.8);
         this.bug.setOrigin(0.5, 0.4);
 
-        // enemyBug 的设置保持不变
+        // 更新 enemyBug 的设置
         this.enemyBug.setCollideWorldBounds(true);
         this.enemyBug.setBounce(0.2);
         this.enemyBug.setGravityY(800);
 
+        // 创建 enemyBug 的跑步动画
         this.anims.create({
             key: 'run_enemyBug',
-            frames: this.anims.generateFrameNumbers('enemyBug', { start: 1, end: 4 }),
-            frameRate: 15,
+            frames: this.anims.generateFrameNames('enemyBug', {
+                prefix: 'Comp 3_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 60,
             repeat: -1
         });
 
+        // 创建 enemyBug 的失败动画（如果需要的话）
         this.anims.create({
             key: 'fail_enemyBug',
-            frames: [{ key: 'enemyBug', frame: 9 }],
+            frames: [{ key: 'enemyBug', frame: 'Comp 3_00006.png' }],  // 使用适当的帧
             frameRate: 15
         });
 
         this.enemyBug.play('run_enemyBug');
-        this.enemyBug.setScale(1);
-        this.enemyBug.setOrigin(0.5, 0.4);
+        this.enemyBug.setScale(0.8);  // 调整大小，可能需要根据新sprite的尺寸进行调整
+        this.enemyBug.setOrigin(0.5, 0.5);
+
+        // 添加 enemyBug 的燃烧动画
+        this.anims.create({
+            key: 'burn_enemyBug',
+            frames: this.anims.generateFrameNames('enemyBugBurn', {
+                prefix: 'Comp 4_',
+                start: 0,
+                end: 13,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 15,
+            repeat: 0
+        });
     }
 
     createButtons() {
-        // 创文本
-        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, '', {
+        // 创建问题文本
+        this.questionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 150, '', {
             fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '70px',
             fontWeight: 'bold',
@@ -244,10 +266,10 @@ class MainScene extends Phaser.Scene {
         // 添加阴影效果
         this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
-        // 创建答案按和文本
+        // 创建答案按钮和文本
         const buttonWidth = 300;
         const buttonHeight = 80;
-        const buttonY = this.cameras.main.height * 0.75;
+        const buttonY = this.cameras.main.height * 0.55;  // 将按钮位置从 0.75 调整到 0.65
 
         // 创建阴影
         this.button1Shadow = this.add.graphics();
@@ -432,7 +454,7 @@ class MainScene extends Phaser.Scene {
     }
 
     answer(button) {
-        // 禁用钮，防止多次点击
+        // 禁用按钮，防止多次点击
         this.button1.disableInteractive();
         this.button2.disableInteractive();
 
@@ -442,7 +464,15 @@ class MainScene extends Phaser.Scene {
             this.updateScore(score + 1);
             this.showCorrectFeedback(button);
             this.moveBugForward();
-            this.createStarEffect();  // 添加星星特效
+            this.createStarEffect();
+            
+            // 播放 enemyBug 的燃烧动画
+            this.enemyBug.play('burn_enemyBug');
+            
+            // 在动画结束后重置为跑步动画
+            this.enemyBug.once('animationcomplete', () => {
+                this.enemyBug.play('run_enemyBug');
+            });
         } else {
             // 错误答案的处理
             console.log("错误答案！");
@@ -682,7 +712,7 @@ class MainScene extends Phaser.Scene {
             duration: 500,  // 动画持续0.5秒
             yoyo: true,  // 动画会来回进行
             repeat: -1,  // 无限重复
-            ease: 'Sine.easeInOut'  // 使用正弦曲线使动画更平滑
+            ease: 'Sine.easeInOut'  // 使用���弦曲线使动画更平滑
         });
     }
 
@@ -698,7 +728,7 @@ class MainScene extends Phaser.Scene {
     }
 
     updateGameSpeed() {
-        // 用指数函数来计算新的中层背景速度和地面速度
+        // 用指函数来计算中的层背景速度和地面速度
         let progress = this.currentQuestionIndex / this.questions.length;
         this.midGroundSpeed = this.initialMidGroundSpeed + (this.maxMidGroundSpeed - this.initialMidGroundSpeed) * Math.pow(progress, 5);
         this.groundSpeed = this.initialGroundSpeed + (this.maxGroundSpeed - this.initialGroundSpeed) * Math.pow(progress, 5);
