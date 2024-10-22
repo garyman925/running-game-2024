@@ -17,6 +17,8 @@ class LoadScene extends Phaser.Scene {
 			startFrame: 13, 
 			endFrame: 19 
 		});
+		// 加载 bugbug 精灵图集
+		this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
 		this.load.spritesheet('enemyBug', '../assets/enemyBug.png', { frameWidth: 190, frameHeight: 170 });
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
 		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });

@@ -150,22 +150,36 @@ class MainScene extends Phaser.Scene {
         this.bug.setBounce(0.2);
         this.bug.setGravityY(800);
 
+        // 创建跑步动画
         this.anims.create({
             key: 'run_bug',
-            frames: this.anims.generateFrameNumbers('bugRun', { start: 0, end: 10 }),
+            frames: this.anims.generateFrameNames('bugbug', {
+                prefix: 'Comp 1_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
             frameRate: 15,
             repeat: -1
         });
 
+        // 创建跌倒动画
         this.anims.create({
-            key: 'action_bug',
-            frames: this.anims.generateFrameNumbers('bugAction', { start: 0, end: 6 }),
+            key: 'fall_bug',
+            frames: this.anims.generateFrameNames('bugbug', {
+                prefix: 'Comp 2_',
+                start: 0,
+                end: 6,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
             frameRate: 15,
             repeat: 0
         });
 
         this.bug.play('run_bug');
-        this.bug.setScale(0.8); // 将缩放比例从 0.5 增加到 0.8
+        this.bug.setScale(0.8);
         this.bug.setOrigin(0.5, 0.4);
 
         // enemyBug 的设置保持不变
@@ -205,7 +219,7 @@ class MainScene extends Phaser.Scene {
         // 添加阴影效果
         this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
-        // 创建答案按钮背景和文本
+        // 创建答案按景和文本
         const buttonWidth = 300;
         const buttonHeight = 80;
         const buttonY = this.cameras.main.height * 0.75;
@@ -408,6 +422,7 @@ class MainScene extends Phaser.Scene {
             // 错误答案的处理
             console.log("错误答案！");
             this.showWrongFeedback(button);
+            this.playFallBugAnimation();  // 播放fall_bug动画
             this.moveEnemyBugForward();
         }
 
@@ -666,7 +681,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 设置飞龙的固定位��，例如屏幕度的3/4处
+        // 设置飞龙的固定位，例如屏幕度的3/4处
         const dragonX = this.sys.game.config.width * 3 / 4;
         
         this.dragon = this.add.image(dragonX, this.sys.game.config.height / 2, 'dragon');
@@ -728,6 +743,22 @@ class MainScene extends Phaser.Scene {
             duration: 500,
             ease: 'Power2',
             delay: this.tweens.stagger(100)
+        });
+    }
+
+    // 新增方法：播放fall_bug动画
+    playFallBugAnimation() {
+        this.bug.play('fall_bug');
+        
+        this.bug.once('animationcomplete', () => {
+            // 设置动画停在最后一帧
+            this.bug.anims.stopOnFrame(this.bug.anims.currentAnim.frames[this.bug.anims.currentAnim.frames.length - 1]);
+            
+            // 在最后一帧停留约1秒
+            this.time.delayedCall(1000, () => {
+                // 1秒后重置为run_bug动画
+                this.bug.play('run_bug');
+            });
         });
     }
 }
