@@ -42,6 +42,11 @@ class LoadScene extends Phaser.Scene {
 		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
 		// 加载新的dragon sprite sheet
 		this.load.atlas('dragon', '../assets/dragon-sprite.png', '../assets/dragon-sprite.json');
+		this.load.spritesheet('fireball', '../assets/fireball.png', { 
+			frameWidth: 176, // 根据你的实际图片调整
+			frameHeight: 147 // 根据你的实际图片调整
+		});
+		//this.load.image('fireball', '../assets/fireball.png');
 	}
 
 	create() {

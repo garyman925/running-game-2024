@@ -159,6 +159,14 @@ class MainScene extends Phaser.Scene {
 
         // 創建龍（確保這裡只調用一次）
         this.createDragon();
+
+        // 創建火球動畫
+        this.anims.create({
+            key: 'fireball_anim',
+            frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 
     setupBugs() {
@@ -361,7 +369,7 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // 确保虫子始终部分穿过地面
+        // 确终部分穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
         const bugOffset = 120; // 与创建虫子时使用相同的值
         const maxYBug = groundTop + bugOffset - 40;
@@ -439,7 +447,7 @@ class MainScene extends Phaser.Scene {
             // 错误答案的处理
             console.log("错误答案！");
             this.showWrongFeedback(button);
-            this.playFallBugAnimation();  // 播放fall_bug动画
+            this.shootFireball();  // 添加這行
             this.moveEnemyBugForward();
         }
 
@@ -494,7 +502,7 @@ class MainScene extends Phaser.Scene {
         const jumpDuration = moveDuration / 1.5; // 上升时间
         const fallDuration = moveDuration / 2; // 下落时间
 
-        // 向前移动和向上跳跃
+        // 向前移动和向上跳
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + 80,
@@ -545,7 +553,7 @@ class MainScene extends Phaser.Scene {
                 ++i;
             },
             repeat: length - 1,
-            delay: 50 // 你可以调整这个值改变打字速度
+            delay: 50 // 你可以调整这个��改变打字速度
         });
     }
 
@@ -725,14 +733,14 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 如果龍已經存在，先銷毀它
+        // 如果龍已經存在，先毀它
         if (this.dragon) {
             this.dragon.destroy();
         }
 
         // 設置飛龍的位置在畫面左邊
         const dragonX = this.sys.game.config.width * 1 / 8; // 將龍移到屏幕寬度的1/8處
-        const dragonY = this.sys.game.config.height * 1 / 2; // 將龍移到屏幕高度��中間
+        const dragonY = this.sys.game.config.height * 1 / 2; // 將龍移到屏幕高度中間
         
         this.dragon = this.add.sprite(dragonX, dragonY, 'dragon');
         this.dragon.setScale(1.2);  // 調整大小，可能需要根據實際情況調整
@@ -784,7 +792,7 @@ class MainScene extends Phaser.Scene {
             alpha: 1,
             duration: 500,
             ease: 'Power2',
-            delay: this.tweens.stagger(100), // 每个元素之间100ms的延迟
+            delay: this.tweens.stagger(100), // 个元素之间100ms的迟
             onComplete: () => {
                 // 启用按钮交互
                 this.button1.setInteractive();
@@ -804,18 +812,103 @@ class MainScene extends Phaser.Scene {
 
     // 新增方法：播放fall_bug动画
     playFallBugAnimation() {
+        console.log('Starting fall_bug animation');
         this.bug.play('fall_bug');
         
         this.bug.once('animationcomplete', () => {
-            // 设置动停在最后一帧
+            console.log('fall_bug animation completed');
+            // 设置动画停在最后一帧
             this.bug.anims.stopOnFrame(this.bug.anims.currentAnim.frames[this.bug.anims.currentAnim.frames.length - 1]);
             
             // 在最后一帧停留约1秒
             this.time.delayedCall(1000, () => {
+                console.log('Resetting to run_bug animation');
                 // 1秒后重置为run_bug动画
                 this.bug.play('run_bug');
             });
         });
+
+        // 添加一些视觉反馈
+        this.cameras.main.shake(250, 0.02);
+        this.bug.setTint(0xff0000);  // 将 bug 变红
+        this.time.delayedCall(250, () => {
+            this.bug.clearTint();  // 250ms 后恢复正常颜色
+        });
+    }
+
+    shootFireball() {
+        // 計算火球的起始位置（在畫面右上角）
+        const startX = this.sys.game.config.width - 50;
+        const startY = 50;
+
+        const fireball = this.physics.add.sprite(startX, startY, 'fireball');
+        fireball.setScale(0.5);  // 调整大小
+        fireball.setDepth(5);
+
+        // 設置火球的初始目標為 bug
+        let targetX = this.bug.x;
+        let targetY = this.bug.y - this.bug.height / 2;
+
+        // 計算初始角度和速度
+        let angle = Phaser.Math.Angle.Between(startX, startY, targetX, targetY);
+        const speed = 600;
+
+        // 設置火球的初始速度
+        fireball.setVelocity(
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed
+        );
+
+        fireball.setRotation(angle);
+
+        // 添加旋转动画
+        this.tweens.add({
+            targets: fireball,
+            angle: 360,  // 旋转360度
+            duration: 1000,  // 1秒完成一次旋转
+            repeat: -1,  // 无限重复
+            ease: 'Linear'  // 线性缓动，使旋转速度恒定
+        });
+
+        // 添加更新邏輯，確保火球會追蹤並擊中 bug
+        this.time.addEvent({
+            delay: 16, // 約60fps
+            callback: () => {
+                if (!fireball.active) return;
+
+                // 重新計算目標位置
+                targetX = this.bug.x;
+                targetY = this.bug.y - this.bug.height / 2;
+
+                // 計算新的角度
+                angle = Phaser.Math.Angle.Between(fireball.x, fireball.y, targetX, targetY);
+
+                // 調整火球的速度向量
+                fireball.setVelocity(
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed
+                );
+
+                // 檢查是否足夠接近 bug
+                const distance = Phaser.Math.Distance.Between(fireball.x, fireball.y, targetX, targetY);
+                console.log('Distance to bug:', distance); // 輸出距離以進行調試
+
+                if (distance < 20) { // 如果距離小於 20 像素
+                    this.playFallBugAnimation();
+                    fireball.destroy();
+                }
+            },
+            loop: true
+        });
+
+        // 如果火球在 3 秒後仍未擊中目標，銷毀它
+        this.time.delayedCall(3000, () => {
+            if (fireball.active) {
+                fireball.destroy();
+            }
+        });
+
+        console.log('Fireball shot!');
     }
 }
 
