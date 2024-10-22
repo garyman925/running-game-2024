@@ -27,13 +27,13 @@ class MenuScene extends Phaser.Scene {
         // 调整背景位置以确保覆盖整个屏幕
         this.bg.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
 
-        // 添加 logo 文本
-        const logoText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, 'Runrun Bug', {
-            fontSize: '64px',
+        // 添加 logo 文本，使用 Mountains of Christmas 字体
+        const logoText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, 'Run! BUG BUG!', {
+            fontFamily: '"Mountains of Christmas", cursive',
+            fontSize: '120px',
             fontStyle: 'bold',
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 6
+            fill: '#e73d79',
+            strokeThickness: 10
         }).setOrigin(0.5);
 
         // 为 logo 文本添加简单的动画效果
@@ -46,10 +46,21 @@ class MenuScene extends Phaser.Scene {
         });
 
         // 添加提示文本
-        this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
-            fontSize: '32px',
+        const startText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
+            fontFamily: '"Mountains of Christmas", cursive',
+            fontSize: '42px',
             fill: '#fff'
         }).setOrigin(0.5);
+
+        // 添加闪烁效果
+        this.tweens.add({
+            targets: startText,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: 'Power2',
+            yoyo: true,
+            repeat: -1
+        });
 
         // 使整个场景可点击
         this.input.on('pointerdown', () => this.startGame());
