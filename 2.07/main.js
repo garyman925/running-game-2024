@@ -85,7 +85,7 @@ class MainScene extends Phaser.Scene {
         const bugOffset = 120; // 增加偏移量以适应更大的 bug
         const bugStartX = this.sys.game.config.width * 0.2; // 將虫子的初始 X 坐標設置為屏幕寬度的 20%
         this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 40, 'bug'); // 將主角虫子稍微提高
-        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低，並稍微靠左
+        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低，稍微靠左
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
@@ -170,7 +170,7 @@ class MainScene extends Phaser.Scene {
     }
 
     setupBugs() {
-        // 设置 bug 的动画
+        // 设置 bug 的画
         this.bug.setCollideWorldBounds(true);
         this.bug.setBounce(0.2);
         this.bug.setGravityY(800);
@@ -356,7 +356,7 @@ class MainScene extends Phaser.Scene {
             this.answer1Text.setWordWrapWidth(280);
             this.answer2Text.setWordWrapWidth(280);
             
-            // 显示答案按钮和文本
+            // 显答案按钮和文本
             this.showAnswers();
         });
     }
@@ -369,7 +369,7 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // 确终部分穿过地面
+        // 确终部穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
         const bugOffset = 120; // 与创建虫子时使用相同的值
         const maxYBug = groundTop + bugOffset - 40;
@@ -447,7 +447,7 @@ class MainScene extends Phaser.Scene {
             // 错误答案的处理
             console.log("错误答案！");
             this.showWrongFeedback(button);
-            this.shootFireball();  // 添加這行
+            this.shootMeteor();  // 這裡改為 shootMeteor
             this.moveEnemyBugForward();
         }
 
@@ -553,7 +553,7 @@ class MainScene extends Phaser.Scene {
                 ++i;
             },
             repeat: length - 1,
-            delay: 50 // 你可以调整这个��改变打字速度
+            delay: 50 // 你可以调整这个改变打字速度
         });
     }
 
@@ -733,12 +733,12 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 如果龍已經存在，先毀它
+        // 如果已經存在，先毀它
         if (this.dragon) {
             this.dragon.destroy();
         }
 
-        // 設置飛龍的位置在畫面左邊
+        // 設置飛龍的位置在畫左邊
         const dragonX = this.sys.game.config.width * 1 / 8; // 將龍移到屏幕寬度的1/8處
         const dragonY = this.sys.game.config.height * 1 / 2; // 將龍移到屏幕高度中間
         
@@ -836,14 +836,16 @@ class MainScene extends Phaser.Scene {
         });
     }
 
-    shootFireball() {
-        // 計算火球的起始位置（在畫面右上角）
+    shootMeteor() {
+        // 計算陨石的起始位置（在畫面右上角）
         const startX = this.sys.game.config.width - 50;
         const startY = 50;
 
-        const fireball = this.physics.add.sprite(startX, startY, 'fireball');
-        fireball.setScale(0.5);  // 调整大小
-        fireball.setDepth(5);
+        const meteor = this.physics.add.sprite(startX, startY, 'meteor');
+        meteor.setScale(0.3);  // 調整大小，可能需要根據 meteor 圖片的實際大小進行調整
+        meteor.setOrigin(0.5, 0.5);  // 設置原點為中心
+        meteor.setDepth(5);
+        meteor.setBlendMode(Phaser.BlendModes.ADD);  // 添加混合模式
 
         // 設置火球的初始目標為 bug
         let targetX = this.bug.x;
@@ -854,48 +856,43 @@ class MainScene extends Phaser.Scene {
         const speed = 600;
 
         // 設置火球的初始速度
-        fireball.setVelocity(
+        meteor.setVelocity(
             Math.cos(angle) * speed,
             Math.sin(angle) * speed
         );
 
-        fireball.setRotation(angle);
-
-        // 添加旋转动画
-        this.tweens.add({
-            targets: fireball,
-            angle: 360,  // 旋转360度
-            duration: 1000,  // 1秒完成一次旋转
-            repeat: -1,  // 无限重复
-            ease: 'Linear'  // 线性缓动，使旋转速度恒定
-        });
+        // 設置陨石的初始旋轉角度，使其頭部指向目標
+        //meteor.setRotation(angle);  // 添加 π/2（90度）使頭部指向目標
 
         // 添加更新邏輯，確保火球會追蹤並擊中 bug
         this.time.addEvent({
             delay: 16, // 約60fps
             callback: () => {
-                if (!fireball.active) return;
+                if (!meteor.active) return;
 
                 // 重新計算目標位置
                 targetX = this.bug.x;
                 targetY = this.bug.y - this.bug.height / 2;
 
                 // 計算新的角度
-                angle = Phaser.Math.Angle.Between(fireball.x, fireball.y, targetX, targetY);
+                angle = Phaser.Math.Angle.Between(meteor.x, meteor.y, targetX, targetY);
 
                 // 調整火球的速度向量
-                fireball.setVelocity(
+                meteor.setVelocity(
                     Math.cos(angle) * speed,
                     Math.sin(angle) * speed
                 );
 
+                // 更新陨石的旋轉角度，使其頭部始終指向目標
+                meteor.setRotation(angle + Math.PI + Math.PI / 4);  // 調整為 225 度（π + π/4）
+
                 // 檢查是否足夠接近 bug
-                const distance = Phaser.Math.Distance.Between(fireball.x, fireball.y, targetX, targetY);
+                const distance = Phaser.Math.Distance.Between(meteor.x, meteor.y, targetX, targetY);
                 console.log('Distance to bug:', distance); // 輸出距離以進行調試
 
                 if (distance < 20) { // 如果距離小於 20 像素
                     this.playFallBugAnimation();
-                    fireball.destroy();
+                    meteor.destroy();
                 }
             },
             loop: true
@@ -903,12 +900,12 @@ class MainScene extends Phaser.Scene {
 
         // 如果火球在 3 秒後仍未擊中目標，銷毀它
         this.time.delayedCall(3000, () => {
-            if (fireball.active) {
-                fireball.destroy();
+            if (meteor.active) {
+                meteor.destroy();
             }
         });
 
-        console.log('Fireball shot!');
+        console.log('Meteor shot!');
     }
 }
 
