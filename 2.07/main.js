@@ -160,7 +160,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 15,
+            frameRate: 60,
             repeat: -1
         });
 
@@ -471,14 +471,41 @@ class MainScene extends Phaser.Scene {
     }
 
     moveBugForward() {
+        // 创建一个复合动画，包括向前移动、轻跳和下落
+        const jumpHeight = 50; // 跳跃高度
+        const moveDuration = 500; // 总移动时间
+        const jumpDuration = moveDuration / 1.5; // 上升时间
+        const fallDuration = moveDuration / 2; // 下落时间
+
+        // 向前移动和向上跳跃
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + 80,
-            y: this.bug.y - 15, // 保持向上移动
-            duration: 1000,
-            ease: 'Power2'
+            y: this.bug.y - jumpHeight,
+            duration: jumpDuration,
+            ease: 'Sine.easeOut',
+            onComplete: () => {
+                // 下落
+                this.tweens.add({
+                    targets: this.bug,
+                    y: this.bug.y + jumpHeight,
+                    duration: fallDuration,
+                    ease: 'Sine.easeIn'
+                });
+            }
         });
+
+        // 播放跑步音效
         this.running.play();
+
+        // 可选：添加一个轻微的旋转效果
+        this.tweens.add({
+            targets: this.bug,
+            angle: {from: -5, to: 5},
+            duration: moveDuration / 2,
+            yoyo: true,
+            repeat: 1
+        });
     }
 
     moveEnemyBugForward() {
