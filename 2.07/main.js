@@ -40,9 +40,9 @@ class MainScene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, this.sys.game.config.width, this.sys.game.config.height);
 
         // 创建背景
-        this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
-        this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
-        this.bg.setDepth(0);
+        // this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
+        // this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
+        // this.bg.setDepth(0);
 
         // 创建变暗的遮罩
         this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);

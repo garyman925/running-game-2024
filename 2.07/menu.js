@@ -9,13 +9,24 @@ class MenuScene extends Phaser.Scene {
             frameWidth: 224,  // 假设按钮宽度为224像素
             frameHeight: 76   // 假设按钮高度为152像素，每帧高度为76像素
         });
-        this.load.image('bg', '../assets/bg4.png');
+        // 移除这行，因为背景图片应该已经在 LoadScene 中加载
+        // this.load.image('bg', '../assets/bg-world-1.png');
     }
 
     create() {
-        // 添加背景
-        this.add.tileSprite(0, 0, this.cameras.main.width, this.cameras.main.height, 'bg').setOrigin(0);
+        // 创建背景
+        this.bg = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'bg');
         
+        // 计算缩放比例
+        const scaleX = this.cameras.main.width / 2400;
+        const scaleY = this.cameras.main.height / 1350;
+        const scale = Math.min(scaleX, scaleY);
+        
+        this.bg.setScale(scale);
+        
+        // 调整背景位置以确保覆盖整个屏幕
+        this.bg.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
+
         // 添加 logo 文本
         const logoText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, 'Runrun Bug', {
             fontSize: '64px',
@@ -33,30 +44,18 @@ class MenuScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-        
-        // 添加开始按钮
-        let startButton = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 + 50, 'startBtn', 0)
-            .setInteractive()
-            .on('pointerover', () => startButton.setFrame(1))
-            .on('pointerout', () => startButton.setFrame(0))
-            .on('pointerdown', () => this.scene.start('MainScene'));
 
-        // 调整按钮大小（如果需要）
-        startButton.setScale(0.5);  // 根据需要调整缩放比例
-
-        // 添加文本（可选）
-        this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 150, 'Click to Start', {
+        // 添加提示文本
+        this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
             fontSize: '32px',
             fill: '#fff'
         }).setOrigin(0.5);
 
-        // 添加调试信息
-        console.log('Texture exists:', this.textures.exists('startBtn'));
-        if (!this.textures.exists('startBtn')) {
-            console.error('startBtn texture not found');
-            // 使用一个占位图像
-            let placeholder = this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2 + 50, 200, 100, 0xff0000);
-            placeholder.setInteractive().on('pointerdown', () => this.scene.start('MainScene'));
-        }
+        // 使整个场景可点击
+        this.input.on('pointerdown', () => this.startGame());
+    }
+
+    startGame() {
+        this.scene.start('MainScene');
     }
 }
