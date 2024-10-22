@@ -32,7 +32,6 @@ class MainScene extends Phaser.Scene {
         this.maxGroundSpeed = 4;  // 最大地面速度
         this.currentQuestionIndex = 0;
         this.meteorEmitter = null;
-        this.dragon = null;
     }
 
     create() {
@@ -142,6 +141,23 @@ class MainScene extends Phaser.Scene {
 
         this.midGroundSpeed = this.initialMidGroundSpeed;
         this.groundSpeed = this.initialGroundSpeed;
+
+        // 創建龍的動畫（只保留一個動畫，命名為dragon_fly）
+        this.anims.create({
+            key: 'dragon_fly',
+            frames: this.anims.generateFrameNames('dragon', {
+                prefix: 'dragon_',
+                start: 1,
+                end: 4,
+                zeroPad: 1,
+                suffix: '.png'
+            }),
+            frameRate: 8,  // 可以根據需要調整幀率
+            repeat: -1
+        });
+
+        // 創建龍（確保這裡只調用一次）
+        this.createDragon();
     }
 
     setupBugs() {
@@ -219,7 +235,7 @@ class MainScene extends Phaser.Scene {
         // 添加阴影效果
         this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
-        // 创建答案按景和文本
+        // 创建答案按和文本
         const buttonWidth = 300;
         const buttonHeight = 80;
         const buttonY = this.cameras.main.height * 0.75;
@@ -373,24 +389,13 @@ class MainScene extends Phaser.Scene {
         // 更新陨石效果
         this.updateMeteors();
 
-        // 更新旗子位置（仅当旗子可见时）
+        // 更新旗子位置（仅当旗子可见时��
         if (this.playerFlag && this.playerFlag.visible) {
             this.playerFlag.x = this.bug.x;
             // y坐标由补间动画处理
         }
 
-        // 更新飞龙的位置（如果需要的话）
-        // 注意：如果使用 tweens 来移动飞龙，这里可能不需要额外的更新代码
-
-        // 调整飞龙的位置以模拟背景移动
-        // if (this.dragon) {
-        //     this.dragon.x -= this.midGroundSpeed * 0.5;
-        //     if (this.dragon.x < -this.dragon.width) {
-        //         this.dragon.x = this.sys.game.config.width + this.dragon.width;
-        //     }
-        // }
-
-        // ... 其更新逻辑 ...
+  
     }
 
     createFeedbackIcons() {
@@ -579,7 +584,7 @@ class MainScene extends Phaser.Scene {
             x: { min: 0, max: this.sys.game.config.width },
             y: -50,
             speedX: { min: -150, max: -100 },  // 固定的水平速度
-            speedY: { min: 100, max: 150 },    // 固定的垂直速度
+            speedY: { min: 100, max: 150 },    // 固定的垂直度
             scale: { min: 0.1, max: 0.6 },
             alpha: { start: 1, end: 0 },
             lifespan: { min: 4000, max: 8000 },
@@ -673,7 +678,7 @@ class MainScene extends Phaser.Scene {
     }
 
     updateGameSpeed() {
-        // 使用指数函数来计算新的中层背景速度和地面速度
+        // 用指数函数来计算新的中层背景速度和地面速度
         let progress = this.currentQuestionIndex / this.questions.length;
         this.midGroundSpeed = this.initialMidGroundSpeed + (this.maxMidGroundSpeed - this.initialMidGroundSpeed) * Math.pow(progress, 5);
         this.groundSpeed = this.initialGroundSpeed + (this.maxGroundSpeed - this.initialGroundSpeed) * Math.pow(progress, 5);
@@ -708,25 +713,37 @@ class MainScene extends Phaser.Scene {
     }
 
     createDragon() {
-        // 设置飞龙的固定位，例如屏幕度的3/4处
-        const dragonX = this.sys.game.config.width * 3 / 4;
-        
-        this.dragon = this.add.image(dragonX, this.sys.game.config.height / 2, 'dragon');
-        this.dragon.setScale(1);  // 调整大小
-        this.dragon.setDepth(1.5);  // 设置深度在中层背景之后，地面之前
+        // 如果龍已經存在，先銷毀它
+        if (this.dragon) {
+            this.dragon.destroy();
+        }
 
-        // 添加飞龙的上下浮动动画
+        // 設置飛龍的位置
+        const dragonX = this.sys.game.config.width * 3 / 4;
+        const dragonY = this.sys.game.config.height * 1 / 3;
+        
+        this.dragon = this.add.sprite(dragonX, dragonY, 'dragon');
+        this.dragon.setScale(0.8);  // 由於新的sprite尺寸較大，我們需要進一步縮小
+        this.dragon.setDepth(1.5);  // 設置深度在中層背景之後，地面之前
+
+        // 播放飛行動畫
+        this.dragon.play('dragon_fly');
+
+        // 添加飛龍的上下浮動動畫
         this.tweens.add({
             targets: this.dragon,
-            y: '+=50',  // 上下浮动50像素
+            y: '+=20',  // 減小浮動範圍
             duration: 2000,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
 
-        // 如果飞龙图片面向左边，可能需要翻转图片
-        // this.dragon.setFlipX(true);
+        // 如果飛龍圖片面向右邊，需要翻轉圖片
+        this.dragon.setFlipX(true);
+
+        // 添加這行來檢查龍的大小
+        console.log('Dragon size:', this.dragon.width, this.dragon.height);
     }
 
     // 新增方法：隐藏答案按钮和文本
@@ -778,7 +795,7 @@ class MainScene extends Phaser.Scene {
         this.bug.play('fall_bug');
         
         this.bug.once('animationcomplete', () => {
-            // 设置动画停在最后一帧
+            // 设置动停在最后一帧
             this.bug.anims.stopOnFrame(this.bug.anims.currentAnim.frames[this.bug.anims.currentAnim.frames.length - 1]);
             
             // 在最后一帧停留约1秒
