@@ -20,3 +20,4 @@ if (this.currentQuestion && this.currentQuestion.checkAnswer(selectedAnswer)) {
     
     // 其他答错的处理逻辑...
 }
+

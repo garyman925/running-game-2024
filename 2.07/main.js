@@ -2,30 +2,12 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
         this.questions = [
-            "What is the capital of France?",
-            "Which planet is known as the Red Planet?",
-            "What is the largest mammal in the world?",
-            "What is the smallest country in the world?",
-            "What is the currency of Japan?",
-            "Who wrote 'Romeo and Juliet'?",
-            "What is the boiling point of water?",
-            "Which gas do plants absorb from the atmosphere?",
-            "What is the hardest natural substance on Earth?",
-            "Who painted the Mona Lisa?"
+            "What is the capital of France?"
         ];
         this.answers = [
-            ["Paris", "London"],
-            ["Mars", "Venus"],
-            ["Blue Whale", "African Elephant"],
-            ["Vatican City", "Monaco"],
-            ["Yen", "Won"],
-            ["William Shakespeare", "Charles Dickens"],
-            ["100 degrees Celsius", "90 degrees Celsius"],
-            ["Carbon Dioxide", "Oxygen"],
-            ["Diamond", "Gold"],
-            ["Leonardo da Vinci", "Pablo Picasso"]
+            ["Paris", "London"]
         ];
-        this.qIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        this.qIds = [1];
         this.initialMidGroundSpeed = 0.8;  // 增加初始速度
         this.maxMidGroundSpeed = 3.0;  // 增加最大速度
         this.initialGroundSpeed = 1;  // 初始地面速度
@@ -387,7 +369,17 @@ class MainScene extends Phaser.Scene {
         console.log("Game Over. Score: " + score);
         console.log("Questions: " + JSON.stringify(this.qIds));
         console.log("User Answers: " + JSON.stringify(this.collectResult));
-        this.scene.start('EndScene');
+        
+        this.scene.start('EndScene', { 
+            score: score, 
+            bugPosition: this.bug.y,
+            enemyBugPosition: this.enemyBug.y,
+            groundPosition: this.ground.y,
+            midGroundPosition: this.midGround.y,
+            questions: this.questions,
+            answers: this.answers,
+            userAnswers: this.collectResult
+        });
     }
 
     update() {
@@ -712,7 +704,7 @@ class MainScene extends Phaser.Scene {
             duration: 500,  // 动画持续0.5秒
             yoyo: true,  // 动画会来回进行
             repeat: -1,  // 无限重复
-            ease: 'Sine.easeInOut'  // 使用���弦曲线使动画更平滑
+            ease: 'Sine.easeInOut'  // 使用弦曲线使动画更平滑
         });
     }
 
