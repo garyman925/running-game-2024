@@ -4,8 +4,13 @@ class EndScene extends Phaser.Scene {
     }
 
     init(data) {
-        this.score = data.score;
-        console.log("Received score in EndScene:", this.score);  // 添加这行
+        console.log("EndScene init method called with data:", data);
+        this.bugScore = data.bugScore;
+        this.enemyBugScore = data.enemyBugScore;
+        this.score = data.score; // 确保这行存在
+        console.log("After assignment in init - Bug Score:", this.bugScore);
+        console.log("After assignment in init - Enemy Bug Score:", this.enemyBugScore);
+        console.log("After assignment in init - Score:", this.score);
         this.bugPosition = data.bugPosition;
         this.enemyBugPosition = data.enemyBugPosition;
         this.groundPosition = data.groundPosition;
@@ -13,11 +18,12 @@ class EndScene extends Phaser.Scene {
         this.questions = data.questions;
         this.answers = data.answers;
         this.userAnswers = data.userAnswers;
-        this.bugScore = data.bugScore;
-        this.enemyBugScore = data.enemyBugScore;
     }
 
     create() {
+        console.log("EndScene create method called");
+        console.log("In create - Bug Score:", this.bugScore);
+        console.log("In create - Enemy Bug Score:", this.enemyBugScore);
         // 停止 MainScene 的背景音乐
         this.sound.stopByKey('bgm');
 
@@ -70,7 +76,7 @@ class EndScene extends Phaser.Scene {
         castleMask.fillRect(this.sys.game.config.width / 2, 0, this.sys.game.config.width / 2, this.sys.game.config.height);
         castle.setMask(castleMask.createGeometryMask());
 
-        // 创建 darkmask
+        // 建 darkmask
         this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);
         this.darkMask.setOrigin(0, 0);
         this.darkMask.setDepth(1);
@@ -122,15 +128,15 @@ class EndScene extends Phaser.Scene {
             align: 'left'
         };
 
-        // 显示玩家分数
-        this.add.text(20, 20, `Your Score: ${this.bugScore}`, scoreTextStyle)
-            .setOrigin(0, 0)
-            .setDepth(10);
+        // // 显示玩家分数
+        // this.add.text(20, 20, `Your Score: ${this.bugScore}`, scoreTextStyle)
+        //     .setOrigin(0, 0)
+        //     .setDepth(10);
 
-        // 显示敌人分数
-        this.add.text(20, 60, `Enemy Score: ${this.enemyBugScore}`, scoreTextStyle)
-            .setOrigin(0, 0)
-            .setDepth(10);
+        // // 显示敌人分数
+        // this.add.text(20, 60, `Enemy Score: ${this.enemyBugScore}`, scoreTextStyle)
+        //     .setOrigin(0, 0)
+        //     .setDepth(10);
 
         // 移除之前的分数动画代码
         // this.animateScore(0, this.score);
@@ -235,6 +241,57 @@ class EndScene extends Phaser.Scene {
             frameRate: 15,
             repeat: 0
         });
+
+        // 创建敌人图标和分数显示
+        const enemyIconSize = 130;  // 图标的直径
+        const enemyIconX = this.sys.game.config.width - 200;
+        const enemyIconY = 60 + enemyIconSize / 2;
+        const enemyIcon = this.add.image(enemyIconX, enemyIconY, 'enemy-icon').setOrigin(0.5).setDepth(6);
+        
+        // 创建圆形遮罩
+        const enemyMask = this.make.graphics().fillCircle(enemyIconX, enemyIconY, enemyIconSize / 2);
+        enemyIcon.setMask(enemyMask.createGeometryMask());
+        
+        // 调整图标大小以填满圆形
+        enemyIcon.setDisplaySize(enemyIconSize, enemyIconSize);
+
+        // 在创建分数文本之前再次检查分数值
+        console.log("Before creating score text - Bug Score:", this.bugScore);
+        console.log("Before creating score text - Enemy Bug Score:", this.enemyBugScore);
+
+        // 创建分数文本
+        this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, `${this.enemyBugScore}`, {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '24px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0).setDepth(7);
+
+        // 创建玩家图标和分数显示，放在敌人图标下方
+        const userIconSize = 130;  // 图标的直径
+        const userIconX = enemyIconX;  // 与敌人图标的 X 坐标相同
+        const userIconY = enemyIconY + enemyIconSize + 80;  // 在敌人图标下方，留出一些间距
+        const userIcon = this.add.image(userIconX, userIconY, 'user-icon').setOrigin(0.5).setDepth(6);
+        
+        // 创建圆形遮罩
+        const userMask = this.make.graphics().fillCircle(userIconX, userIconY, userIconSize / 2);
+        userIcon.setMask(userMask.createGeometryMask());
+        
+        // 调整图标大小以填满圆形
+        userIcon.setDisplaySize(userIconSize, userIconSize);
+
+        // 创建分数文本并置于图标下方中央
+        this.add.text(userIconX, userIconY + userIconSize / 2 + 30, `${this.bugScore}`, {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '24px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0).setDepth(7);
+
+        // 创建敌人分数文本并置于图标下方中央
+        this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, `${this.enemyBugScore}`, {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '24px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0).setDepth(7);
     }
 
     update() {
@@ -370,7 +427,7 @@ class EndScene extends Phaser.Scene {
         hitAreaGraphics.fillRectShape(hitArea);
         hitAreaGraphics.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
 
-        // 设置拖动
+        // 置拖动
         this.input.setDraggable(hitAreaGraphics);
 
         // 创建悬停提示文本

@@ -503,20 +503,25 @@ class MainScene extends Phaser.Scene {
     }
 
     endGame() {
-        console.log("Game Over. Score: " + score);
-        console.log("Questions: " + JSON.stringify(this.qIds));
-        console.log("User Answers: " + JSON.stringify(this.collectResult));
+        console.log("Game Over. Bug Score:", this.bugScore);
+        console.log("Game Over. Enemy Bug Score:", this.enemyBugScore);
         
-        // 停止播放 footsteps 音效
-        if (this.footstepsSound) {
-            this.footstepsSound.stop();
-        }
-
-        this.scene.start('EndScene', { 
+        const endSceneData = { 
             bugScore: this.bugScore,
             enemyBugScore: this.enemyBugScore,
-            // ... 其他需要传递的数据 ...
-        });
+            score: this.bugScore, // 添加这行，确保与 EndScene 中的 this.score 对应
+            bugPosition: this.bug.y,
+            enemyBugPosition: this.enemyBug.y,
+            groundPosition: this.ground.y,
+            midGroundPosition: this.midGround.y,
+            questions: this.questions,
+            answers: this.answers,
+            userAnswers: this.collectResult
+        };
+        
+        console.log("Data being passed to EndScene:", endSceneData);
+        
+        this.scene.start('EndScene', endSceneData);
     }
 
     update() {
@@ -808,7 +813,7 @@ class MainScene extends Phaser.Scene {
 
     createPlayerFlag() {
         this.playerFlag = this.add.image(this.bug.x, this.bug.y - 30, 'flag');
-        this.playerFlag.setScale(1);  // ���整小
+        this.playerFlag.setScale(1);  // 整小
         this.playerFlag.setOrigin(0.5, 1);  // 设置原点为部中心
         this.playerFlag.setDepth(this.bug.depth + 1);  // 确保旗子在虫子上方
 
@@ -846,7 +851,7 @@ class MainScene extends Phaser.Scene {
         }
 
         // 陨石速度和频率保持不变
-        // 如果你想在游戏开始时设置陨石的速度和频率，可以在 createMeteors 方法中进行设置
+        // 如果你想在游戏开始时设置陨石速度和频率，可以在 createMeteors 方法中进行设置
     }
 
     showSpeedUpText() {
