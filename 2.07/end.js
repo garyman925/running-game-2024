@@ -16,6 +16,9 @@ class EndScene extends Phaser.Scene {
     }
 
     create() {
+        // 停止 footstep 音效
+        this.sound.stopByKey('footsteps');
+
         // 创建背景
         this.midGround = this.add.tileSprite(
             this.sys.game.config.width / 2,

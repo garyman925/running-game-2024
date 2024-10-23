@@ -30,13 +30,16 @@ class LoadScene extends Phaser.Scene {
 		this.load.image('cross', '../assets/cross.png');
 		this.load.image('correct', '../assets/correct.png');
 		this.load.image('wrong', '../assets/wrong.png');
-		this.load.audio('bgm', '../audio/bgm1.mp3');
+		this.load.audio('bgm', '../audio/bgm.mp3');
 		this.load.audio('fail', '../audio/felldown2.wav');
 		this.load.audio('endbgm', '../audio/complete2.mp3');
 		this.load.audio('running', '../audio/run.wav');
 		this.load.audio('aruready', '../audio/aruready.wav');
 		this.load.audio('yeah', '../audio/yeah.mp3');
 		this.load.audio('step', '../audio/step.wav');
+		this.load.audio('footsteps', '../audio/footsteps.mp3');
+		this.load.audio('you_are_correct', '../audio/you_are_correct.mp3');
+		this.load.audio('you_are_wrong', '../audio/you_are_wrong.mp3');
 		this.load.image('meteor', '../assets/meteor-3.png');
 		this.load.image('star', '../assets/star.png');  // 确保你有一个星星的图片资源
 		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
@@ -51,6 +54,7 @@ class LoadScene extends Phaser.Scene {
 		// 加载 enemyBug 的燃烧 sprite sheet
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.image('castle', '../assets/castle.png');  // 确保路径正确
+		this.load.audio('dragon_roar', '../audio/dragon.mp3');
 	}
 
 	create() {

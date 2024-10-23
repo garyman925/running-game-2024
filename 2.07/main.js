@@ -28,6 +28,8 @@ class MainScene extends Phaser.Scene {
         this.maxGroundSpeed = 4;  // 最大地面速度
         this.currentQuestionIndex = 0;
         this.meteorEmitter = null;
+        this.footstepsSound = null;
+        this.dragonRoarSound = null;
     }
 
     create() {
@@ -101,7 +103,7 @@ class MainScene extends Phaser.Scene {
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
-        // 设置虫子性
+        // 设虫子性
         this.setupBugs();
 
         // 创建钮和文本
@@ -165,7 +167,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 1,
                 suffix: '.png'
             }),
-            frameRate: 8,  // 可以根據需要調整幀率
+            frameRate: 8,  // 可以根據需調整幀率
             repeat: -1
         });
 
@@ -188,6 +190,18 @@ class MainScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-D', () => {
             this.debugEndScene();
         });
+
+        // 加载并播放脚步声音效
+        this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.5 });
+        this.footstepsSound.play();
+
+        // 加载龙叫声音效
+        this.dragonRoarSound = this.sound.add('dragon_roar');
+
+        // 初始调用播放龙吼叫的方法
+        this.playDragonRoar();
+
+        console.log('Dragon roar timer set');  // 添加这行日志
     }
 
     setupBugs() {
@@ -255,7 +269,7 @@ class MainScene extends Phaser.Scene {
         });
 
         this.enemyBug.play('run_enemyBug');
-        this.enemyBug.setScale(0.8);  // 调整大小，可能需要根据新sprite的尺寸进行调整
+        this.enemyBug.setScale(0.8);  // 调整大小，可能需要根据新sprite的尺寸进调整
         this.enemyBug.setOrigin(0.5, 0.5);
 
         // 添加 enemyBug 的燃烧动画
@@ -405,12 +419,17 @@ class MainScene extends Phaser.Scene {
     }
 
     endGame() {
-        console.log("Game Over. Score: " + score);  // 添加这行来检查分数
+        console.log("Game Over. Score: " + score);
         console.log("Questions: " + JSON.stringify(this.qIds));
         console.log("User Answers: " + JSON.stringify(this.collectResult));
         
+        // 停止播放 footsteps 音效
+        if (this.footstepsSound) {
+            this.footstepsSound.stop();
+        }
+
         this.scene.start('EndScene', { 
-            score: score,  // 确保这里使用的是正确的分数变量
+            score: score, 
             bugPosition: this.bug.y,
             enemyBugPosition: this.enemyBug.y,
             groundPosition: this.ground.y,
@@ -440,7 +459,7 @@ class MainScene extends Phaser.Scene {
         // 注释掉或删除移动中层背景的代码
         // this.midGround.tilePositionX += this.midGroundSpeed;
 
-        // 移动地面
+        // 动地面
         this.ground.tilePositionX += this.groundSpeed;
 
         // 持续检查问题文的可见性
@@ -477,7 +496,7 @@ class MainScene extends Phaser.Scene {
         this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
         this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
         
-        // 设置反馈图标的深度
+        // 设置馈图标的深度
         this.tick.setDepth(6);
         this.cross.setDepth(6);
         this.correct.setDepth(7);
@@ -497,6 +516,9 @@ class MainScene extends Phaser.Scene {
             this.moveBugForward();
             this.createStarEffect();
             
+            // 播放正确答案音效
+            this.sound.play('you_are_correct');
+            
             // 播放 enemyBug 的燃烧动画
             this.enemyBug.play('burn_enemyBug');
             
@@ -508,8 +530,12 @@ class MainScene extends Phaser.Scene {
             // 错误答案的处理
             console.log("错误答案！");
             this.showWrongFeedback(button);
-            this.shootMeteor();  // 這裡改為 shootMeteor
+            this.pauseFootsteps();  // 暂停脚步声
+            this.playFallBugAnimation();
             this.moveEnemyBugForward();
+            
+            // 播放错误答案音效
+            this.sound.play('you_are_wrong');
         }
 
         // 显示旗子
@@ -530,7 +556,7 @@ class MainScene extends Phaser.Scene {
     showCorrectFeedback(button) {
         this.tick.setPosition(button.x, button.y).setVisible(true);
         this.correct.setVisible(true);
-        this.yeah.play();
+        //this.yeah.play();
 
         // 2秒后隐藏反馈
         this.time.delayedCall(2000, () => {
@@ -542,7 +568,7 @@ class MainScene extends Phaser.Scene {
     showWrongFeedback(button) {
         this.cross.setPosition(button.x, button.y).setVisible(true);
         this.wrong.setVisible(true);
-        this.fail.play();
+        //this.fail.play();
 
         // 显示正确答案
         const correctButton = (button === this.button1) ? this.button2 : this.button1;
@@ -732,7 +758,7 @@ class MainScene extends Phaser.Scene {
 
     createPlayerFlag() {
         this.playerFlag = this.add.image(this.bug.x, this.bug.y - 30, 'flag');
-        this.playerFlag.setScale(1);  // 调整大小
+        this.playerFlag.setScale(1);  // 调整小
         this.playerFlag.setOrigin(0.5, 1);  // 设置原点为部中心
         this.playerFlag.setDepth(this.bug.depth + 1);  // 确保旗子在虫子上方
 
@@ -886,6 +912,7 @@ class MainScene extends Phaser.Scene {
                 console.log('Resetting to run_bug animation');
                 // 1秒后重置为run_bug动画
                 this.bug.play('run_bug');
+                this.resumeFootsteps();  // 恢复脚步声
             });
         });
 
@@ -988,6 +1015,40 @@ class MainScene extends Phaser.Scene {
 
         // 立即跳转到 EndScene
         this.scene.start('EndScene', debugData);
+    }
+
+    pauseFootsteps() {
+        if (this.footstepsSound) {
+            this.footstepsSound.pause();
+        }
+    }
+
+    resumeFootsteps() {
+        if (this.footstepsSound) {
+            this.footstepsSound.resume();
+        }
+    }
+
+    shutdown() {
+        if (this.footstepsSound) {
+            this.footstepsSound.stop();
+        }
+        if (this.dragonRoarSound) {
+            this.dragonRoarSound.stop();
+        }
+        // 可能的其他清理代码
+    }
+
+    playDragonRoar() {
+        console.log('Dragon roar played at:', new Date().toISOString());
+        this.dragonRoarSound.play({ volume: 0.5 });
+
+        // 在音效播放完毕后，设置一个延迟来再次调用此方法
+        this.dragonRoarSound.once('complete', () => {
+            this.time.delayedCall(4000, () => {
+                this.playDragonRoar();
+            });
+        });
     }
 }
 
