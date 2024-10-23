@@ -60,12 +60,18 @@ class EndScene extends Phaser.Scene {
         // 创建陨石效果
         this.createMeteors();
 
-        // 显示得分
-        this.add.text(this.sys.game.config.width / 2, 50, `Final Score: ${this.score}`, {
+        // 修改显示得分的位置
+        this.add.text(this.sys.game.config.width - 20, 50, `Final Score: ${this.score}`, {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '32px',
+            fontSize: '24px',
             fill: '#ffffff'
-        }).setOrigin(0.5).setDepth(5);
+        }).setOrigin(1, 0.5).setDepth(5);  // 使用 setOrigin(1, 0.5) 使文本右对齐
+
+        // 调整滚动文本区域的位置和大小
+        const textWidth = 1100;  // 增加文本区域宽度
+        const textHeight = 450;  // 增加文本区���高度
+        const padding = 20;
+        const topMargin = 80;  // 稍微降低文本区域的位置
 
         // 创建滚动文本区域
         this.createScrollableText();
@@ -116,21 +122,22 @@ class EndScene extends Phaser.Scene {
     }
 
     createScrollableText() {
-        const textWidth = 1000;
-        const textHeight = 400;
-        const padding = 20;
-        const topMargin = 100;
+        const margin = 50;  // 边距
+        const textWidth = this.sys.game.config.width / 2 + 300;  // 增加文本宽度
+        const textHeight = this.sys.game.config.height / 2;  // 将高度设置为屏幕高度的一半
         const scrollBarWidth = 20;
-        const cornerRadius = 20;  // 圆角半径
+        const cornerRadius = 20;
+        const leftOffset = 0;  // 向左偏移量
+        const topMargin = margin;  // 将顶部边距设置为 margin，使答案框贴在顶部
 
-        // 建背景
+        // 创建背景
         const background = this.add.graphics();
         background.fillStyle(0x000000, 0.7);
         background.fillRoundedRect(
-            this.sys.game.config.width / 2 - textWidth / 2 - padding,
+            margin - leftOffset,
             topMargin,
-            textWidth + padding * 2,
-            textHeight + padding * 2,
+            textWidth,
+            textHeight,
             cornerRadius
         );
         background.setDepth(5);
@@ -139,10 +146,10 @@ class EndScene extends Phaser.Scene {
         const mask = this.make.graphics();
         mask.fillStyle(0xffffff);
         mask.fillRoundedRect(
-            this.sys.game.config.width / 2 - textWidth / 2 - padding,
+            margin - leftOffset,
             topMargin,
-            textWidth + padding * 2,
-            textHeight + padding * 2,
+            textWidth,
+            textHeight,
             cornerRadius
         );
 
@@ -155,23 +162,23 @@ class EndScene extends Phaser.Scene {
                        const isCorrect = i === 0;
                        const isUserAnswer = userAnswer === i;
                        const prefix = isCorrect ? '✓' : '✗';
-                       let answerText = `       ${answer} ${prefix}`; // 将前缀移到答案后面
+                       let answerText = `     ${answer} ${prefix}`; // 在答案前添加五个空格
                        if (isUserAnswer) {
                            answerText += ' (Your Answer)';
                        }
                        return answerText;
-                   }).join('\n') + '\n'; // 移除了一个换行符
+                   }).join('\n') + '\n';
         }).join('\n');
 
         const text = this.add.text(
-            this.sys.game.config.width / 2 - textWidth / 2,
-            topMargin + padding,
+            margin + 10 - leftOffset,
+            topMargin + 10,
             content,
             {
                 fontFamily: '"Jost", sans-serif',
-                fontSize: '22px',
+                fontSize: '18px',
                 color: '#ffffff',
-                wordWrap: { width: textWidth },
+                wordWrap: { width: textWidth - 40 },
                 lineSpacing: 5,
                 align: 'left'
             }
@@ -180,14 +187,13 @@ class EndScene extends Phaser.Scene {
         text.setMask(mask.createGeometryMask());
 
         // 创建滚动条
-        const scrollBarX = this.sys.game.config.width / 2 + textWidth / 2 + scrollBarWidth / 2;
         const scrollBar = this.add.graphics();
         scrollBar.fillStyle(0xcccccc, 1);
         scrollBar.fillRoundedRect(
-            scrollBarX - scrollBarWidth / 2,
+            margin + textWidth - scrollBarWidth - leftOffset,
             topMargin,
             scrollBarWidth,
-            textHeight + padding * 2,
+            textHeight,
             scrollBarWidth / 2
         );
         scrollBar.setDepth(6);
@@ -196,7 +202,7 @@ class EndScene extends Phaser.Scene {
         const scrollThumb = this.add.graphics();
         scrollThumb.fillStyle(0xffffff, 1);
         scrollThumb.fillRoundedRect(
-            scrollBarX - scrollBarWidth / 2,
+            margin + textWidth - scrollBarWidth - leftOffset,
             topMargin,
             scrollBarWidth,
             100,
@@ -206,10 +212,10 @@ class EndScene extends Phaser.Scene {
 
         // 创建一个透明的交互区域，覆盖整个滚动条
         const hitArea = new Phaser.Geom.Rectangle(
-            scrollBarX - scrollBarWidth / 2,
+            margin - leftOffset,
             topMargin,
-            scrollBarWidth,
-            textHeight + padding * 2
+            textWidth,
+            textHeight
         );
         const hitAreaGraphics = this.add.graphics({ fillStyle: { color: 0xffffff, alpha: 0 } });
         hitAreaGraphics.fillRectShape(hitArea);
@@ -229,16 +235,19 @@ class EndScene extends Phaser.Scene {
         hoverText.setVisible(false);
         hoverText.setDepth(8);
 
+        // 计算滚动条的 X 坐标
+        const scrollBarX = margin + textWidth - scrollBarWidth - leftOffset;
+
         // 添加鼠标悬停效果
         hitAreaGraphics.on('pointerover', (pointer) => {
             this.input.setDefaultCursor('pointer');
             hoverText.setVisible(true);
-            hoverText.setPosition(scrollBarX + scrollBarWidth / 2 + 10, pointer.y);
+            hoverText.setPosition(scrollBarX + scrollBarWidth + 10, pointer.y);
         });
 
         hitAreaGraphics.on('pointermove', (pointer) => {
             if (hoverText.visible) {
-                hoverText.setPosition(scrollBarX + scrollBarWidth / 2 + 10, pointer.y);
+                hoverText.setPosition(scrollBarX + scrollBarWidth + 10, pointer.y);
             }
         });
 
@@ -249,7 +258,7 @@ class EndScene extends Phaser.Scene {
 
         // 滚动逻辑
         let isDragging = false;
-        const maxY = topMargin + textHeight + padding * 2 - 100;
+        const maxY = topMargin + textHeight - 100;
         const minY = topMargin;
 
         hitAreaGraphics.on('drag', (pointer, dragX, dragY) => {
@@ -258,31 +267,31 @@ class EndScene extends Phaser.Scene {
             scrollThumb.clear();
             scrollThumb.fillStyle(0xffffff, 1);
             scrollThumb.fillRoundedRect(
-                scrollBarX - scrollBarWidth / 2,
+                margin + textWidth - scrollBarWidth - leftOffset,
                 newY,
                 scrollBarWidth,
                 100,
                 scrollBarWidth / 2
             );
             const scrollPercentage = (newY - minY) / (maxY - minY);
-            text.y = topMargin + padding - (text.height - textHeight) * scrollPercentage;
+            text.y = topMargin + 10 - (text.height - textHeight) * scrollPercentage;
         });
 
         hitAreaGraphics.on('dragend', () => {
             isDragging = false;
         });
 
-        // 标滚轮滚动
+        // 鼠标滚轮滚动
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
             if (!isDragging) {
                 text.y -= deltaY;
-                text.y = Phaser.Math.Clamp(text.y, -(text.height - textHeight) + topMargin + padding, topMargin + padding);
-                const scrollPercentage = (topMargin + padding - text.y) / (text.height - textHeight);
+                text.y = Phaser.Math.Clamp(text.y, -(text.height - textHeight) + topMargin + 10, topMargin + 10);
+                const scrollPercentage = (topMargin + 10 - text.y) / (text.height - textHeight);
                 const newY = minY + (maxY - minY) * scrollPercentage;
                 scrollThumb.clear();
                 scrollThumb.fillStyle(0xffffff, 1);
                 scrollThumb.fillRoundedRect(
-                    scrollBarX - scrollBarWidth / 2,
+                    margin + textWidth - scrollBarWidth - leftOffset,
                     newY,
                     scrollBarWidth,
                     100,
