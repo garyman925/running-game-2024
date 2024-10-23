@@ -118,27 +118,32 @@ class EndScene extends Phaser.Scene {
     createScrollableText() {
         const textWidth = 1000;
         const textHeight = 400;
-        const padding = 0;
+        const padding = 20;
         const topMargin = 100;
+        const scrollBarWidth = 20;
+        const cornerRadius = 20;  // 圆角半径
 
         // 创建背景
-        const background = this.add.rectangle(
-            this.sys.game.config.width / 2,
-            topMargin + textHeight / 2,
+        const background = this.add.graphics();
+        background.fillStyle(0x000000, 0.7);
+        background.fillRoundedRect(
+            this.sys.game.config.width / 2 - textWidth / 2 - padding,
+            topMargin,
             textWidth + padding * 2,
             textHeight + padding * 2,
-            0x000000,
-            0.7
-        ).setDepth(5);
+            cornerRadius
+        );
+        background.setDepth(5);
 
         // 创建遮罩
         const mask = this.make.graphics();
         mask.fillStyle(0xffffff);
-        mask.fillRect(
+        mask.fillRoundedRect(
             this.sys.game.config.width / 2 - textWidth / 2 - padding,
             topMargin,
             textWidth + padding * 2,
-            textHeight + padding * 2
+            textHeight + padding * 2,
+            cornerRadius
         );
 
         // 创建文本
@@ -169,35 +174,95 @@ class EndScene extends Phaser.Scene {
         text.setMask(mask.createGeometryMask());
 
         // 创建滚动条
-        const scrollBar = this.add.rectangle(
-            this.sys.game.config.width / 2 + textWidth / 2 + padding / 2,
+        const scrollBarX = this.sys.game.config.width / 2 + textWidth / 2 + scrollBarWidth / 2;
+        const scrollBar = this.add.graphics();
+        scrollBar.fillStyle(0xcccccc, 1);
+        scrollBar.fillRoundedRect(
+            scrollBarX - scrollBarWidth / 2,
             topMargin,
-            10,
+            scrollBarWidth,
             textHeight + padding * 2,
-            0xcccccc
-        ).setOrigin(0.5, 0).setDepth(6);
+            scrollBarWidth / 2
+        );
+        scrollBar.setDepth(6);
 
-        const scrollThumb = this.add.rectangle(
-            this.sys.game.config.width / 2 + textWidth / 2 + padding / 2,
+        // 创建滚动滑块
+        const scrollThumb = this.add.graphics();
+        scrollThumb.fillStyle(0xffffff, 1);
+        scrollThumb.fillRoundedRect(
+            scrollBarX - scrollBarWidth / 2,
             topMargin,
-            10,
-            50,
-            0xffffff
-        ).setOrigin(0.5, 0).setDepth(7).setInteractive({ draggable: true });
+            scrollBarWidth,
+            100,
+            scrollBarWidth / 2
+        );
+        scrollThumb.setDepth(7);
+
+        // 创建一个透明的交互区域，覆盖整个滚动条
+        const hitArea = new Phaser.Geom.Rectangle(
+            scrollBarX - scrollBarWidth / 2,
+            topMargin,
+            scrollBarWidth,
+            textHeight + padding * 2
+        );
+        const hitAreaGraphics = this.add.graphics({ fillStyle: { color: 0xffffff, alpha: 0 } });
+        hitAreaGraphics.fillRectShape(hitArea);
+        hitAreaGraphics.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+
+        // 设置拖动
+        this.input.setDraggable(hitAreaGraphics);
+
+        // 创建悬停提示文本
+        const hoverText = this.add.text(0, 0, 'Scroll', {
+            fontFamily: '"IM Fell DW Pica", serif',
+            fontSize: '20px',
+            color: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { x: 5, y: 5 }
+        });
+        hoverText.setVisible(false);
+        hoverText.setDepth(8);
+
+        // 添加鼠标悬停效果
+        hitAreaGraphics.on('pointerover', (pointer) => {
+            this.input.setDefaultCursor('pointer');
+            hoverText.setVisible(true);
+            hoverText.setPosition(scrollBarX + scrollBarWidth / 2 + 10, pointer.y);
+        });
+
+        hitAreaGraphics.on('pointermove', (pointer) => {
+            if (hoverText.visible) {
+                hoverText.setPosition(scrollBarX + scrollBarWidth / 2 + 10, pointer.y);
+            }
+        });
+
+        hitAreaGraphics.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            hoverText.setVisible(false);
+        });
 
         // 滚动逻辑
         let isDragging = false;
-        const maxY = topMargin + textHeight + padding * 2 - scrollThumb.height;
+        const maxY = topMargin + textHeight + padding * 2 - 100;
         const minY = topMargin;
 
-        scrollThumb.on('drag', (pointer, dragX, dragY) => {
+        hitAreaGraphics.on('drag', (pointer, dragX, dragY) => {
             isDragging = true;
-            scrollThumb.y = Phaser.Math.Clamp(dragY, minY, maxY);
-            const scrollPercentage = (scrollThumb.y - minY) / (maxY - minY);
+            const newY = Phaser.Math.Clamp(dragY, minY, maxY);
+            scrollThumb.clear();
+            scrollThumb.fillStyle(0xffffff, 1);
+            scrollThumb.fillRoundedRect(
+                scrollBarX - scrollBarWidth / 2,
+                newY,
+                scrollBarWidth,
+                100,
+                scrollBarWidth / 2
+            );
+            const scrollPercentage = (newY - minY) / (maxY - minY);
             text.y = topMargin + padding - (text.height - textHeight) * scrollPercentage;
         });
 
-        scrollThumb.on('dragend', () => {
+        hitAreaGraphics.on('dragend', () => {
             isDragging = false;
         });
 
@@ -207,7 +272,16 @@ class EndScene extends Phaser.Scene {
                 text.y -= deltaY;
                 text.y = Phaser.Math.Clamp(text.y, -(text.height - textHeight) + topMargin + padding, topMargin + padding);
                 const scrollPercentage = (topMargin + padding - text.y) / (text.height - textHeight);
-                scrollThumb.y = minY + (maxY - minY) * scrollPercentage;
+                const newY = minY + (maxY - minY) * scrollPercentage;
+                scrollThumb.clear();
+                scrollThumb.fillStyle(0xffffff, 1);
+                scrollThumb.fillRoundedRect(
+                    scrollBarX - scrollBarWidth / 2,
+                    newY,
+                    scrollBarWidth,
+                    100,
+                    scrollBarWidth / 2
+                );
             }
         });
     }
