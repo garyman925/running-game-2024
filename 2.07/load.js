@@ -55,6 +55,8 @@ class LoadScene extends Phaser.Scene {
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.image('castle', '../assets/castle.png');  // 确保路径正确
 		this.load.audio('dragon_roar', '../audio/dragon.mp3');
+		this.load.audio('endscene-bgm', '../audio/endscene-bgm.mp3');
+		this.load.audio('dang', '../audio/dang.mp3');
 	}
 
 	create() {

@@ -416,6 +416,13 @@ class MainScene extends Phaser.Scene {
             // 显答案按钮和文本
             this.showAnswers();
         });
+
+        // 显示问题文本
+        this.questionText.setText(question);
+        this.questionText.setVisible(true);
+
+        // 播放 dang 音效
+        this.sound.play('dang');
     }
 
     endGame() {

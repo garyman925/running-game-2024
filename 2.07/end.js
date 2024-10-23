@@ -16,8 +16,17 @@ class EndScene extends Phaser.Scene {
     }
 
     create() {
+        // 停止 MainScene 的背景音乐
+        this.sound.stopByKey('bgm');
+
+        // 停止 dragon roar 音效
+        this.sound.stopByKey('dragon_roar');
+
         // 停止 footstep 音效
         this.sound.stopByKey('footsteps');
+
+        // 播放 EndScene 的背景音乐
+        this.sound.play('endscene-bgm', { loop: false });
 
         // 创建背景
         this.midGround = this.add.tileSprite(
@@ -113,7 +122,7 @@ class EndScene extends Phaser.Scene {
         this.createScrollableText();
 
         // 添加重新开始按钮
-        const restartButton = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 50, 'Restart', {
+        const restartButton = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 250, 'Replay', {
             fontFamily: '"Press Start 2P", cursive',
             fontSize: '24px',
             fill: '#ffffff'
@@ -373,5 +382,9 @@ class EndScene extends Phaser.Scene {
                 );
             }
         });
+    }
+
+    shutdown() {
+        this.sound.stopByKey('endscene-bgm');
     }
 }
