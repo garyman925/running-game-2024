@@ -35,6 +35,11 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
+        // 重置游戏状态
+        this.currentQuestionIndex = 0;
+        this.bugScore = 0;
+        this.enemyBugScore = 0;
+        
         // 设置物理系统
         this.physics.world.setBounds(0, 0, this.sys.game.config.width, this.sys.game.config.height);
 
@@ -197,13 +202,9 @@ class MainScene extends Phaser.Scene {
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.5 });
         this.footstepsSound.play();
 
-        // 加载龙叫声音效
-        this.dragonRoarSound = this.sound.add('dragon_roar');
-
-        // 初始调用播放龙吼叫的方法
-        this.playDragonRoar();
-
-        console.log('Dragon roar timer set');  // 添加这行日志
+        // 删除或注释掉以下两行
+        // this.playDragonRoar();
+        // console.log('Dragon roar timer set');
     }
 
     setupBugs() {
@@ -923,7 +924,7 @@ class MainScene extends Phaser.Scene {
             // 在最后一帧停留约1秒
             this.time.delayedCall(1000, () => {
                 console.log('Resetting to run_bug animation');
-                // 1秒后重置为run_bug动画
+                // 1秒后重置为run_bug画
                 this.bug.play('run_bug');
                 this.resumeFootsteps();  // 恢复脚步声
             });
@@ -1009,7 +1010,7 @@ class MainScene extends Phaser.Scene {
         console.log('Meteor shot!');
     }
 
-    // 新增方法：立即跳转到 EndScene 进行调试
+    // 新增方法立即跳转到 EndScene 进行调试
     debugEndScene() {
         // 停止所有声音
         //this.sound.stopAll();
@@ -1046,22 +1047,7 @@ class MainScene extends Phaser.Scene {
         if (this.footstepsSound) {
             this.footstepsSound.stop();
         }
-        if (this.dragonRoarSound) {
-            this.dragonRoarSound.stop();
-        }
         // 可能的其他清理代码
-    }
-
-    playDragonRoar() {
-        console.log('Dragon roar played at:', new Date().toISOString());
-        this.dragonRoarSound.play({ volume: 1 });
-
-        // 在音效播放完毕后，设置一个延迟来再次调用此方法
-        this.dragonRoarSound.once('complete', () => {
-            this.time.delayedCall(10000, () => {
-                this.playDragonRoar();
-            });
-        });
     }
 }
 

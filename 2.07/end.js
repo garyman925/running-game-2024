@@ -21,9 +21,6 @@ class EndScene extends Phaser.Scene {
         // 停止 MainScene 的背景音乐
         this.sound.stopByKey('bgm');
 
-        // 停止 dragon roar 音效
-        this.sound.stopByKey('dragon_roar');
-
         // 停止 footstep 音效
         this.sound.stopByKey('footsteps');
 
@@ -172,8 +169,28 @@ class EndScene extends Phaser.Scene {
             fill: '#ffffff'
         }).setOrigin(0.5).setDepth(5);
 
+        // 设置按钮为交互式
+        restartButton.setInteractive({ useHandCursor: true });
+
+        // 添加鼠标悬停效果
+        restartButton.on('pointerover', () => {
+            restartButton.setStyle({ fill: '#ff0' });
+        });
+
+        restartButton.on('pointerout', () => {
+            restartButton.setStyle({ fill: '#ffffff' });
+        });
+
+        // 修改点击事件
         restartButton.on('pointerdown', () => {
-            this.scene.start('MainScene');
+            // 停止当前场景的音乐
+            this.sound.stopAll();
+
+            // 重置全局分数
+            score = 0;
+
+            // 返回到 MenuScene
+            this.scene.start('MenuScene');
         });
 
         // 确保所有他元素的深度小于 10
