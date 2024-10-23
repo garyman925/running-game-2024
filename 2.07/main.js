@@ -30,6 +30,8 @@ class MainScene extends Phaser.Scene {
         this.meteorEmitter = null;
         this.footstepsSound = null;
         this.dragonRoarSound = null;
+        this.bugScore = 0;
+        this.enemyBugScore = 0;
     }
 
     create() {
@@ -443,7 +445,9 @@ class MainScene extends Phaser.Scene {
             midGroundPosition: this.midGround.y,
             questions: this.questions,
             answers: this.answers,
-            userAnswers: this.collectResult
+            userAnswers: this.collectResult,
+            bugScore: this.bugScore,
+            enemyBugScore: this.enemyBugScore
         });
     }
 
@@ -517,6 +521,7 @@ class MainScene extends Phaser.Scene {
 
         if (button === this.correctAnswer) {
             // 正确答案的处理
+            this.bugScore++;
             console.log("正确答案！");
             this.updateScore(score + 1);
             this.showCorrectFeedback(button);
@@ -535,6 +540,7 @@ class MainScene extends Phaser.Scene {
             });
         } else {
             // 错误答案的处理
+            this.enemyBugScore++;
             console.log("错误答案！");
             this.showWrongFeedback(button);
             this.pauseFootsteps();  // 暂停脚步声
@@ -1048,11 +1054,11 @@ class MainScene extends Phaser.Scene {
 
     playDragonRoar() {
         console.log('Dragon roar played at:', new Date().toISOString());
-        this.dragonRoarSound.play({ volume: 0.5 });
+        this.dragonRoarSound.play({ volume: 1 });
 
         // 在音效播放完毕后，设置一个延迟来再次调用此方法
         this.dragonRoarSound.once('complete', () => {
-            this.time.delayedCall(4000, () => {
+            this.time.delayedCall(10000, () => {
                 this.playDragonRoar();
             });
         });

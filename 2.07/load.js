@@ -4,6 +4,8 @@ class LoadScene extends Phaser.Scene {
 	}
 
 	preload() {
+		console.log('Preload started');
+		
 		this.load.image('bird', '../assets/bird.png');
 		this.load.spritesheet('bugRun', '../assets/bugbug-running.png', { 
 			frameWidth: 170, 
@@ -20,6 +22,7 @@ class LoadScene extends Phaser.Scene {
 		// 加载 bugbug 精灵图集
 		this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
 		this.load.atlas('enemyBug', '../assets/enemy-sprite.png', '../assets/enemy-sprite.json');
+		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
 		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
 		this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
@@ -40,6 +43,8 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio('footsteps', '../audio/footsteps.mp3');
 		this.load.audio('you_are_correct', '../audio/you_are_correct.mp3');
 		this.load.audio('you_are_wrong', '../audio/you_are_wrong.mp3');
+		this.load.audio('you_lose', '../audio/you_lose.mp3');
+		this.load.audio('you_are_the_winner', '../audio/you_are_the_winner.mp3');
 		this.load.image('meteor', '../assets/meteor-3.png');
 		this.load.image('star', '../assets/star.png');  // 确保你有一个星星的图片资源
 		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
@@ -57,9 +62,13 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio('dragon_roar', '../audio/dragon.mp3');
 		this.load.audio('endscene-bgm', '../audio/endscene-bgm.mp3');
 		this.load.audio('dang', '../audio/dang.mp3');
+		console.log('Audio files added to load queue');
+		
+		console.log('Preload completed');
 	}
 
 	create() {
+		console.log('LoadScene create method called');
 		this.scene.start('MenuScene');
 	}
 }

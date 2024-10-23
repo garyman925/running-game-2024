@@ -13,6 +13,8 @@ class EndScene extends Phaser.Scene {
         this.questions = data.questions;
         this.answers = data.answers;
         this.userAnswers = data.userAnswers;
+        this.bugScore = data.bugScore;
+        this.enemyBugScore = data.enemyBugScore;
     }
 
     create() {
@@ -27,6 +29,10 @@ class EndScene extends Phaser.Scene {
 
         // 播放 EndScene 的背景音乐
         this.sound.play('endscene-bgm', { loop: false });
+        //控制音量
+        this.sound.setVolume(0.5);
+       
+ 
 
         // 创建背景
         this.midGround = this.add.tileSprite(
@@ -82,9 +88,31 @@ class EndScene extends Phaser.Scene {
         this.bug.setScale(0.8);
         this.enemyBug.setScale(0.8);
 
-        // 播放虫子的跑步动
-        this.bug.play('run_bug');
-        this.enemyBug.play('run_enemyBug');
+        // 根据分数决定虫子的行为和播放音效
+        if (this.bugScore > this.enemyBugScore) {
+            // 主角虫子跑到城堡前
+            this.tweens.add({
+                targets: this.bug,
+                x: this.sys.game.config.width * 0.7,
+                duration: 2000,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.bug.play('idle_bug');
+                    // 播放胜利音效
+                    this.sound.play('you_are_the_winner');
+                }
+            });
+            this.bug.play('run_bug');
+
+            // 对手虫子播放燃烧动画
+            this.enemyBug.play('burn_enemyBug');
+        } else {
+            // 如果主角虫子没赢，两只虫子都播放普通动画
+            this.bug.play('run_bug');
+            this.enemyBug.play('run_enemyBug');
+            // 播放失败音效
+            this.sound.play('you_lose');
+        }
 
         // 创建陨石效果
         this.createMeteors();
@@ -148,13 +176,66 @@ class EndScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        // 确保所有其他元素的深度小于 10
+        // 确保所有他元素的深度小于 10
         this.midGround.setDepth(2);
         this.darkMask.setDepth(1);
         this.ground.setDepth(3);
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
         this.meteorParticles.setDepth(5);
+
+        // 创建动画
+        this.anims.create({
+            key: 'run_bug',
+            frames: this.anims.generateFrameNames('bugbug', {
+                prefix: 'Comp 1_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 60,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle_bug',
+            frames: this.anims.generateFrameNames('bugbug', {
+                prefix: 'Comp 1_',
+                start: 0,
+                end: 0,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'run_enemyBug',
+            frames: this.anims.generateFrameNames('enemyBug', {
+                prefix: 'Comp 3_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 60,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'burn_enemyBug',
+            frames: this.anims.generateFrameNames('enemyBugBurn', {
+                prefix: 'Comp 4_',
+                start: 0,
+                end: 13,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 15,
+            repeat: 0
+        });
     }
 
     animateScore(start, end) {
