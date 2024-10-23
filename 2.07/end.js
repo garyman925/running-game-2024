@@ -123,7 +123,7 @@ class EndScene extends Phaser.Scene {
         const scrollBarWidth = 20;
         const cornerRadius = 20;  // 圆角半径
 
-        // 创建背景
+        // ��建背景
         const background = this.add.graphics();
         background.fillStyle(0x000000, 0.7);
         background.fillRoundedRect(
@@ -154,8 +154,12 @@ class EndScene extends Phaser.Scene {
                    answers.map((answer, i) => {
                        const isCorrect = i === 0;
                        const isUserAnswer = userAnswer === i;
-                       const prefix = isCorrect ? '✓' : (isUserAnswer ? '✗' : ' ');
-                       return `${prefix} ${answer}`;
+                       const prefix = isCorrect ? '✓' : '✗';
+                       let answerText = `${prefix} ${answer}`;
+                       if (isUserAnswer) {
+                           answerText += ' (Your Answer)';
+                       }
+                       return answerText;
                    }).join('\n') + '\n\n';
         }).join('\n');
 
@@ -266,7 +270,7 @@ class EndScene extends Phaser.Scene {
             isDragging = false;
         });
 
-        // 鼠标滚轮滚动
+        // ��标滚轮滚动
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
             if (!isDragging) {
                 text.y -= deltaY;
