@@ -64,7 +64,7 @@ class EndScene extends Phaser.Scene {
         // 修改显示得分的位置和样式
         const scoreTextStyle = {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '48px',
+            fontSize: '100px',
             fill: '#ffffff',
             align: 'center'
         };
@@ -81,15 +81,19 @@ class EndScene extends Phaser.Scene {
         const finalScoreWidth = finalScoreText.width;
         finalScoreText.destroy(); // 我们只是用来计算宽度，所以现在可以删除它
 
-        // 创建分数文本，初始显示实际分数
-        this.scoreText = this.add.text(this.sys.game.config.width - 20 - finalScoreWidth / 2, 30, `${this.score}`, scoreTextStyle)
+        // 显示分数，向下和向左移动
+        const scoreX = this.sys.game.config.width - 60 - finalScoreWidth / 2;
+        const scoreY = 80;  // 向下移动到 50
+        this.scoreText = this.add.text(scoreX, scoreY, `${this.score}`, scoreTextStyle)
             .setOrigin(0.5, 0)
             .setDepth(10);
 
-        console.log("Initial score set:", this.score);  // 添加这行
+        console.log("Initial score set:", this.score);
 
-        // 显示 "Final Score" 文本
-        this.add.text(this.sys.game.config.width - 20, 90, 'Final Score', finalScoreTextStyle)
+        // 显示 "Final Score" 文本，向下和向左移动
+        const finalScoreX = this.sys.game.config.width - 60;
+        const finalScoreY = 200;  // 向下移动到 110
+        this.add.text(finalScoreX, finalScoreY, 'Final Score', finalScoreTextStyle)
             .setOrigin(1, 0)
             .setDepth(10);
 
