@@ -42,6 +42,22 @@ class MainScene extends Phaser.Scene {
         this.midGround.setScale(1.2);
         this.midGround.setDepth(2);
 
+        // 创建城堡图片（放在 midGround 之前）
+        const castle = this.add.image(
+            this.sys.game.config.width + 50, 
+            this.sys.game.config.height / 2 - 170,  // 将 y 坐标向上移动 50 像素
+            'castle'
+        );
+        castle.setOrigin(1, 0.5);  // 设置原点为右侧中心
+        castle.setScale(0.9);  // 保持缩放比例为 1
+        castle.setDepth(1.5);  // 设置深度在 midGround (深度为2) 之前
+
+        // 创建一个遮罩来覆盖城堡的右半部分
+        const castleMask = this.add.graphics();
+        castleMask.fillStyle(0x000000, 1);
+        castleMask.fillRect(this.sys.game.config.width / 2, 0, this.sys.game.config.width / 2, this.sys.game.config.height);
+        castle.setMask(castleMask.createGeometryMask());
+
         // 创建飞龙
         this.createDragon();
 
@@ -149,6 +165,9 @@ class MainScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+
+        // 设置 midGroundSpeed 为 0
+        this.midGroundSpeed = 0;
     }
 
     setupBugs() {
@@ -356,7 +375,7 @@ class MainScene extends Phaser.Scene {
                 this.correctAnswer = this.button2;
             }
             
-            // 调整文本换行
+            // 调整文本行
             this.answer1Text.setWordWrapWidth(280);
             this.answer2Text.setWordWrapWidth(280);
             
@@ -398,8 +417,8 @@ class MainScene extends Phaser.Scene {
             this.enemyBug.setVelocityY(0);
         }
 
-        // 移动中层背景以创造视差果
-        this.midGround.tilePositionX += this.midGroundSpeed;
+        // 注释掉或删除移动中层背景的代码
+        // this.midGround.tilePositionX += this.midGroundSpeed;
 
         // 移动地面
         this.ground.tilePositionX += this.groundSpeed;
@@ -771,7 +790,7 @@ class MainScene extends Phaser.Scene {
         // 播放飛行動畫
         this.dragon.play('dragon_fly');
 
-        // 添加飛龍的上下浮動動畫
+        // 添加飛龍的上下動動畫
         this.tweens.add({
             targets: this.dragon,
             y: '+=30',  // 增加浮動範圍

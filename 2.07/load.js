@@ -50,6 +50,7 @@ class LoadScene extends Phaser.Scene {
 		
 		// 加载 enemyBug 的燃烧 sprite sheet
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
+		this.load.image('castle', '../assets/castle.png');  // 确保路径正确
 	}
 
 	create() {
