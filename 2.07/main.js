@@ -2,12 +2,26 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
         this.questions = [
-            "What is the capital of France?"
+            "What is the capital of France?",
+            "What is the capital of Japan?",
+            "What is the capital of China?",
+            "What is the capital of Korea?",
+            "What is the capital of Vietnam?",
+            "What is the capital of Thailand?",
+            "What is the capital of Indonesia?",
+            "What is the capital of Malaysia?"
         ];
         this.answers = [
-            ["Paris", "London"]
+            ["Paris", "London"],
+            ["Tokyo", "Seoul"],
+            ["Beijing", "Shanghai"],
+            ["Seoul", "Tokyo"],
+            ["Hanoi", "Bangkok"],
+            ["Jakarta", "Bandung"],
+            ["Bangkok", "Phuket"],
+            ["Jakarta", "Bandung"]
         ];
-        this.qIds = [1];
+        this.qIds = [1,2,3,4,5,6,7,8];
         this.initialMidGroundSpeed = 0.8;  // 增加初始速度
         this.maxMidGroundSpeed = 3.0;  // 增加最大速度
         this.initialGroundSpeed = 1;  // 初始地面速度
@@ -26,7 +40,7 @@ class MainScene extends Phaser.Scene {
         // this.bg.setDepth(0);
 
         // 创建变暗的遮罩
-        this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);
+        this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.5);
         this.darkMask.setOrigin(0, 0);
         this.darkMask.setDepth(1);
 
@@ -45,7 +59,7 @@ class MainScene extends Phaser.Scene {
         // 创建城堡图片（放在 midGround 之前）
         const castle = this.add.image(
             this.sys.game.config.width + 50, 
-            this.sys.game.config.height / 2 - 170,  // 将 y 坐标向上移动 50 像素
+            this.sys.game.config.height / 2 - 120,  // 将 y 坐标向上移动 50 像素
             'castle'
         );
         castle.setOrigin(1, 0.5);  // 设置原点为右侧中心
@@ -168,6 +182,12 @@ class MainScene extends Phaser.Scene {
 
         // 设置 midGroundSpeed 为 0
         this.midGroundSpeed = 0;
+
+        // 添加键盘监听器
+        // 只用於Debug , 完成後請移除
+        this.input.keyboard.on('keydown-D', () => {
+            this.debugEndScene();
+        });
     }
 
     setupBugs() {
@@ -947,6 +967,27 @@ class MainScene extends Phaser.Scene {
         });
 
         console.log('Meteor shot!');
+    }
+
+    // 新增方法：立即跳转到 EndScene 进行调试
+    debugEndScene() {
+        // 停止所有声音
+        //this.sound.stopAll();
+
+        // 准备一些模拟数据
+        const debugData = {
+            score: 5,  // 模拟得分
+            bugPosition: this.bug.y,
+            enemyBugPosition: this.enemyBug.y,
+            groundPosition: this.ground.y,
+            midGroundPosition: this.midGround.y,
+            questions: this.questions,
+            answers: this.answers,
+            userAnswers: [0, 1, 0, 1, 0]  // 模拟用户答案
+        };
+
+        // 立即跳转到 EndScene
+        this.scene.start('EndScene', debugData);
     }
 }
 

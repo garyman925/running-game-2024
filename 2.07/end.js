@@ -123,7 +123,7 @@ class EndScene extends Phaser.Scene {
         const scrollBarWidth = 20;
         const cornerRadius = 20;  // 圆角半径
 
-        // 创建背景
+        // 建背景
         const background = this.add.graphics();
         background.fillStyle(0x000000, 0.7);
         background.fillRoundedRect(
@@ -155,12 +155,12 @@ class EndScene extends Phaser.Scene {
                        const isCorrect = i === 0;
                        const isUserAnswer = userAnswer === i;
                        const prefix = isCorrect ? '✓' : '✗';
-                       let answerText = `${prefix} ${answer}`;
+                       let answerText = `       ${answer} ${prefix}`; // 将前缀移到答案后面
                        if (isUserAnswer) {
                            answerText += ' (Your Answer)';
                        }
                        return answerText;
-                   }).join('\n') + '\n\n';
+                   }).join('\n') + '\n'; // 移除了一个换行符
         }).join('\n');
 
         const text = this.add.text(
@@ -169,10 +169,11 @@ class EndScene extends Phaser.Scene {
             content,
             {
                 fontFamily: '"Jost", sans-serif',
-                fontSize: '24px',
+                fontSize: '22px',
                 color: '#ffffff',
                 wordWrap: { width: textWidth },
-                lineSpacing: 10
+                lineSpacing: 5,
+                align: 'left'
             }
         ).setDepth(6);
 
