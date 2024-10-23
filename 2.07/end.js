@@ -40,11 +40,6 @@ class EndScene extends Phaser.Scene {
         this.midGround.setScale(1.2);
         this.midGround.setDepth(2);
 
-        // 创建 darkmask
-        this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);
-        this.darkMask.setOrigin(0, 0);
-        this.darkMask.setDepth(1);
-
         // 创建地面
         this.ground = this.add.tileSprite(
             this.sys.game.config.width / 2,
@@ -55,6 +50,27 @@ class EndScene extends Phaser.Scene {
         );
         this.ground.setScale(1.5);
         this.ground.setDepth(3);
+
+        // 创建城堡图片（放在地面之上）
+        const castle = this.add.image(
+            this.sys.game.config.width + 50, 
+            this.groundPosition,  // 调整 y 坐标，使城堡位于地面之上
+            'castle'
+        );
+        castle.setOrigin(1, 1);  // 设置原点为右下角
+        castle.setScale(0.9);  // 保持与 MainScene 相同的缩放比例
+        castle.setDepth(4);  // 设置深度比地面（深度为3）高
+
+        // 创建一个遮罩来覆盖城堡的右半部分
+        const castleMask = this.add.graphics();
+        castleMask.fillStyle(0x000000, 1);
+        castleMask.fillRect(this.sys.game.config.width / 2, 0, this.sys.game.config.width / 2, this.sys.game.config.height);
+        castle.setMask(castleMask.createGeometryMask());
+
+        // 创建 darkmask
+        this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.7);
+        this.darkMask.setOrigin(0, 0);
+        this.darkMask.setDepth(1);
 
         // 创建虫子
         this.bug = this.add.sprite(this.sys.game.config.width * 0.3, this.bugPosition, 'bugbug');
@@ -173,8 +189,8 @@ class EndScene extends Phaser.Scene {
 
     update() {
         // 移动背景和地面
-        this.midGround.tilePositionX += 0.5;
-        this.ground.tilePositionX += 1;
+        this.midGround.tilePositionX += 0;
+        this.ground.tilePositionX += 0;
 
         // 更新陨石效果
         this.updateMeteors();
