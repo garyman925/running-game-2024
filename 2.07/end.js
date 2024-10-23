@@ -5,6 +5,7 @@ class EndScene extends Phaser.Scene {
 
     init(data) {
         this.score = data.score;
+        console.log("Received score in EndScene:", this.score);  // 添加这行
         this.bugPosition = data.bugPosition;
         this.enemyBugPosition = data.enemyBugPosition;
         this.groundPosition = data.groundPosition;
@@ -53,25 +54,53 @@ class EndScene extends Phaser.Scene {
         this.bug.setScale(0.8);
         this.enemyBug.setScale(0.8);
 
-        // 播放虫子的跑步动画
+        // 播放虫子的跑步动
         this.bug.play('run_bug');
         this.enemyBug.play('run_enemyBug');
 
         // 创建陨石效果
         this.createMeteors();
 
-        // 修改显示得分的位置
-        this.add.text(this.sys.game.config.width - 20, 50, `Final Score: ${this.score}`, {
+        // 修改显示得分的位置和样式
+        const scoreTextStyle = {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '48px',
+            fill: '#ffffff',
+            align: 'center'
+        };
+
+        const finalScoreTextStyle = {
             fontFamily: '"Press Start 2P", cursive',
             fontSize: '24px',
-            fill: '#ffffff'
-        }).setOrigin(1, 0.5).setDepth(5);  // 使用 setOrigin(1, 0.5) 使文本右对齐
+            fill: '#ffffff',
+            align: 'center'
+        };
+
+        // 计算 "Final Score" 文本的宽度
+        const finalScoreText = this.add.text(0, 0, 'Final Score', finalScoreTextStyle);
+        const finalScoreWidth = finalScoreText.width;
+        finalScoreText.destroy(); // 我们只是用来计算宽度，所以现在可以删除它
+
+        // 创建分数文本，初始显示实际分数
+        this.scoreText = this.add.text(this.sys.game.config.width - 20 - finalScoreWidth / 2, 30, `${this.score}`, scoreTextStyle)
+            .setOrigin(0.5, 0)
+            .setDepth(10);
+
+        console.log("Initial score set:", this.score);  // 添加这行
+
+        // 显示 "Final Score" 文本
+        this.add.text(this.sys.game.config.width - 20, 90, 'Final Score', finalScoreTextStyle)
+            .setOrigin(1, 0)
+            .setDepth(10);
+
+        // 添加分数动画
+        this.animateScore(0, this.score);
 
         // 调整滚动文本区域的位置和大小
         const textWidth = 1100;  // 增加文本区域宽度
-        const textHeight = 450;  // 增加文本区���高度
+        const textHeight = 450;  // 增加文本区域高度
         const padding = 20;
-        const topMargin = 80;  // 稍微降低文本区域的位置
+        const topMargin = 120;  // 稍微增加顶部边距，为分数显示留出更多空间
 
         // 创建滚动文本区域
         this.createScrollableText();
@@ -85,6 +114,44 @@ class EndScene extends Phaser.Scene {
 
         restartButton.on('pointerdown', () => {
             this.scene.start('MainScene');
+        });
+
+        // 确保所有其他元素的深度小于 10
+        this.midGround.setDepth(2);
+        this.darkMask.setDepth(1);
+        this.ground.setDepth(3);
+        this.bug.setDepth(4);
+        this.enemyBug.setDepth(4);
+        this.meteorParticles.setDepth(5);
+    }
+
+    animateScore(start, end) {
+        console.log("Animating score from", start, "to", end);  // 添加这行
+        const duration = 2000;
+        const steps = 60;
+        const stepDuration = duration / steps;
+        let currentScore = start;
+
+        const scoreInterval = this.time.addEvent({
+            delay: stepDuration,
+            callback: () => {
+                currentScore = Math.min(currentScore + Math.ceil((end - start) / steps), end);
+                this.scoreText.setText(currentScore.toString());
+                console.log("Current score:", currentScore);  // 添加这行
+                this.scoreText.setScale(1.2);
+                this.tweens.add({
+                    targets: this.scoreText,
+                    scale: 1,
+                    duration: stepDuration,
+                    ease: 'Bounce.Out'
+                });
+
+                if (currentScore >= end) {
+                    scoreInterval.remove();
+                    console.log("Animation completed");  // 添加这行
+                }
+            },
+            repeat: steps
         });
     }
 
@@ -114,7 +181,7 @@ class EndScene extends Phaser.Scene {
             rotate: 0
         });
 
-        this.meteorParticles.setDepth(1);
+        this.meteorParticles.setDepth(5);
     }
 
     updateMeteors() {

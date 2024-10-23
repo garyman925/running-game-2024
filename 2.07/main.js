@@ -405,12 +405,12 @@ class MainScene extends Phaser.Scene {
     }
 
     endGame() {
-        console.log("Game Over. Score: " + score);
+        console.log("Game Over. Score: " + score);  // 添加这行来检查分数
         console.log("Questions: " + JSON.stringify(this.qIds));
         console.log("User Answers: " + JSON.stringify(this.collectResult));
         
         this.scene.start('EndScene', { 
-            score: score, 
+            score: score,  // 确保这里使用的是正确的分数变量
             bugPosition: this.bug.y,
             enemyBugPosition: this.enemyBug.y,
             groundPosition: this.ground.y,
