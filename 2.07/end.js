@@ -117,41 +117,23 @@ class EndScene extends Phaser.Scene {
         // 修改显示得分的位置和样式
         const scoreTextStyle = {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '100px',
+            fontSize: '32px',
             fill: '#ffffff',
-            align: 'center'
+            align: 'left'
         };
 
-        const finalScoreTextStyle = {
-            fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px',
-            fill: '#ffffff',
-            align: 'center'
-        };
-
-        // 计算 "Final Score" 文本的宽度
-        const finalScoreText = this.add.text(0, 0, 'Final Score', finalScoreTextStyle);
-        const finalScoreWidth = finalScoreText.width;
-        finalScoreText.destroy(); // 我们只是用来计算宽度，所以现在可以删除它
-
-        // 显示分数，向下和向左移动
-        const scoreX = this.sys.game.config.width - 60 - finalScoreWidth / 2;
-        const scoreY = 80;  // 向下移动到 50
-        this.scoreText = this.add.text(scoreX, scoreY, `${this.score}`, scoreTextStyle)
-            .setOrigin(0.5, 0)
+        // 显示玩家分数
+        this.add.text(20, 20, `Your Score: ${this.bugScore}`, scoreTextStyle)
+            .setOrigin(0, 0)
             .setDepth(10);
 
-        console.log("Initial score set:", this.score);
-
-        // 显示 "Final Score" 文本，向下和向左移动
-        const finalScoreX = this.sys.game.config.width - 60;
-        const finalScoreY = 200;  // 向下移动到 110
-        this.add.text(finalScoreX, finalScoreY, 'Final Score', finalScoreTextStyle)
-            .setOrigin(1, 0)
+        // 显示敌人分数
+        this.add.text(20, 60, `Enemy Score: ${this.enemyBugScore}`, scoreTextStyle)
+            .setOrigin(0, 0)
             .setDepth(10);
 
-        // 添加分数动画
-        this.animateScore(0, this.score);
+        // 移除之前的分数动画代码
+        // this.animateScore(0, this.score);
 
         // 调整滚动文本区域的位置和大小
         const textWidth = 1100;  // 增加文本区域宽度
@@ -252,36 +234,6 @@ class EndScene extends Phaser.Scene {
             }),
             frameRate: 15,
             repeat: 0
-        });
-    }
-
-    animateScore(start, end) {
-        console.log("Animating score from", start, "to", end);  // 添加这行
-        const duration = 2000;
-        const steps = 60;
-        const stepDuration = duration / steps;
-        let currentScore = start;
-
-        const scoreInterval = this.time.addEvent({
-            delay: stepDuration,
-            callback: () => {
-                currentScore = Math.min(currentScore + Math.ceil((end - start) / steps), end);
-                this.scoreText.setText(currentScore.toString());
-                console.log("Current score:", currentScore);  // 添加这行
-                this.scoreText.setScale(1.2);
-                this.tweens.add({
-                    targets: this.scoreText,
-                    scale: 1,
-                    duration: stepDuration,
-                    ease: 'Bounce.Out'
-                });
-
-                if (currentScore >= end) {
-                    scoreInterval.remove();
-                    console.log("Animation completed");  // 添加这行
-                }
-            },
-            repeat: steps
         });
     }
 

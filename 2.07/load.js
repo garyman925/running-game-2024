@@ -62,6 +62,8 @@ class LoadScene extends Phaser.Scene {
 		//this.load.audio('dragon_roar', '../audio/dragon.mp3');
 		this.load.audio('endscene-bgm', '../audio/endscene-bgm.mp3');
 		this.load.audio('dang', '../audio/dang.mp3');
+		this.load.image('user-icon', '../assets/bugbug-icon.png');
+		this.load.image('enemy-icon', '../assets/enemy-icon.png');
 		console.log('Audio files added to load queue');
 		
 		console.log('Preload completed');
