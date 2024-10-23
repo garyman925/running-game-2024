@@ -2,10 +2,28 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Runrun Bug</title>
     <style>
-        body { margin: 0; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            -webkit-text-size-adjust: none;
+        }
+        #game {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            touch-action: none;
+        }
     </style>
     <!-- 更新 Google Fonts 链接 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,20 +39,105 @@
     <div id="game"></div>
     <script>
     var config = {
-        type: Phaser.AUTO,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        parent: 'game',
-        scene: [LoadScene, MenuScene, MainScene, EndScene],
+        type: Phaser.WEBGL,  // 强制使用 WebGL
+        scale: {
+            mode: Phaser.Scale.RESIZE,
+            parent: 'game',
+            width: 1920,
+            height: 1200,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            orientation: Phaser.Scale.LANDSCAPE,
+            min: {
+                width: 480,
+                height: 300
+            },
+            max: {
+                width: 1920,
+                height: 1200
+            }
+        },
+        render: {
+            antialias: true,
+            pixelArt: false,
+            roundPixels: true,
+            powerPreference: 'high-performance',
+            batchSize: 2048,
+            clearBeforeRender: false,
+            preserveDrawingBuffer: true,
+            premultipliedAlpha: false,
+            failIfMajorPerformanceCaveat: false,
+            desynchronized: true,
+            antialiasGL: false
+        },
         physics: {
             default: 'arcade',
             arcade: {
                 gravity: { y: 300 },
-                debug: false
+                debug: false,
+                fps: 60,
+                tileBias: 8,
+                overlapBias: 8,
+                forceX: false
             }
-        }
+        },
+        pipeline: {
+            enableMultiPipeline: true
+        },
+        dom: {
+            createContainer: true
+        },
+        input: {
+            activePointers: 2,
+            smoothFactor: 0,
+            touch: {
+                capture: true,
+                dragThreshold: 20,
+                tapThreshold: 200
+            }
+        },
+        audio: {
+            disableWebAudio: false,
+            noAudio: false
+        },
+        scene: [LoadScene, MenuScene, MainScene, EndScene],
+        backgroundColor: '#000000',
+        autoMobilePipeline: true,
+        banner: false,
+        transparent: false
     };
+
     var game = new Phaser.Game(config);
+
+    // 优化移动设备的触摸事件
+    document.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+    }, { passive: false });
+
+    // 监听游戏启动完成事件
+    game.events.once('ready', function() {
+        // 优化渲染性能
+        game.renderer.optimizeRedraw = true;
+        game.renderer.setTexturePriority(['atlas']);
+    });
+
+    // 监听窗口失焦事件
+    window.addEventListener('blur', function() {
+        game.scene.pause(game.scene.getScenes(true)[0]);
+    });
+
+    // 监听窗口获得焦点事件
+    window.addEventListener('focus', function() {
+        game.scene.resume(game.scene.getScenes(true)[0]);
+    });
+
+    // 监听内存警告
+    if ('memory' in performance) {
+        setInterval(function() {
+            if (performance.memory.usedJSHeapSize > performance.memory.jsHeapSizeLimit * 0.9) {
+                game.textures.clearUnusedTextures();
+            }
+        }, 30000);
+    }
     </script>
 </body>
 </html>
