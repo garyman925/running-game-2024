@@ -123,7 +123,7 @@ class EndScene extends Phaser.Scene {
         const scrollBarWidth = 20;
         const cornerRadius = 20;  // 圆角半径
 
-        // ��建背景
+        // 创建背景
         const background = this.add.graphics();
         background.fillStyle(0x000000, 0.7);
         background.fillRoundedRect(
@@ -168,10 +168,11 @@ class EndScene extends Phaser.Scene {
             topMargin + padding,
             content,
             {
-                fontFamily: '"IM Fell DW Pica", serif',
-                fontSize: '30px',
+                fontFamily: '"Jost", sans-serif',
+                fontSize: '24px',
                 color: '#ffffff',
-                wordWrap: { width: textWidth }
+                wordWrap: { width: textWidth },
+                lineSpacing: 10
             }
         ).setDepth(6);
 
@@ -270,7 +271,7 @@ class EndScene extends Phaser.Scene {
             isDragging = false;
         });
 
-        // ��标滚轮滚动
+        // 标滚轮滚动
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
             if (!isDragging) {
                 text.y -= deltaY;
