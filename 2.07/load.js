@@ -72,6 +72,9 @@ class LoadScene extends Phaser.Scene {
 		
 		// 加载新的地面图片
 		this.load.image('new-ground', '../assets/tile-ground.png');
+		
+		// 加载 logo 图片
+		this.load.image('logo', '../assets/run-bugbug-logotext.png');
 	}
 
 	create() {

@@ -581,15 +581,15 @@ class MainScene extends Phaser.Scene {
         this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
         
         // 增大 correct 和 wrong 图标的大小
-        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct')
+        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2 + 150, 'correct')
             .setVisible(false)
             .setOrigin(0.5)
-            .setScale(2);  // 从默认的 1 增加到 1.5
+            .setScale(1.5);  // 从默认的 1 增加到 1.5
         
-        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong')
+        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2 + 150, 'wrong')
             .setVisible(false)
             .setOrigin(0.5)
-            .setScale(2);  // 从默认的 1 增加到 1.5
+            .setScale(1.5);  // 从默认的 1 增加到 1.5
         
         // 设置反馈图标的深度
         this.tick.setDepth(6);

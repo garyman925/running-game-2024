@@ -24,20 +24,16 @@ class MenuScene extends Phaser.Scene {
         // 创建飞龙
         this.createDragon();
 
-        // 添加 logo 文本，使用 Mountains of Christmas 字体
-        const logoText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 100, 'Run! BUG BUG!', {
-            fontFamily: '"Mountains of Christmas", cursive',
-            fontSize: '120px',
-            fontStyle: 'bold',
-            fill: '#e73d79',
-            strokeThickness: 10
-        }).setOrigin(0.5);
-
-        
+        // 添加图片 logo
+        const logo = this.add.image(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 - 100,
+            'logo'
+        ).setOrigin(0.5);
 
         // 为 logo 文本添加简单的动画效果
         this.tweens.add({
-            targets: logoText,
+            targets: logo,
             scale: 1.1,
             duration: 1000,
             yoyo: true,
@@ -45,7 +41,7 @@ class MenuScene extends Phaser.Scene {
         });
 
         // 添加提示文本
-        const startText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
+        const startText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 300, 'Click Anywhere to Start', {
             fontFamily: 'sans-serif',
             fontSize: '60px',
             fontStyle: 'bold',
