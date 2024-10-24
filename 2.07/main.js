@@ -191,7 +191,7 @@ class MainScene extends Phaser.Scene {
         // 创建敌人分数数值文本（放在标题下方）
         this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 70, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '90px', // 分数��以大一些
+            fontSize: '90px', // 分数以大一些
             fill: '#ffffff',
             align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
@@ -334,7 +334,7 @@ class MainScene extends Phaser.Scene {
             repeat: -1
         });
 
-        // 创建 enemyBug 的失败动画（如果需要的话）
+        // 创建 enemyBug 的失动画（如果需要的话）
         this.anims.create({
             key: 'fail_enemyBug',
             frames: [{ key: 'enemyBug', frame: 'Comp 3_00006.png' }],  // 使用适当的帧
@@ -376,35 +376,39 @@ class MainScene extends Phaser.Scene {
         this.questionText.setShadow(3, 3, 'rgba(0,0,0,0.7)', 10);
 
         // 创建答案按钮和文本
-        const buttonWidth = 300;
+        const buttonY = this.cameras.main.height * 0.55;
+        const minButtonWidth = 300;  // 最小按钮宽度
         const buttonHeight = 100;
-        const buttonY = this.cameras.main.height * 0.55;  // 将按钮位置从 0.75 调整到 0.65
+        const buttonPadding = 40;  // 文字和按钮边缘的间距
+
+        // 创建临时文本对象，但设置为不可见
+        this.tempText1 = this.add.text(0, 0, '', {
+            fontFamily: '"IM Fell DW Pica", serif',
+            fontSize: '70px',
+            fontWeight: 'bold'
+        }).setVisible(false);  // 设置为不可见
+        
+        this.tempText2 = this.add.text(0, 0, '', {
+            fontFamily: '"IM Fell DW Pica", serif',
+            fontSize: '70px',
+            fontWeight: 'bold'
+        }).setVisible(false);  // 设置为不可见
 
         // 创建阴影
         this.button1Shadow = this.add.graphics();
         this.button2Shadow = this.add.graphics();
 
-        this.button1Shadow.fillStyle(0x000000, 0.3);
-        this.button2Shadow.fillStyle(0x000000, 0.3);
-
-        this.button1Shadow.fillRoundedRect(this.cameras.main.width * 0.3 - buttonWidth / 2 + 5, buttonY - buttonHeight / 2 + 5, buttonWidth, buttonHeight, 15);
-        this.button2Shadow.fillRoundedRect(this.cameras.main.width * 0.7 - buttonWidth / 2 + 5, buttonY - buttonHeight / 2 + 5, buttonWidth, buttonHeight, 15);
-
+        // 创建按钮
         this.button1 = this.add.graphics();
         this.button2 = this.add.graphics();
 
-        this.button1.fillStyle(0xffffff, 1);
-        this.button2.fillStyle(0xffffff, 1);
-
-        this.button1.fillRoundedRect(this.cameras.main.width * 0.3 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight, 15);
-        this.button2.fillRoundedRect(this.cameras.main.width * 0.7 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight, 15);
-
+        // 创建答案文本
         this.answer1Text = this.add.text(this.cameras.main.width * 0.3, buttonY, '', {
             fontFamily: '"IM Fell DW Pica", serif',
             fontSize: '70px',
             fontWeight: 'bold',
             fill: '#000000',
-            align: 'center',
+            align: 'center'
         }).setOrigin(0.5);
 
         this.answer2Text = this.add.text(this.cameras.main.width * 0.7, buttonY, '', {
@@ -412,24 +416,43 @@ class MainScene extends Phaser.Scene {
             fontSize: '70px',
             fontWeight: 'bold',
             fill: '#000000',
-            align: 'center',
+            align: 'center'
         }).setOrigin(0.5);
 
-        // 设置按钮交互
-        this.button1.setInteractive(new Phaser.Geom.Rectangle(this.cameras.main.width * 0.3 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
-        this.button2.setInteractive(new Phaser.Geom.Rectangle(this.cameras.main.width * 0.7 - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        // 更新按钮大小和位置的方法
+        this.updateButtonSize = (text, button, buttonShadow, answerText, isLeft) => {
+            this.tempText1.setText(text);
+            const textWidth = this.tempText1.width;
+            const buttonWidth = Math.max(minButtonWidth, textWidth + buttonPadding * 2);
+            const x = isLeft ? this.cameras.main.width * 0.3 : this.cameras.main.width * 0.7;
+
+            buttonShadow.clear();
+            button.clear();
+
+            buttonShadow.fillStyle(0x000000, 0.3);
+            button.fillStyle(0xffffff, 1);
+
+            buttonShadow.fillRoundedRect(x - buttonWidth / 2 + 5, buttonY - buttonHeight / 2 + 5, buttonWidth, buttonHeight, 15);
+            button.fillRoundedRect(x - buttonWidth / 2, buttonY - buttonHeight / 2, buttonWidth, buttonHeight, 15);
+
+            answerText.setText(text);
+            
+            // 更新交互区域
+            button.setInteractive(new Phaser.Geom.Rectangle(
+                x - buttonWidth / 2,
+                buttonY - buttonHeight / 2,
+                buttonWidth,
+                buttonHeight
+            ), Phaser.Geom.Rectangle.Contains);
+        };
 
         // 设置按钮点击事件
         this.button1.on('pointerdown', () => this.answer(this.button1));
         this.button2.on('pointerdown', () => this.answer(this.button2));
 
-        // 设置深度
-        this.button1Shadow.setDepth(4);
-        this.button2Shadow.setDepth(4);
-        this.button1.setDepth(5);
-        this.button2.setDepth(5);
-        this.answer1Text.setDepth(6);
-        this.answer2Text.setDepth(6);
+        // 不要在这里销毁临时文本对象
+        // tempText1.destroy();
+        // tempText2.destroy();
     }
 
     initializeGame() {
@@ -473,13 +496,14 @@ class MainScene extends Phaser.Scene {
         
         // 延迟显示答案
         this.time.delayedCall(500, () => {  // 等待淡入完成
+            // 更新按钮大小
             if (Math.random() < 0.5) {
-                this.answer1Text.setText(answers[0]);
-                this.answer2Text.setText(answers[1]);
+                this.updateButtonSize(answers[0], this.button1, this.button1Shadow, this.answer1Text, true);
+                this.updateButtonSize(answers[1], this.button2, this.button2Shadow, this.answer2Text, false);
                 this.correctAnswer = this.button1;
             } else {
-                this.answer1Text.setText(answers[1]);
-                this.answer2Text.setText(answers[0]);
+                this.updateButtonSize(answers[1], this.button1, this.button1Shadow, this.answer1Text, true);
+                this.updateButtonSize(answers[0], this.button2, this.button2Shadow, this.answer2Text, false);
                 this.correctAnswer = this.button2;
             }
             
@@ -792,7 +816,7 @@ class MainScene extends Phaser.Scene {
             duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
-                // 第二阶段：星星在头顶停���并轻微放大缩小
+                // 第二阶段：星星在头顶停并轻微放大缩小
                 this.tweens.add({
                     targets: star,
                     scale: 2,
@@ -1115,7 +1139,7 @@ class MainScene extends Phaser.Scene {
 
     resumeDragonAnimation() {
         if (this.dragon && this.dragon.anims) {
-            this.dragon.anims.resume(); // ��复龙的动画
+            this.dragon.anims.resume(); // 复龙的动画
         }
     }
 
@@ -1139,5 +1163,7 @@ var answers = [
     ["Mars", "Venus"],
     ["Blue Whale", "African Elephant"]
 ];
+
+
 
 
