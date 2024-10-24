@@ -73,7 +73,7 @@ class MainScene extends Phaser.Scene {
             'castle'
         );
         castle.setOrigin(1, 0.5);  // 设置原点为右侧中心
-        castle.setScale(0.9);  // 保持缩放比例为 1
+        castle.setScale(1.3);  // 保持缩放比例为 1
         castle.setDepth(1.5);  // 设置深度在 midGround (深度为2) 之前
 
         // 创建一个遮罩来覆盖城堡的右半部分
@@ -104,12 +104,12 @@ class MainScene extends Phaser.Scene {
 
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
-        const bugOffset = 120; // 增加偏移量以适应更大的 bug
-        const bugStartX = this.sys.game.config.width * 0.2; // 将虫子的初始 X 坐标设置为屏幕宽度的 20%
+        const bugOffset = 120;
+        const bugStartX = this.sys.game.config.width * 0.2;
         
-        // 调整虫子的 Y 坐标，使其更高一些
-        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 80, 'bug');  // 从 -40 改为 -80
-        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 20, 'enemyBug');  // 从 +20 改为 -20
+        // 调整虫子的 Y 坐标，使其更高
+        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 120, 'bug');  // 从 -80 改为 -120
+        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 60, 'enemyBug');  // 从 -20 改为 -60
 
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
@@ -293,9 +293,17 @@ class MainScene extends Phaser.Scene {
         // this.startMeteors();
 
         // 延迟加载陨石效果
-        this.time.delayedCall(3500, () => {
+        this.time.delayedCall(500, () => {
             this.createMeteors();
             this.startMeteors();
+        });
+
+        // 添加随机跳跃的定时器
+        this.time.addEvent({
+            delay: Phaser.Math.Between(2000, 4000),  // 每2-4秒随机一次
+            callback: this.randomJump,
+            callbackScope: this,
+            loop: true
         });
     }
 
@@ -315,7 +323,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 30,  // 从 60 降到 30
+            frameRate: 60,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -353,7 +361,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 30,  // 从 60 降到 30
+            frameRate: 60,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -480,7 +488,7 @@ class MainScene extends Phaser.Scene {
     }
 
     showQuestion(question, answers) {
-        // 确保问题以问号结尾
+        // 确保问题以问结尾
         if (!question.endsWith('?')) {
             question += '?';
         }
@@ -545,15 +553,17 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // 确终部穿过地面
+        // 确保虫子不会穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
-        const bugOffset = 120; // 与创建虫子时使用相同的值
-        const maxYBug = groundTop + bugOffset - 80;  // 从 -40 改为 -80
-        const maxYEnemyBug = groundTop + bugOffset - 20;  // 从 +20 改为 -20
+        const bugOffset = 120;
+        const maxYBug = groundTop + bugOffset - 120;
+        const maxYEnemyBug = groundTop + bugOffset - 60;
 
         if (this.bug.y > maxYBug) {
             this.bug.y = maxYBug;
             this.bug.setVelocityY(0);
+            // 确保虫子在地面上时保持在原位
+            this.bug.setVelocityX(0);
         }
         if (this.enemyBug.y > maxYEnemyBug) {
             this.enemyBug.y = maxYEnemyBug;
@@ -692,51 +702,50 @@ class MainScene extends Phaser.Scene {
     }
 
     moveBugForward() {
-        // 创建一个复合动画，包括向前移动、轻跳和下落
-        const jumpHeight = 50; // 跳跃高度
-        const moveDuration = 500; // 总移动时间
-        const jumpDuration = moveDuration / 1.5; // 上升时间
-        const fallDuration = moveDuration / 2; // 下落时间
+        // 增加移动距离
+        const moveDistance = 200;  // 前进距离
+        const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的10%）
 
-        // 向前移动和向跳
+        // 创建移动动画
         this.tweens.add({
             targets: this.bug,
-            x: this.bug.x + 80,
-            y: this.bug.y - jumpHeight,
-            duration: jumpDuration,
-            ease: 'Sine.easeOut',
+            x: this.bug.x + moveDistance,  // 向前移动
+            duration: 1000,
+            ease: 'Power2',
             onComplete: () => {
-                // 下落
+                // 在移动完成后，只返回一小段距离
                 this.tweens.add({
                     targets: this.bug,
-                    y: this.bug.y + jumpHeight,
-                    duration: fallDuration,
-                    ease: 'Sine.easeIn'
+                    x: this.bug.x - returnDistance,  // 只返回10%的距离
+                    duration: 1000,
+                    ease: 'Power2'
                 });
             }
-        });
-
-        // 播放跑步音效
-        this.running.play();
-
-        // 可选：添加一个轻微的旋转效果
-        this.tweens.add({
-            targets: this.bug,
-            angle: {from: -5, to: 5},
-            duration: moveDuration / 2,
-            yoyo: true,
-            repeat: 1
         });
     }
 
     moveEnemyBugForward() {
+        // 增加移动距离
+        const moveDistance = 200;  // 前进距离
+        const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的30%）
+
+        // 创建移动动画
         this.tweens.add({
             targets: this.enemyBug,
-            x: this.enemyBug.x + 40,
-            y: this.enemyBug.y + 5, // 稍微向下移动，但幅度减小
+            x: this.enemyBug.x + moveDistance,  // 向前移动
             duration: 1000,
-            ease: 'Power2'
+            ease: 'Power2',
+            onComplete: () => {
+                // 在移动完成后，只返回一小段距离
+                this.tweens.add({
+                    targets: this.enemyBug,
+                    x: this.enemyBug.x - returnDistance,  // 只返回30%的距离
+                    duration: 1000,
+                    ease: 'Power2'
+                });
+            }
         });
+
         this.running.play();
     }
 
@@ -1006,7 +1015,7 @@ class MainScene extends Phaser.Scene {
             });
         });
 
-        // 加一些视觉反馈
+        // 一些视觉反馈
         this.cameras.main.shake(250, 0.02);
         this.bug.setTint(0xff0000);  // 将 bug 变红
         this.time.delayedCall(250, () => {
@@ -1135,6 +1144,25 @@ class MainScene extends Phaser.Scene {
     resumeDragonAnimation() {
         if (this.dragon && this.dragon.anims) {
             this.dragon.anims.resume(); // 恢复龙的动画
+        }
+    }
+
+    // 添加随机跳跃方法
+    randomJump() {
+        // 只有在虫子在地面上且正在运行动画时才跳跃
+        if (this.bug.body.touching.down && this.bug.anims.currentAnim.key === 'run_bug') {
+            // 随机生成跳跃力度
+            const jumpVelocity = Phaser.Math.Between(-300, -400);
+            this.bug.setVelocityY(jumpVelocity);
+
+            // 添加一些水平移动
+            const horizontalVelocity = Phaser.Math.Between(-50, 50);
+            this.bug.setVelocityX(horizontalVelocity);
+
+            // 设置一个短暂的定时器来重置水平速度
+            this.time.delayedCall(500, () => {
+                this.bug.setVelocityX(0);
+            });
         }
     }
 }

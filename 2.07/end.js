@@ -24,7 +24,7 @@ class EndScene extends Phaser.Scene {
         console.log("EndScene create method called");
         console.log("In create - Bug Score:", this.bugScore);
         console.log("In create - Enemy Bug Score:", this.enemyBugScore);
-        // 停止 MainScene 的背景音乐
+        // 停止 MainScene 的景音乐
         this.sound.stopByKey('bgm');
 
         // 停止 footstep 音效
@@ -88,8 +88,8 @@ class EndScene extends Phaser.Scene {
         this.enemyBug.setDepth(4);
         
         // 设置虫子的大小
-        this.bug.setScale(0.8);
-        this.enemyBug.setScale(0.8);
+        this.bug.setScale(1.5);
+        this.enemyBug.setScale(1.5);
 
         // 根据分数决定虫子的行为和播放音效
         if (this.bugScore > this.enemyBugScore) {
@@ -123,7 +123,7 @@ class EndScene extends Phaser.Scene {
         // 修改显示得分的位置和样式
         const scoreTextStyle = {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '32px',
+            fontSize: '40px',
             fill: '#ffffff',
             align: 'left'
         };
@@ -143,7 +143,7 @@ class EndScene extends Phaser.Scene {
 
         // 调整滚动文本区域的位置和大小
         const textWidth = 1100;  // 增加文本区域宽度
-        const textHeight = 450;  // 增加文本区域高度
+        const textHeight = 650;  // 增加文本区域高度
         const padding = 20;
         const topMargin = 120;  // 稍微增加顶部边距，为分数显示留出更多空间
 
@@ -156,6 +156,46 @@ class EndScene extends Phaser.Scene {
             fontSize: '24px',
             fill: '#ffffff'
         }).setOrigin(0.5).setDepth(5);
+
+        // 如果玩家分数高于对手，显示 "You Win!"
+        if (this.bugScore > this.enemyBugScore) {
+            const winText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 300, 'You Win!', {
+                fontFamily: '"Press Start 2P", cursive',
+                fontSize: '36px',
+                fill: '#00ff00',  // 绿色文字
+                stroke: '#000000', // 黑色描边
+                strokeThickness: 6 // 描边厚度
+            }).setOrigin(0.5).setDepth(5);
+
+            // 添加闪烁动画
+            this.tweens.add({
+                targets: winText,
+                alpha: { from: 1, to: 0.5 },
+                duration: 800,
+                yoyo: true,
+                repeat: -1
+            });
+        }
+
+        // 如果玩家分数低于对手，显示 "You Lose!"
+        if (this.bugScore < this.enemyBugScore) {
+            const loseText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 300, 'You Lose!', {
+                fontFamily: '"Press Start 2P", cursive',
+                fontSize: '36px',
+                fill: '#ff0000',  // 红色文字
+                stroke: '#000000', // 黑色描边
+                strokeThickness: 6 // 描边厚度
+            }).setOrigin(0.5).setDepth(5);
+
+            // 添加闪烁动画
+            this.tweens.add({
+                targets: loseText,
+                alpha: { from: 1, to: 0.5 },
+                duration: 800,
+                yoyo: true,
+                repeat: -1
+            });
+        }
 
         // 设置按钮为交互式
         restartButton.setInteractive({ useHandCursor: true });
@@ -259,17 +299,11 @@ class EndScene extends Phaser.Scene {
         console.log("Before creating score text - Bug Score:", this.bugScore);
         console.log("Before creating score text - Enemy Bug Score:", this.enemyBugScore);
 
-        // 创建分数文本
-        this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, `${this.enemyBugScore}`, {
-            fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px',
-            fill: '#ffffff'
-        }).setOrigin(0.5, 0).setDepth(7);
 
         // 创建玩家图标和分数显示，放在敌人图标下方
         const userIconSize = 130;  // 图标的直径
         const userIconX = enemyIconX;  // 与敌人图标的 X 坐标相同
-        const userIconY = enemyIconY + enemyIconSize + 80;  // 在敌人图标下方，留出一些间距
+        const userIconY = enemyIconY + enemyIconSize + 150;  // 在敌人图标下方，留出一些间距
         const userIcon = this.add.image(userIconX, userIconY, 'user-icon').setOrigin(0.5).setDepth(6);
         
         // 创建圆形遮罩
@@ -280,17 +314,21 @@ class EndScene extends Phaser.Scene {
         userIcon.setDisplaySize(userIconSize, userIconSize);
 
         // 创建分数文本并置于图标下方中央
-        this.add.text(userIconX, userIconY + userIconSize / 2 + 30, `${this.bugScore}`, {
+        this.add.text(userIconX, userIconY + userIconSize / 2 + 30, 'Your Score:\n' + this.bugScore, {
             fontFamily: '"Press Start 2P", cursive',
             fontSize: '24px',
-            fill: '#ffffff'
+            fill: '#ffffff',
+            align: 'center',
+            lineSpacing: 10  // 添加行间距
         }).setOrigin(0.5, 0).setDepth(7);
 
         // 创建敌人分数文本并置于图标下方中央
-        this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, `${this.enemyBugScore}`, {
+        this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, 'Enemy Score:\n' + this.enemyBugScore, {
             fontFamily: '"Press Start 2P", cursive',
             fontSize: '24px',
-            fill: '#ffffff'
+            fill: '#ffffff',
+            align: 'center',
+            lineSpacing: 10  // 添加行间距
         }).setOrigin(0.5, 0).setDepth(7);
 
         // 停止龙的动画
@@ -385,7 +423,7 @@ class EndScene extends Phaser.Scene {
             content,
             {
                 fontFamily: '"Jost", sans-serif',
-                fontSize: '18px',
+                fontSize: '30px',
                 color: '#ffffff',
                 wordWrap: { width: textWidth - 40 },
                 lineSpacing: 5,
@@ -419,7 +457,7 @@ class EndScene extends Phaser.Scene {
         );
         scrollThumb.setDepth(7);
 
-        // 创建一个透明的交互区��，覆盖整个滚动条
+        // 创建一个透明的交互区，覆盖整个滚动条
         const hitArea = new Phaser.Geom.Rectangle(
             margin - leftOffset,
             topMargin,
