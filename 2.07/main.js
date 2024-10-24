@@ -105,9 +105,12 @@ class MainScene extends Phaser.Scene {
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
         const bugOffset = 120; // 增加偏移量以适应更大的 bug
-        const bugStartX = this.sys.game.config.width * 0.2; // 將虫子的初始 X 坐標設置為屏幕寬度的 20%
-        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 40, 'bug'); // 將主角虫子稍微提高
-        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset + 20, 'enemyBug'); // 保持敌人虫子稍低，稍微靠左
+        const bugStartX = this.sys.game.config.width * 0.2; // 将虫子的初始 X 坐标设置为屏幕宽度的 20%
+        
+        // 调整虫子的 Y 坐标，使其更高一些
+        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 80, 'bug');  // 从 -40 改为 -80
+        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 20, 'enemyBug');  // 从 +20 改为 -20
+
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
 
@@ -150,7 +153,7 @@ class MainScene extends Phaser.Scene {
         // 添加分显示
         this.scoreText = this.add.text(userIconX, userIconY + userIconSize / 2 + 30, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '36px',
+            fontSize: '50px',
             fill: '#ffffff'
         }).setOrigin(0.5, 0).setDepth(7);
 
@@ -172,7 +175,7 @@ class MainScene extends Phaser.Scene {
         // 添加敌人得分显示，放在右边
         this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px',
+            fontSize: '50px',
             fill: '#ffffff'
         }).setOrigin(0.5, 0).setDepth(7);
 
@@ -193,7 +196,7 @@ class MainScene extends Phaser.Scene {
         this.createMeteors();
         this.startMeteors(); // 启动陨石动画
 
-        // 创建玩��旗子，但初始设置为不可见
+        // 创建玩旗子，但初始设置为不可见
         this.createPlayerFlag();
         this.playerFlag.setVisible(false);
 
@@ -284,6 +287,16 @@ class MainScene extends Phaser.Scene {
 
         // 停止龙的动画
         this.stopDragonAnimation();
+
+        // 移除这两行
+        // this.createMeteors();
+        // this.startMeteors();
+
+        // 延迟加载陨石效果
+        this.time.delayedCall(3500, () => {
+            this.createMeteors();
+            this.startMeteors();
+        });
     }
 
     setupBugs() {
@@ -302,7 +315,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 60,
+            frameRate: 30,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -316,12 +329,13 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 15,
+            frameRate: 30,  // 从 15 降到 12
             repeat: 0
         });
 
+        // 增加主角虫子的大小
         this.bug.play('run_bug');
-        this.bug.setScale(0.8);
+        this.bug.setScale(1.4);  // 从 0.8 增加到 1.2
         this.bug.setOrigin(0.5, 0.4);
 
         // 更新 enemyBug 的设置
@@ -339,7 +353,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 60,
+            frameRate: 30,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -347,11 +361,12 @@ class MainScene extends Phaser.Scene {
         this.anims.create({
             key: 'fail_enemyBug',
             frames: [{ key: 'enemyBug', frame: 'Comp 3_00006.png' }],  // 使用适当的帧
-            frameRate: 15
+            frameRate: 30
         });
 
+        // 增加敌人虫子的大小
         this.enemyBug.play('run_enemyBug');
-        this.enemyBug.setScale(0.8);  // 调整大小，可能需要根据新sprite的尺寸进调整
+        this.enemyBug.setScale(1.4);  // 从 0.8 增加到 1.2
         this.enemyBug.setOrigin(0.5, 0.5);
 
         // 添加 enemyBug 的燃烧动画
@@ -364,7 +379,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 15,
+            frameRate: 12,  // 从 15 降到 12
             repeat: 0
         });
     }
@@ -533,8 +548,8 @@ class MainScene extends Phaser.Scene {
         // 确终部穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
         const bugOffset = 120; // 与创建虫子时使用相同的值
-        const maxYBug = groundTop + bugOffset - 40;
-        const maxYEnemyBug = groundTop + bugOffset + 20;
+        const maxYBug = groundTop + bugOffset - 80;  // 从 -40 改为 -80
+        const maxYEnemyBug = groundTop + bugOffset - 20;  // 从 +20 改为 -20
 
         if (this.bug.y > maxYBug) {
             this.bug.y = maxYBug;
@@ -567,7 +582,7 @@ class MainScene extends Phaser.Scene {
 
         // 移除或註釋掉這部分代碼
         /*
-        // 讓龍緩慢向右移動
+        // 讓龍緩慢向右動
         if (this.dragon) {
             this.dragon.x += 0.5; // 每幀向右移動 0.5 像素，可以根據需要調整
 
@@ -752,19 +767,17 @@ class MainScene extends Phaser.Scene {
         this.meteorEmitter = this.meteorParticles.createEmitter({
             x: { min: 0, max: this.sys.game.config.width },
             y: -50,
-            speedX: { min: -150, max: -100 },
-            speedY: { min: 100, max: 150 },
-            scale: { min: 0.1, max: 0.6 },
+            speedX: { min: -100, max: -80 },    // 降低速度
+            speedY: { min: 80, max: 120 },      // 降低速度
+            scale: { min: 0.1, max: 0.4 },      // 减小粒子大小
             alpha: { start: 1, end: 0 },
-            lifespan: { min: 4000, max: 8000 },
+            lifespan: { min: 3000, max: 6000 }, // 减少生命周期
             quantity: 1,
-            frequency: 500,
+            frequency: 1000,                     // 降低频率（从 500 到 1000）
             blendMode: 'ADD',
+            maxParticles: 20,                   // 限制最大粒子数量
             rotate: 0
         });
-
-        // 默认��动陨石效果
-        this.startMeteors();
     }
 
     // 启动陨石发射
@@ -993,7 +1006,7 @@ class MainScene extends Phaser.Scene {
             });
         });
 
-        // ���加一些视觉反馈
+        // 加一些视觉反馈
         this.cameras.main.shake(250, 0.02);
         this.bug.setTint(0xff0000);  // 将 bug 变红
         this.time.delayedCall(250, () => {

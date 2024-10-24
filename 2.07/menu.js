@@ -50,7 +50,7 @@ class MenuScene extends Phaser.Scene {
 
         // 添加提示文本
         const startText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
-            fontFamily: '"Mountains of Christmas", cursive',
+            fontFamily: 'sans-serif',
             fontSize: '42px',
             fill: '#fff'
         }).setOrigin(0.5);
@@ -59,9 +59,9 @@ class MenuScene extends Phaser.Scene {
         this.tweens.add({
             targets: startText,
             alpha: { from: 1, to: 0 },
-            duration: 1000,
+            duration: 500,
             ease: 'Power2',
-            yoyo: true,
+            yoyo: true, 
             repeat: -1
         });
 

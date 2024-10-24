@@ -6,7 +6,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Runrun Bug</title>
+    <!-- 修改 Google Fonts 加载方式 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- 添加字体加载检查 -->
     <style>
+        @font-face {
+            font-family: 'IM Fell DW Pica';
+            font-display: swap;
+            src: local('IM Fell DW Pica'),
+                 url('https://fonts.gstatic.com/s/imfelldwpica/v16/2sDGZGRQotv9nbn2qSl0TxXVYNw9ZA.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Press Start 2P';
+            font-display: swap;
+            src: local('Press Start 2P'),
+                 url('https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2') format('woff2');
+        }
+        
         html, body {
             margin: 0;
             padding: 0;
@@ -28,14 +46,24 @@
             transform: translate(-50%, -50%);
             color: white;
             font-size: 24px;
-            display: none; /* 默认隐藏 */
+            display: none;
             text-align: center;
+            font-family: 'IM Fell DW Pica', serif;
+        }
+        
+        /* 添加字体预加载 */
+        .font-preload {
+            position: absolute;
+            left: -9999px;
+            visibility: hidden;
+        }
+        .font-preload-im-fell {
+            font-family: 'IM Fell DW Pica', serif;
+        }
+        .font-preload-press-start {
+            font-family: 'Press Start 2P', cursive;
         }
     </style>
-    <!-- 更新 Google Fonts 链接 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <script src="load.js"></script>
     <script src="menu.js"></script>
@@ -43,47 +71,95 @@
     <script src="end.js"></script>
 </head>
 <body>
+    <!-- 添加字体预加载元素 -->
+    <div class="font-preload font-preload-im-fell">.</div>
+    <div class="font-preload font-preload-press-start">.</div>
+    
     <div id="game"></div>
     <div id="orientation-warning">请将设备旋转为横屏模式以获得最佳体验。</div>
     <script>
-    var config = {
-        type: Phaser.WEBGL,
-        scale: {
-            mode: Phaser.Scale.FIT,
-            parent: 'game',
-            width: 1920,
-            height: 1200,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-            orientation: Phaser.Scale.LANDSCAPE,
-            autoRound: true
-        },
-        scene: [LoadScene, MenuScene, MainScene, EndScene],
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 300 },
-                debug: false
+    // 添加字体加载检查
+    document.fonts.ready.then(function() {
+        console.log('Fonts are loaded');
+        
+        var config = {
+            type: Phaser.WEBGL, // 强制使用 WebGL
+            scale: {
+                mode: Phaser.Scale.FIT,
+                parent: 'game',
+                width: 1920,
+                height: 1200,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                orientation: Phaser.Scale.LANDSCAPE,
+                autoRound: true
+            },
+            render: {
+                antialias: false,        // 关闭抗锯齿
+                pixelArt: false,
+                roundPixels: true,       // 开启像素四舍五入
+                powerPreference: 'high-performance',  // 优先使用高性能模式
+                batchSize: 2048,         // 增加批处理大小
+                clearBeforeRender: false,  // 不在每帧清除画布
+                desynchronized: true,    // 使用异步渲染
+                failIfMajorPerformanceCaveat: false,
+                premultipliedAlpha: false
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: false,
+                    fps: 60,
+                    tileBias: 8,
+                    overlapBias: 8,
+                    forceX: false
+                }
+            },
+            pipeline: {
+                enableMultiPipeline: true
+            },
+            dom: {
+                createContainer: true
+            },
+            input: {
+                activePointers: 2,
+                smoothFactor: 0,
+                touch: {
+                    capture: true,
+                    dragThreshold: 20,
+                    tapThreshold: 200
+                }
+            },
+            audio: {
+                disableWebAudio: false,
+                noAudio: false
+            },
+            scene: [LoadScene, MenuScene, MainScene, EndScene],
+            backgroundColor: '#000000',
+            autoMobilePipeline: true,
+            banner: false,
+            transparent: false
+        };
+
+        var game = new Phaser.Game(config);
+
+        // 检查屏幕方向并显示提示
+        function checkOrientation() {
+            if (window.innerHeight > window.innerWidth) {
+                // 竖屏状态，显示提示
+                document.getElementById('orientation-warning').style.display = 'block';
+            } else {
+                // 横屏状态，隐藏提示
+                document.getElementById('orientation-warning').style.display = 'none';
             }
         }
-    };
 
-    var game = new Phaser.Game(config);
+        // 页面加载和方向变化时都执行
+        window.addEventListener('load', checkOrientation);
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+    });
 
-    // 检查屏幕方向并显示提示
-    function checkOrientation() {
-        if (window.innerHeight > window.innerWidth) {
-            // 竖屏状态，显示提示
-            document.getElementById('orientation-warning').style.display = 'block';
-        } else {
-            // 横屏状态，隐藏提示
-            document.getElementById('orientation-warning').style.display = 'none';
-        }
-    }
-
-    // 页面加载和方向变化时都执行
-    window.addEventListener('load', checkOrientation);
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
     </script>
 </body>
 </html>
