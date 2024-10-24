@@ -86,21 +86,21 @@ class MainScene extends Phaser.Scene {
         this.createDragon();
 
         // 创建地面
-        const groundHeight = 200;
+        const groundHeight = 100;  // 改为实际图片高度
         this.ground = this.add.tileSprite(
             this.sys.game.config.width / 2,
             this.sys.game.config.height - groundHeight / 2,
             this.sys.game.config.width,
-            groundHeight,
-            'ground'
+            groundHeight,  // 使用实际图片高度
+            'new-ground'
         );
-        this.ground.setScale(1.5);
+        this.ground.setScale(3.3);  // 不需要缩放，使用原始大小
         this.ground.setDepth(3);
         this.physics.add.existing(this.ground, true);
 
-        // 调整地面的物体积大小以匹配视觉大小
-        this.ground.body.setSize(this.ground.width, this.ground.height / 1.5);
-        this.ground.body.setOffset(0, this.ground.height / 3);
+        // 调整地面的物理体积大小以匹配视觉大小
+        this.ground.body.setSize(this.ground.width, groundHeight);
+        this.ground.body.setOffset(0, 0);  // 不需要偏移
 
         // 创建虫子
         const groundTop = this.sys.game.config.height - groundHeight * 1.5;
@@ -108,8 +108,8 @@ class MainScene extends Phaser.Scene {
         const bugStartX = this.sys.game.config.width * 0.2;
         
         // 调整虫子的 Y 坐标，使其更高
-        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 120, 'bug');  // 从 -80 改为 -120
-        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 60, 'enemyBug');  // 从 -20 改为 -60
+        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 300, 'bug');  // 从 -300 改为 -400
+        this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 120, 'enemyBug');  // 保持不变
 
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
@@ -150,13 +150,20 @@ class MainScene extends Phaser.Scene {
         // 调整图标大小以填满圆形
         userIcon.setDisplaySize(userIconSize, userIconSize);
 
-        // 添加分数显示
-        this.scoreText = this.add.text(userIconX , userIconY + userIconSize / 2 + 30, 'Your Score:\n0', {
+        // 创建分数标题文本
+        this.scoreTitleText = this.add.text(userIconX, userIconY + userIconSize / 2 + 30, 'Your Score', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px', // 标题字体改小
+            fontSize: '24px',
             fill: '#ffffff',
-            align: 'center',
-            lineSpacing: 10  // 添加行间距
+            align: 'center'
+        }).setOrigin(0.5, 0).setDepth(7);
+
+        // 创建分数数值文本（放在标题下方）
+        this.scoreText = this.add.text(userIconX, userIconY + userIconSize / 2 + 70, '0', {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '36px', // 分数字体可以大一些
+            fill: '#ffffff',
+            align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
 
 
@@ -173,14 +180,20 @@ class MainScene extends Phaser.Scene {
         // 调整图标大小以填满圆形
         enemyIcon.setDisplaySize(enemyIconSize, enemyIconSize);
 
-
-        // 添加敌人得分显示
-        this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, 'Enemy Score:\n0', {
+        // 创建敌人分数标题文本
+        this.enemyScoreTitleText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, 'Enemy Score', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px', // 标题字体改小
+            fontSize: '24px',
             fill: '#ffffff',
-            align: 'center',
-            lineSpacing: 10  // 添加行间距
+            align: 'center'
+        }).setOrigin(0.5, 0).setDepth(7);
+
+        // 创建敌人分数数值文本（放在标题下方）
+        this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 70, '0', {
+            fontFamily: '"Press Start 2P", cursive',
+            fontSize: '36px', // 分数字体可以大一些
+            fill: '#ffffff',
+            align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
 
         // 添加碰撞
@@ -194,7 +207,7 @@ class MainScene extends Phaser.Scene {
         this.answer1Text.setDepth(6);
         this.answer2Text.setDepth(6);
         this.scoreText.setDepth(6);
-        this.wrong.setDepth(7);  // 将 "you are wrong" 显示设置为最高深度
+        this.wrong.setDepth(7);  //  "you are wrong" 显示设置为最高深度
 
         // 创建陨石粒子系统
         this.createMeteors();
@@ -224,7 +237,7 @@ class MainScene extends Phaser.Scene {
         // 創建龍（確保這裡只調用一次）
         this.createDragon();
 
-        // 創建火球動畫
+        // 創火球動畫
         this.anims.create({
             key: 'fireball_anim',
             frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 5 }),
@@ -269,7 +282,7 @@ class MainScene extends Phaser.Scene {
         //     fill: '#ffffff'
         // }).setOrigin(0.5, 0).setDepth(7);
 
-        // // 创建敌人图标和分数显示
+        // // 建敌人图标和分数显示
         // const enemyIconSize = 130;  // 图标的直径
         // const enemyIconX = this.sys.game.config.width - 100;
         // const enemyIconY = 30 + enemyIconSize / 2;
@@ -302,7 +315,7 @@ class MainScene extends Phaser.Scene {
             this.startMeteors();
         });
 
-        // 删除或注释掉这段代码
+        // 删除或释掉这段代码
         /*
         // 添加随机跳跃的定时器
         this.time.addEvent({
@@ -564,13 +577,12 @@ class MainScene extends Phaser.Scene {
         // 确保虫子不会穿过地面
         const groundTop = this.sys.game.config.height - this.ground.height * 1.5;
         const bugOffset = 120;
-        const maxYBug = groundTop + bugOffset - 120;
-        const maxYEnemyBug = groundTop + bugOffset - 60;
+        const maxYBug = groundTop + bugOffset - 300;  // 从 -300 改为 -400
+        const maxYEnemyBug = groundTop + bugOffset - 120;  // 保持不变
 
         if (this.bug.y > maxYBug) {
             this.bug.y = maxYBug;
             this.bug.setVelocityY(0);
-            // 确保虫子在地面上时保持在原位
             this.bug.setVelocityX(0);
         }
         if (this.enemyBug.y > maxYEnemyBug) {
@@ -776,11 +788,11 @@ class MainScene extends Phaser.Scene {
     }
 
     updateScore(score) {
-        this.scoreText.setText('Your Score:\n' + score.toString());
+        this.scoreText.setText(score.toString());
     }
 
     updateEnemyScore(score) {
-        this.enemyScoreText.setText('Enemy Score:\n' + score.toString());
+        this.enemyScoreText.setText(score.toString());
     }
 
     createMeteors() {

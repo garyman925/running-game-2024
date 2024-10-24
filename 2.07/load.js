@@ -69,6 +69,9 @@ class LoadScene extends Phaser.Scene {
 		console.log('Audio files added to load queue');
 		
 		console.log('Preload completed');
+		
+		// 加载新的地面图片
+		this.load.image('new-ground', '../assets/tile-ground.png');
 	}
 
 	create() {
