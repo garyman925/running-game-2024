@@ -139,7 +139,7 @@ class MainScene extends Phaser.Scene {
 
         // 创建玩家图标和分数显示
         const userIconSize = 130;  // 图标的直径
-        const userIconX = 100;
+        const userIconX = 150;
         const userIconY = 30 + userIconSize / 2;
         const userIcon = this.add.image(userIconX, userIconY, 'user-icon').setOrigin(0.5).setDepth(6);
         
@@ -150,17 +150,19 @@ class MainScene extends Phaser.Scene {
         // 调整图标大小以填满圆形
         userIcon.setDisplaySize(userIconSize, userIconSize);
 
-        // 添加分显示
-        this.scoreText = this.add.text(userIconX, userIconY + userIconSize / 2 + 30, '0', {
+        // 添加分数显示
+        this.scoreText = this.add.text(userIconX , userIconY + userIconSize / 2 + 30, 'Your Score:\n0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '50px',
-            fill: '#ffffff'
+            fontSize: '24px', // 标题字体改小
+            fill: '#ffffff',
+            align: 'center',
+            lineSpacing: 10  // 添加行间距
         }).setOrigin(0.5, 0).setDepth(7);
 
 
         // 创建敌人图标和分数显示
         const enemyIconSize = 130;  // 图标的直径
-        const enemyIconX = this.sys.game.config.width - 100;
+        const enemyIconX = this.sys.game.config.width - 200;
         const enemyIconY = 30 + enemyIconSize / 2;
         const enemyIcon = this.add.image(enemyIconX, enemyIconY, 'enemy-icon').setOrigin(0.5).setDepth(6);
         
@@ -172,11 +174,13 @@ class MainScene extends Phaser.Scene {
         enemyIcon.setDisplaySize(enemyIconSize, enemyIconSize);
 
 
-        // 添加敌人得分显示，放在右边
-        this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, '0', {
+        // 添加敌人得分显示
+        this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, 'Enemy Score:\n0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '50px',
-            fill: '#ffffff'
+            fontSize: '24px', // 标题字体改小
+            fill: '#ffffff',
+            align: 'center',
+            lineSpacing: 10  // 添加行间距
         }).setOrigin(0.5, 0).setDepth(7);
 
         // 添加碰撞
@@ -194,7 +198,7 @@ class MainScene extends Phaser.Scene {
 
         // 创建陨石粒子系统
         this.createMeteors();
-        this.startMeteors(); // 启动陨石动画
+        this.startMeteors(); // 启动
 
         // 创建玩旗子，但初始设置为不可见
         this.createPlayerFlag();
@@ -213,7 +217,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 1,
                 suffix: '.png'
             }),
-            frameRate: 8,  // 可以根據需調整幀率
+            frameRate: 6,  // 从 8 降到 6
             repeat: -1
         });
 
@@ -237,7 +241,7 @@ class MainScene extends Phaser.Scene {
             this.debugEndScene();
         });
 
-        // 加载并播脚步声音效
+        // 加并播脚步声音效
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.5 });
         this.footstepsSound.play();
 
@@ -298,20 +302,28 @@ class MainScene extends Phaser.Scene {
             this.startMeteors();
         });
 
+        // 删除或注释掉这段代码
+        /*
         // 添加随机跳跃的定时器
         this.time.addEvent({
-            delay: Phaser.Math.Between(2000, 4000),  // 每2-4秒随机一次
+            delay: Phaser.Math.Between(2000, 4000),
             callback: this.randomJump,
             callbackScope: this,
             loop: true
         });
+        */
     }
 
     setupBugs() {
-        // 设置 bug 的画
+        // 设置 bug 的物理属性
         this.bug.setCollideWorldBounds(true);
         this.bug.setBounce(0.2);
-        this.bug.setGravityY(800);
+        this.bug.setGravityY(400);  // 从 800 降到 400，减轻重力
+
+        // 设置 enemyBug 的物理属性
+        this.enemyBug.setCollideWorldBounds(true);
+        this.enemyBug.setBounce(0.2);
+        this.enemyBug.setGravityY(400);  // 从 800 降到 400，减轻重力
 
         // 创建跑步动画
         this.anims.create({
@@ -323,7 +335,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 60,  // 从 60 降到 30
+            frameRate: 30,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -361,7 +373,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 60,  // 从 60 降到 30
+            frameRate: 30,  // 从 60 降到 30
             repeat: -1
         });
 
@@ -387,7 +399,7 @@ class MainScene extends Phaser.Scene {
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 12,  // 从 15 降到 12
+            frameRate: 10,  // 从 12 降到 10
             repeat: 0
         });
     }
@@ -499,11 +511,11 @@ class MainScene extends Phaser.Scene {
         // 隐藏答案按钮和文本
         this.hideAnswers();
         
-        // 使用打字机效果显示问题
-        this.typewriterEffect(this.questionText, question);
+        // 使用淡入效果显示问题
+        this.fadeInText(this.questionText, question);
         
-        // 延迟显示答案，等待问题完全显示
-        this.time.delayedCall(question.length * 50 + 500, () => {
+        // 延迟显示答案
+        this.time.delayedCall(500, () => {  // 等待淡入完成
             if (Math.random() < 0.5) {
                 this.answer1Text.setText(answers[0]);
                 this.answer2Text.setText(answers[1]);
@@ -514,19 +526,15 @@ class MainScene extends Phaser.Scene {
                 this.correctAnswer = this.button2;
             }
             
-            // 调整文本行
+            // 调整文本换行
             this.answer1Text.setWordWrapWidth(280);
             this.answer2Text.setWordWrapWidth(280);
             
-            // 显答案按钮和文本
+            // 显示答案按钮和文本
             this.showAnswers();
         });
 
-        // 显示问题文本
-        this.questionText.setText(question);
-        this.questionText.setVisible(true);
-
-        // 播放 dang 音效
+        // 播放音效
         this.sound.play('dang');
     }
 
@@ -582,7 +590,7 @@ class MainScene extends Phaser.Scene {
         }
 
         // 更新陨石效果
-        this.updateMeteors();
+        //this.updateMeteors();
 
         // 更新旗子位置（仅当旗子可见时
         if (this.playerFlag && this.playerFlag.visible) {
@@ -704,21 +712,24 @@ class MainScene extends Phaser.Scene {
     moveBugForward() {
         // 增加移动距离
         const moveDistance = 200;  // 前进距离
-        const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的10%）
+        const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的30%）
+        //const jumpHeight = -100;  // 跳跃高度
 
-        // 创建移动动画
+        // 创建移动和跳跃动画
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + moveDistance,  // 向前移动
+            y: this.bug.y,    // 向上跳跃
             duration: 1000,
             ease: 'Power2',
             onComplete: () => {
-                // 在移动完成后，只返回一小段距离
+                // 在移动完成后，返回一小段距离并落回原来的高度
                 this.tweens.add({
                     targets: this.bug,
-                    x: this.bug.x - returnDistance,  // 只返回10%的距离
+                    x: this.bug.x - returnDistance,  // 返回30%的距离
+                    y: this.bug.y,      // 落回原来的高度
                     duration: 1000,
-                    ease: 'Power2'
+                    ease: 'Power1'
                 });
             }
         });
@@ -749,25 +760,27 @@ class MainScene extends Phaser.Scene {
         this.running.play();
     }
 
-    typewriterEffect(text, targetText) {
-        const length = targetText.length;
-        let i = 0;
-        this.time.addEvent({
-            callback: () => {
-                text.setText(targetText.slice(0, i + 1));  // 改为 i + 1
-                ++i;
-            },
-            repeat: length - 1,
-            delay: 50 // 你可以调整这个改变打字速度
+    fadeInText(text, targetText) {
+        // 直接设置完整文本
+        text.setText(targetText);
+        // 初始设置为完全透明
+        text.setAlpha(0);
+        
+        // 创建淡入动画
+        this.tweens.add({
+            targets: text,
+            alpha: 1,
+            duration: 500,  // 500ms 的淡入时间
+            ease: 'Linear'
         });
     }
 
     updateScore(score) {
-        this.scoreText.setText(score.toString());
+        this.scoreText.setText('Your Score:\n' + score.toString());
     }
 
     updateEnemyScore(score) {
-        this.enemyScoreText.setText(score.toString());
+        this.enemyScoreText.setText('Enemy Score:\n' + score.toString());
     }
 
     createMeteors() {
@@ -776,15 +789,15 @@ class MainScene extends Phaser.Scene {
         this.meteorEmitter = this.meteorParticles.createEmitter({
             x: { min: 0, max: this.sys.game.config.width },
             y: -50,
-            speedX: { min: -100, max: -80 },    // 降低速度
-            speedY: { min: 80, max: 120 },      // 降低速度
-            scale: { min: 0.1, max: 0.4 },      // 减小粒子大小
+            speedX: { min: -100, max: -80 },
+            speedY: { min: 80, max: 120 },
+            scale: { min: 0.1, max: 0.4 },
             alpha: { start: 1, end: 0 },
-            lifespan: { min: 3000, max: 6000 }, // 减少生命周期
+            lifespan: { min: 3000, max: 6000 },
             quantity: 1,
-            frequency: 1000,                     // 降低频率（从 500 到 1000）
+            frequency: 2000,  // 从 1000 增加到 2000，减少生成频率
             blendMode: 'ADD',
-            maxParticles: 5,                   // 限制最大粒子数量
+            maxParticles: 5,  // 限制最大粒子数量
             rotate: 0
         });
     }
@@ -895,7 +908,7 @@ class MainScene extends Phaser.Scene {
         }
 
         // 陨石速度和频率保持不变
-        // 如果你想在游戏开始时设置陨石速度和频率，可以在 createMeteors 方法中进行设置
+        // 如果你想在游戏开始时设置陨石速度和频率，可以 createMeteors 方法中进行设置
     }
 
     showSpeedUpText() {
@@ -1003,7 +1016,7 @@ class MainScene extends Phaser.Scene {
         
         this.bug.once('animationcomplete', () => {
             console.log('fall_bug animation completed');
-            // 设置动画停在最后一帧
+            // 设置动画停最后
             this.bug.anims.stopOnFrame(this.bug.anims.currentAnim.frames[this.bug.anims.currentAnim.frames.length - 1]);
             
             // 在最后一帧停留约1秒
@@ -1095,7 +1108,7 @@ class MainScene extends Phaser.Scene {
         console.log('Meteor shot!');
     }
 
-    // 新增方法立即跳转到 EndScene 进行调试
+    // 新增方法即跳转到 EndScene 进行调试
     debugEndScene() {
         // 停止所有声音
         //this.sound.stopAll();
@@ -1147,24 +1160,12 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    // 添加随机跳跃方法
+    // 删除或注释掉整个 randomJump 方法
+    /*
     randomJump() {
-        // 只有在虫子在地面上且正在运行动画时才跳跃
-        if (this.bug.body.touching.down && this.bug.anims.currentAnim.key === 'run_bug') {
-            // 随机生成跳跃力度
-            const jumpVelocity = Phaser.Math.Between(-300, -400);
-            this.bug.setVelocityY(jumpVelocity);
-
-            // 添加一些水平移动
-            const horizontalVelocity = Phaser.Math.Between(-50, 50);
-            this.bug.setVelocityX(horizontalVelocity);
-
-            // 设置一个短暂的定时器来重置水平速度
-            this.time.delayedCall(500, () => {
-                this.bug.setVelocityX(0);
-            });
-        }
+        // ... 跳跃相关的代码 ...
     }
+    */
 }
 
 // 全局变量

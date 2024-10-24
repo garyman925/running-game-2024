@@ -4,13 +4,7 @@ class MenuScene extends Phaser.Scene {
     }
 
     preload() {
-        // 加载 startBtn 作为精灵表
-        this.load.spritesheet('startBtn', '../assets/start_btn.png', { 
-            frameWidth: 224,  // 假设按钮宽度为224像素
-            frameHeight: 76   // 假设按钮高度为152像素，每帧高度为76像素
-        });
-        // 移除这行，因为背景图片应该已经在 LoadScene 中加载
-        // this.load.image('bg', '../assets/bg-world-1.png');
+
     }
 
     create() {
@@ -39,6 +33,8 @@ class MenuScene extends Phaser.Scene {
             strokeThickness: 10
         }).setOrigin(0.5);
 
+        
+
         // 为 logo 文本添加简单的动画效果
         this.tweens.add({
             targets: logoText,
@@ -51,7 +47,8 @@ class MenuScene extends Phaser.Scene {
         // 添加提示文本
         const startText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Click Anywhere to Start', {
             fontFamily: 'sans-serif',
-            fontSize: '42px',
+            fontSize: '60px',
+            fontStyle: 'bold',
             fill: '#fff'
         }).setOrigin(0.5);
 
@@ -59,8 +56,8 @@ class MenuScene extends Phaser.Scene {
         this.tweens.add({
             targets: startText,
             alpha: { from: 1, to: 0 },
-            duration: 500,
-            ease: 'Power2',
+            duration: 2000,
+            ease: 'Power1',
             yoyo: true, 
             repeat: -1
         });
@@ -75,8 +72,8 @@ class MenuScene extends Phaser.Scene {
         const dragonY = this.cameras.main.height * 0.4;
         
         this.dragon = this.add.image(dragonX, dragonY, 'dragon');
-        this.dragon.setScale(0.8);  // 调整大小
-        this.dragon.setDepth(1);  // 确保飞龙在背景之上
+        this.dragon.setScale(1.6);  // 调整大小
+        this.dragon.setDepth(0);  // 确保飞龙在背景之上
 
         // 添加飞龙的上下浮动动画
         this.tweens.add({
