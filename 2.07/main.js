@@ -784,7 +784,7 @@ class MainScene extends Phaser.Scene {
             quantity: 1,
             frequency: 1000,                     // 降低频率（从 500 到 1000）
             blendMode: 'ADD',
-            maxParticles: 20,                   // 限制最大粒子数量
+            maxParticles: 5,                   // 限制最大粒子数量
             rotate: 0
         });
     }

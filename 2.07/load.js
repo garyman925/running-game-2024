@@ -4,6 +4,7 @@ class LoadScene extends Phaser.Scene {
 	}
 
 	preload() {
+		// 开始加载资源
 		console.log('Preload started');
 		
 		this.load.image('bird', '../assets/bird.png');
@@ -52,7 +53,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.atlas('dragon', '../assets/dragon-sprite.png', '../assets/dragon-sprite.json');
 		this.load.spritesheet('fireball', '../assets/fireball.png', { 
 			frameWidth: 176, // 根据你的实际图片调整
-			frameHeight: 147 // 根据你的实际图片调整
+			frameHeight: 147 // 根据的实际图片调整
 		});
 		//this.load.image('fireball', '../assets/fireball.png');
 		
@@ -64,13 +65,17 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio('dang', '../audio/dang.mp3');
 		this.load.image('user-icon', '../assets/bugbug-icon.png');
 		this.load.image('enemy-icon', '../assets/enemy-icon.png');
+		this.load.image('rotate-ipad', '../assets/rotate-ipad.png');
 		console.log('Audio files added to load queue');
 		
 		console.log('Preload completed');
 	}
 
 	create() {
-		console.log('LoadScene create method called');
-		this.scene.start('MenuScene');
+		// 添加一个短暂的延迟，确保所有资源都完全准备好
+		this.time.delayedCall(500, () => {
+			console.log('LoadScene create method called');
+			this.scene.start('MenuScene');
+		});
 	}
 }

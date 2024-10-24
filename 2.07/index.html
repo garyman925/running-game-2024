@@ -49,9 +49,23 @@
             display: none;
             text-align: center;
             font-family: 'IM Fell DW Pica', serif;
+            width: 80%;
+            max-width: 500px;
+            background: #673ab7c4;
+            padding: 45px;
+        }
+        #orientation-warning img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            animation: rotate 2s infinite linear;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(90deg); }
         }
         
-        /* 添加字体预加载 */
+        /* 添加字体预��载 */
         .font-preload {
             position: absolute;
             left: -9999px;
@@ -76,90 +90,108 @@
     <div class="font-preload font-preload-press-start">.</div>
     
     <div id="game"></div>
-    <div id="orientation-warning">请将设备旋转为横屏模式以获得最佳体验。</div>
+    <div id="orientation-warning">
+        <img src="../assets/rotate-ipad.png" alt="Rotate device">
+        <div>Please rotate your device to landscape mode for the best experience.</div>
+    </div>
     <script>
-    // 添加字体加载检查
-    document.fonts.ready.then(function() {
-        console.log('Fonts are loaded');
-        
-        var config = {
-            type: Phaser.WEBGL, // 强制使用 WebGL
-            scale: {
-                mode: Phaser.Scale.FIT,
-                parent: 'game',
-                width: 1920,
-                height: 1200,
-                autoCenter: Phaser.Scale.CENTER_BOTH,
-                orientation: Phaser.Scale.LANDSCAPE,
-                autoRound: true
-            },
-            render: {
-                antialias: false,        // 关闭抗锯齿
-                pixelArt: false,
-                roundPixels: true,       // 开启像素四舍五入
-                powerPreference: 'high-performance',  // 优先使用高性能模式
-                batchSize: 2048,         // 增加批处理大小
-                clearBeforeRender: false,  // 不在每帧清除画布
-                desynchronized: true,    // 使用异步渲染
-                failIfMajorPerformanceCaveat: false,
-                premultipliedAlpha: false
-            },
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: { y: 300 },
-                    debug: false,
-                    fps: 60,
-                    tileBias: 8,
-                    overlapBias: 8,
-                    forceX: false
-                }
-            },
-            pipeline: {
-                enableMultiPipeline: true
-            },
-            dom: {
-                createContainer: true
-            },
-            input: {
-                activePointers: 2,
-                smoothFactor: 0,
-                touch: {
-                    capture: true,
-                    dragThreshold: 20,
-                    tapThreshold: 200
-                }
-            },
-            audio: {
-                disableWebAudio: false,
-                noAudio: false
-            },
-            scene: [LoadScene, MenuScene, MainScene, EndScene],
-            backgroundColor: '#000000',
-            autoMobilePipeline: true,
-            banner: false,
-            transparent: false
-        };
-
-        var game = new Phaser.Game(config);
-
-        // 检查屏幕方向并显示提示
-        function checkOrientation() {
-            if (window.innerHeight > window.innerWidth) {
-                // 竖屏状态，显示提示
-                document.getElementById('orientation-warning').style.display = 'block';
-            } else {
-                // 横屏状态，隐藏提示
-                document.getElementById('orientation-warning').style.display = 'none';
-            }
-        }
-
-        // 页面加载和方向变化时都执行
-        window.addEventListener('load', checkOrientation);
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
+    // 在页面加载时立即检查设备方向
+    document.addEventListener('DOMContentLoaded', function() {
+        checkOrientation();
+        initGame();
     });
 
+    // 监听方向变化 - 添加多个事件监听
+    window.addEventListener('orientationchange', function() {
+        // 在 Safari 中，需要一个短暂的延迟来确保获取正确的窗口尺寸
+        setTimeout(checkOrientation, 100);
+    });
+
+    // 添加 resize 事件监听，因为在某些设备上 orientationchange 可能不会触发
+    window.addEventListener('resize', function() {
+        checkOrientation();
+    });
+
+    // 检查方向的函数
+    function checkOrientation() {
+        const warning = document.getElementById('orientation-warning');
+        
+        // 使用多种方法检测设备方向
+        const isPortrait = 
+            window.innerHeight > window.innerWidth || // 使用窗口尺寸
+            (window.orientation !== undefined && (window.orientation === 0 || window.orientation === 180)); // 使用方向角度
+        
+        if (isPortrait) {
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    }
+
+    // 初始化游戏的函数保持不变
+    function initGame() {
+        // 确保字体已加载
+        document.fonts.ready.then(function() {
+            console.log('Fonts are loaded');
+            
+            var config = {
+                type: Phaser.WEBGL,
+                scale: {
+                    mode: Phaser.Scale.FIT,
+                    parent: 'game',
+                    width: 1920,
+                    height: 1200,
+                    autoCenter: Phaser.Scale.CENTER_BOTH,
+                    orientation: Phaser.Scale.LANDSCAPE
+                },
+                render: {
+                    antialias: true,         // 保持抗锯齿开启
+                    pixelArt: false,
+                    roundPixels: false,      // 关闭像素四舍五入以保持抗锯齿效果
+                    powerPreference: 'high-performance',
+                    batchSize: 1024,         // 降低批处理大小
+                    clearBeforeRender: true,
+                    maxTextures: 8,          // 限制最大纹理数量
+                    maxLights: 0,            // 禁用光源
+                    mipmapFilter: 'LINEAR'   // 使用线性过滤
+                },
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: { y: 300 },
+                        debug: false,
+                        fps: 30,             // 降低物理引擎帧率
+                        timeScale: 1,
+                        skipQuadTree: true,  // 跳过四叉树检查以提高性能
+                        tileBias: 8
+                    }
+                },
+                pipeline: {
+                    enableMultiPipeline: false  // 禁用多管线渲染
+                },
+                input: {
+                    activePointers: 1,       // 减少多点触控支持
+                    smoothFactor: 0,
+                    touch: {
+                        capture: true,
+                        dragThreshold: 20,
+                        tapThreshold: 200
+                    }
+                },
+                audio: {
+                    disableWebAudio: false,
+                    noAudio: false
+                },
+                scene: [LoadScene, MenuScene, MainScene, EndScene],
+                backgroundColor: '#000000',
+                autoMobilePipeline: false,   // 禁用自动移动管线
+                banner: false,
+                transparent: false
+            };
+
+            var game = new Phaser.Game(config);
+        });
+    }
     </script>
 </body>
 </html>
