@@ -161,7 +161,7 @@ class MainScene extends Phaser.Scene {
         // 创建分数数值文本（放在标题下方）
         this.scoreText = this.add.text(userIconX, userIconY + userIconSize / 2 + 70, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '36px', // 分数字体可以大一些
+            fontSize: '90px', // 分数字体可以大一些
             fill: '#ffffff',
             align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
@@ -191,7 +191,7 @@ class MainScene extends Phaser.Scene {
         // 创建敌人分数数值文本（放在标题下方）
         this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 70, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '36px', // 分数字体可以大一些
+            fontSize: '90px', // 分数字��可以大一些
             fill: '#ffffff',
             align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
@@ -331,12 +331,12 @@ class MainScene extends Phaser.Scene {
         // 设置 bug 的物理属性
         this.bug.setCollideWorldBounds(true);
         this.bug.setBounce(0.2);
-        this.bug.setGravityY(400);  // 从 800 降到 400，减轻重力
+        this.bug.setGravityY(800);  // 从 800 降到 400，减轻重力
 
         // 设置 enemyBug 的物理属性
         this.enemyBug.setCollideWorldBounds(true);
         this.enemyBug.setBounce(0.2);
-        this.enemyBug.setGravityY(400);  // 从 800 降到 400，减轻重力
+        this.enemyBug.setGravityY(800);  // 从 800 降到 400，减轻重力
 
         // 创建跑步动画
         this.anims.create({
@@ -625,12 +625,22 @@ class MainScene extends Phaser.Scene {
     }
 
     createFeedbackIcons() {
+        // tick 和 cross 保持原来的大小
         this.tick = this.add.image(0, 0, 'tick').setVisible(false).setScale(0.2);
         this.cross = this.add.image(0, 0, 'cross').setVisible(false).setScale(0.2);
-        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct').setVisible(false).setOrigin(0.5);
-        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong').setVisible(false).setOrigin(0.5);
         
-        // 设置馈图标的深度
+        // 增大 correct 和 wrong 图标的大小
+        this.correct = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'correct')
+            .setVisible(false)
+            .setOrigin(0.5)
+            .setScale(2);  // 从默认的 1 增加到 1.5
+        
+        this.wrong = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'wrong')
+            .setVisible(false)
+            .setOrigin(0.5)
+            .setScale(2);  // 从默认的 1 增加到 1.5
+        
+        // 设置反馈图标的深度
         this.tick.setDepth(6);
         this.cross.setDepth(6);
         this.correct.setDepth(7);
@@ -725,13 +735,12 @@ class MainScene extends Phaser.Scene {
         // 增加移动距离
         const moveDistance = 200;  // 前进距离
         const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的30%）
-        //const jumpHeight = -100;  // 跳跃高度
 
         // 创建移动和跳跃动画
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + moveDistance,  // 向前移动
-            y: this.bug.y,    // 向上跳跃
+            y: this.bug.y,    // 向上
             duration: 1000,
             ease: 'Power2',
             onComplete: () => {
@@ -1172,12 +1181,6 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    // 删除或注释掉整个 randomJump 方法
-    /*
-    randomJump() {
-        // ... 跳跃相关的代码 ...
-    }
-    */
 }
 
 // 全局变量
