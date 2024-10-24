@@ -380,7 +380,7 @@ class MainScene extends Phaser.Scene {
 
         // 创建答案按钮和文本
         const buttonWidth = 300;
-        const buttonHeight = 80;
+        const buttonHeight = 100;
         const buttonY = this.cameras.main.height * 0.55;  // 将按钮位置从 0.75 调整到 0.65
 
         // 创建阴影
@@ -404,7 +404,7 @@ class MainScene extends Phaser.Scene {
 
         this.answer1Text = this.add.text(this.cameras.main.width * 0.3, buttonY, '', {
             fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '30px',
+            fontSize: '70px',
             fontWeight: 'bold',
             fill: '#000000',
             align: 'center',
@@ -412,7 +412,7 @@ class MainScene extends Phaser.Scene {
 
         this.answer2Text = this.add.text(this.cameras.main.width * 0.7, buttonY, '', {
             fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '30px',
+            fontSize: '70px',
             fontWeight: 'bold',
             fill: '#000000',
             align: 'center',
@@ -623,6 +623,9 @@ class MainScene extends Phaser.Scene {
             
             // 播放错误答案音效
             this.sound.play('you_are_wrong');
+
+            this.stopMeteors(); // 停止陨石动画
+            this.stopDragonAnimation(); // 停止龙的动画
         }
 
         // 显示旗子
@@ -745,18 +748,33 @@ class MainScene extends Phaser.Scene {
         this.meteorEmitter = this.meteorParticles.createEmitter({
             x: { min: 0, max: this.sys.game.config.width },
             y: -50,
-            speedX: { min: -150, max: -100 },  // 固定的水平速度
-            speedY: { min: 100, max: 150 },    // 固定的垂直度
+            speedX: { min: -150, max: -100 },
+            speedY: { min: 100, max: 150 },
             scale: { min: 0.1, max: 0.6 },
             alpha: { start: 1, end: 0 },
             lifespan: { min: 4000, max: 8000 },
             quantity: 1,
-            frequency: 500,  // 固定的生成频率
+            frequency: 500,
             blendMode: 'ADD',
             rotate: 0
         });
 
-        this.meteorParticles.setDepth(1);
+        // 默认暂停陨石效果
+        this.meteorEmitter.stop();
+    }
+
+    // 暂停陨石发射
+    stopMeteors() {
+        if (this.meteorEmitter) {
+            this.meteorEmitter.stop();
+        }
+    }
+
+    // 启动陨石发射
+    startMeteors() {
+        if (this.meteorEmitter) {
+            this.meteorEmitter.start();
+        }
     }
 
     updateMeteors() {
@@ -1089,6 +1107,12 @@ class MainScene extends Phaser.Scene {
             this.footstepsSound.stop();
         }
         // 可能的其他清理代码
+    }
+
+    stopDragonAnimation() {
+        if (this.dragon) {
+            this.dragon.anims.pause(); // 暂停龙的动画
+        }
     }
 }
 

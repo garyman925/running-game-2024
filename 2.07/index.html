@@ -14,15 +14,22 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
-            -webkit-text-size-adjust: none;
         }
         #game {
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            touch-action: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #orientation-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            display: none; /* 默认隐藏 */
+            text-align: center;
         }
     </style>
     <!-- 更新 Google Fonts 链接 -->
@@ -37,107 +44,46 @@
 </head>
 <body>
     <div id="game"></div>
+    <div id="orientation-warning">请将设备旋转为横屏模式以获得最佳体验。</div>
     <script>
     var config = {
-        type: Phaser.WEBGL,  // 强制使用 WebGL
+        type: Phaser.WEBGL,
         scale: {
-            mode: Phaser.Scale.RESIZE,
+            mode: Phaser.Scale.FIT,
             parent: 'game',
             width: 1920,
             height: 1200,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             orientation: Phaser.Scale.LANDSCAPE,
-            min: {
-                width: 480,
-                height: 300
-            },
-            max: {
-                width: 1920,
-                height: 1200
-            }
+            autoRound: true
         },
-        render: {
-            antialias: true,
-            pixelArt: false,
-            roundPixels: true,
-            powerPreference: 'high-performance',
-            batchSize: 2048,
-            clearBeforeRender: false,
-            preserveDrawingBuffer: true,
-            premultipliedAlpha: false,
-            failIfMajorPerformanceCaveat: false,
-            desynchronized: true,
-            antialiasGL: false
-        },
+        scene: [LoadScene, MenuScene, MainScene, EndScene],
         physics: {
             default: 'arcade',
             arcade: {
                 gravity: { y: 300 },
-                debug: false,
-                fps: 60,
-                tileBias: 8,
-                overlapBias: 8,
-                forceX: false
+                debug: false
             }
-        },
-        pipeline: {
-            enableMultiPipeline: true
-        },
-        dom: {
-            createContainer: true
-        },
-        input: {
-            activePointers: 2,
-            smoothFactor: 0,
-            touch: {
-                capture: true,
-                dragThreshold: 20,
-                tapThreshold: 200
-            }
-        },
-        audio: {
-            disableWebAudio: false,
-            noAudio: false
-        },
-        scene: [LoadScene, MenuScene, MainScene, EndScene],
-        backgroundColor: '#000000',
-        autoMobilePipeline: true,
-        banner: false,
-        transparent: false
+        }
     };
 
     var game = new Phaser.Game(config);
 
-    // 优化移动设备的触摸事件
-    document.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-    }, { passive: false });
-
-    // 监听游戏启动完成事件
-    game.events.once('ready', function() {
-        // 优化渲染性能
-        game.renderer.optimizeRedraw = true;
-        game.renderer.setTexturePriority(['atlas']);
-    });
-
-    // 监听窗口失焦事件
-    window.addEventListener('blur', function() {
-        game.scene.pause(game.scene.getScenes(true)[0]);
-    });
-
-    // 监听窗口获得焦点事件
-    window.addEventListener('focus', function() {
-        game.scene.resume(game.scene.getScenes(true)[0]);
-    });
-
-    // 监听内存警告
-    if ('memory' in performance) {
-        setInterval(function() {
-            if (performance.memory.usedJSHeapSize > performance.memory.jsHeapSizeLimit * 0.9) {
-                game.textures.clearUnusedTextures();
-            }
-        }, 30000);
+    // 检查屏幕方向并显示提示
+    function checkOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+            // 竖屏状态，显示提示
+            document.getElementById('orientation-warning').style.display = 'block';
+        } else {
+            // 横屏状态，隐藏提示
+            document.getElementById('orientation-warning').style.display = 'none';
+        }
     }
+
+    // 页面加载和方向变化时都执行
+    window.addEventListener('load', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
     </script>
 </body>
 </html>

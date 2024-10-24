@@ -292,6 +292,9 @@ class EndScene extends Phaser.Scene {
             fontSize: '24px',
             fill: '#ffffff'
         }).setOrigin(0.5, 0).setDepth(7);
+
+        // 停止龙的动画
+        this.stopDragonAnimation();
     }
 
     update() {
@@ -416,7 +419,7 @@ class EndScene extends Phaser.Scene {
         );
         scrollThumb.setDepth(7);
 
-        // 创建一个透明的交互区域，覆盖整个滚动条
+        // 创建一个透明的交互区��，覆盖整个滚动条
         const hitArea = new Phaser.Geom.Rectangle(
             margin - leftOffset,
             topMargin,
@@ -509,5 +512,11 @@ class EndScene extends Phaser.Scene {
 
     shutdown() {
         this.sound.stopByKey('endscene-bgm');
+    }
+
+    stopDragonAnimation() {
+        if (this.dragon) {
+            this.dragon.anims.pause(); // 暂停龙的动画
+        }
     }
 }
