@@ -21,9 +21,9 @@ class EndScene extends Phaser.Scene {
     }
 
     create() {
-        console.log("EndScene create method called");
-        console.log("In create - Bug Score:", this.bugScore);
-        console.log("In create - Enemy Bug Score:", this.enemyBugScore);
+        //console.log("EndScene create method called");
+        //console.log("In create - Bug Score:", this.bugScore);
+        //console.log("In create - Enemy Bug Score:", this.enemyBugScore);
         // 停止 MainScene 的景音乐
         this.sound.stopByKey('bgm');
 
@@ -284,8 +284,8 @@ class EndScene extends Phaser.Scene {
         enemyIcon.setDisplaySize(enemyIconSize, enemyIconSize);
 
         // 在创建分数文本之前再次检查分数值
-        console.log("Before creating score text - Bug Score:", this.bugScore);
-        console.log("Before creating score text - Enemy Bug Score:", this.enemyBugScore);
+        //console.log("Before creating score text - Bug Score:", this.bugScore);
+        //console.log("Before creating score text - Enemy Bug Score:", this.enemyBugScore);
 
 
         // 创建玩家图标和分数显示，放在敌人图标下方
@@ -407,7 +407,8 @@ class EndScene extends Phaser.Scene {
                     }
                     return {
                         text: answerText,
-                        isCorrect: isCorrect
+                        isCorrect: isCorrect,
+                        isUserAnswer: isUserAnswer
                     };
                 })
             );
@@ -415,13 +416,23 @@ class EndScene extends Phaser.Scene {
 
         // 创建文本对象
         let currentY = 0;
-        const lineHeight = 80;  // 减小行高
+        const lineHeight = 80;
 
         lines.forEach((line, index) => {
+            let color = '#ffffff';  // 默认白色
+            
+            if (typeof line === 'object') {
+                if (line.isCorrect) {
+                    color = '#00FF00';  // 正确答案为绿色
+                } else if (line.isUserAnswer) {
+                    color = '#FF0000';  // 错误的用户答案为红色
+                }
+            }
+
             const text = this.add.text(0, currentY, typeof line === 'string' ? line : line.text, {
                 fontFamily: '"Jost", sans-serif',
-                fontSize: '48px',  // 减小字体大小
-                color: typeof line === 'string' ? '#ffffff' : (line.isCorrect ? '#00FF00' : '#ffffff'),
+                fontSize: '48px',
+                color: color,
                 wordWrap: { 
                     width: textWidth - 60
                 }
