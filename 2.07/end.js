@@ -147,9 +147,9 @@ class EndScene extends Phaser.Scene {
 
         // 如果玩家分数高于对手，显示 "You Win!"
         if (this.bugScore > this.enemyBugScore) {
-            const winText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 300, 'You Win!', {
+            const winText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 200, 'You Win!', {
                 fontFamily: '"Press Start 2P", cursive',
-                fontSize: '36px',
+                fontSize: '45px',
                 fill: '#00ff00',  // 绿色文字
                 stroke: '#000000', // 黑色描边
                 strokeThickness: 6 // 描边厚度
@@ -167,9 +167,9 @@ class EndScene extends Phaser.Scene {
 
         // 如果玩家分数低于对手，显示 "You Lose!"
         if (this.bugScore < this.enemyBugScore) {
-            const loseText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 300, 'You Lose!', {
+            const loseText = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 200, 'You Lose!', {
                 fontFamily: '"Press Start 2P", cursive',
-                fontSize: '36px',
+                fontSize: '45px',
                 fill: '#ff0000',  // 红色文字
                 stroke: '#000000', // 黑色描边
                 strokeThickness: 6 // 描边厚度
