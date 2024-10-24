@@ -191,7 +191,7 @@ class MainScene extends Phaser.Scene {
         // 创建敌人分数数值文本（放在标题下方）
         this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 70, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '90px', // 分数字��以大一些
+            fontSize: '90px', // 分数��以大一些
             fill: '#ffffff',
             align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
@@ -258,56 +258,10 @@ class MainScene extends Phaser.Scene {
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.5 });
         this.footstepsSound.play();
 
-        // 删除或注释掉以下两行
-        // this.playDragonRoar();
-        // console.log('Dragon roar timer set');
-
-        // // 创建玩家图标和分数显示
-        // const userIconSize = 130;  // 图标的直径
-        // const userIconX = 100;
-        // const userIconY = 30 + userIconSize / 2;
-        // const userIcon = this.add.image(userIconX, userIconY, 'user-icon').setOrigin(0.5).setDepth(6);
-        
-        // // 创建圆形遮罩
-        // const userMask = this.make.graphics().fillCircle(userIconX, userIconY, userIconSize / 2);
-        // userIcon.setMask(userMask.createGeometryMask());
-        
-        // // 调整图标大小以填满圆形
-        // userIcon.setDisplaySize(userIconSize, userIconSize);
-
-        // 创建分数文本并置于图标下方中央
-        // this.scoreText = this.add.text(userIconX, userIconY + userIconSize / 2 + 30, '0', {
-        //     fontFamily: '"Press Start 2P", cursive',
-        //     fontSize: '36px',
-        //     fill: '#ffffff'
-        // }).setOrigin(0.5, 0).setDepth(7);
-
-        // // 建敌人图标和分数显示
-        // const enemyIconSize = 130;  // 图标的直径
-        // const enemyIconX = this.sys.game.config.width - 100;
-        // const enemyIconY = 30 + enemyIconSize / 2;
-        // const enemyIcon = this.add.image(enemyIconX, enemyIconY, 'enemy-icon').setOrigin(0.5).setDepth(6);
-        
-        // // 创建圆形遮罩
-        // const enemyMask = this.make.graphics().fillCircle(enemyIconX, enemyIconY, enemyIconSize / 2);
-        // enemyIcon.setMask(enemyMask.createGeometryMask());
-        
-        // // 调整图标大小以填满圆形
-        // enemyIcon.setDisplaySize(enemyIconSize, enemyIconSize);
-
-        // 创建敌人分数文本并置于图标下方中央
-        // this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 30, '0', {
-        //     fontFamily: '"Press Start 2P", cursive',
-        //     fontSize: '24px',
-        //     fill: '#ffffff'
-        // }).setOrigin(0.5, 0).setDepth(7);
 
         // 停止龙的动画
         this.stopDragonAnimation();
 
-        // 移除这两行
-        // this.createMeteors();
-        // this.startMeteors();
 
         // 延迟加载陨石效果
         this.time.delayedCall(500, () => {
@@ -315,16 +269,6 @@ class MainScene extends Phaser.Scene {
             this.startMeteors();
         });
 
-        // 删除或释掉这段代码
-        /*
-        // 添加随机跳跃的定时器
-        this.time.addEvent({
-            delay: Phaser.Math.Between(2000, 4000),
-            callback: this.randomJump,
-            callbackScope: this,
-            loop: true
-        });
-        */
     }
 
     setupBugs() {
@@ -590,9 +534,6 @@ class MainScene extends Phaser.Scene {
             this.enemyBug.setVelocityY(0);
         }
 
-        // 注释掉或删除移动中层背景的代码
-        // this.midGround.tilePositionX += this.midGroundSpeed;
-
         // 动地面
         this.ground.tilePositionX += this.groundSpeed;
 
@@ -601,27 +542,13 @@ class MainScene extends Phaser.Scene {
             //console.log('Question text visibility:', this.questionText.visible, 'Text:', this.questionText.text);
         }
 
-        // 更新陨石效果
-        //this.updateMeteors();
 
         // 更新旗子位置（仅当旗子可见时
         if (this.playerFlag && this.playerFlag.visible) {
             this.playerFlag.x = this.bug.x;
-            // y坐标���补间动画处理
+            // y坐标补间动画处理
         }
 
-        // 移除或註釋掉這部分代碼
-        /*
-        // 讓龍緩慢向右動
-        if (this.dragon) {
-            this.dragon.x += 0.5; // 每幀向右移動 0.5 像素，可以根據需要調整
-
-            // 如果龍移出畫面，將其重置到左側
-            if (this.dragon.x > this.sys.game.config.width + this.dragon.width / 2) {
-                this.dragon.x = -this.dragon.width / 2;
-            }
-        }
-        */
     }
 
     createFeedbackIcons() {
@@ -865,7 +792,7 @@ class MainScene extends Phaser.Scene {
             duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
-                // 第二阶段：星星在头顶停留并轻微放大缩小
+                // 第二阶段：星星在头顶停���并轻微放大缩小
                 this.tweens.add({
                     targets: star,
                     scale: 2,
@@ -1188,7 +1115,7 @@ class MainScene extends Phaser.Scene {
 
     resumeDragonAnimation() {
         if (this.dragon && this.dragon.anims) {
-            this.dragon.anims.resume(); // 恢复龙的动画
+            this.dragon.anims.resume(); // ��复龙的动画
         }
     }
 
@@ -1212,4 +1139,5 @@ var answers = [
     ["Mars", "Venus"],
     ["Blue Whale", "African Elephant"]
 ];
+
 

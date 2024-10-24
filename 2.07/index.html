@@ -45,19 +45,21 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: black;
-            font-size: 24px;
+            font-size: 36px;
             display: none;
             text-align: center;
             font-family: 'IM Fell DW Pica', serif;
             width: 80%;
-            max-width: 500px;
+            max-width: 600px;
             background: #fff;
-            padding: 45px;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         #orientation-warning img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
             animation: rotate 2s infinite linear;
         }
         @keyframes rotate {
@@ -65,7 +67,7 @@
             to { transform: rotate(90deg); }
         }
         
-        /* 添加字体预��载 */
+        /* 添加字体预加载 */
         .font-preload {
             position: absolute;
             left: -9999px;

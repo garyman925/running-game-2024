@@ -128,32 +128,20 @@ class EndScene extends Phaser.Scene {
             align: 'left'
         };
 
-        // // 显示玩家分数
-        // this.add.text(20, 20, `Your Score: ${this.bugScore}`, scoreTextStyle)
-        //     .setOrigin(0, 0)
-        //     .setDepth(10);
-
-        // // 显示敌人分数
-        // this.add.text(20, 60, `Enemy Score: ${this.enemyBugScore}`, scoreTextStyle)
-        //     .setOrigin(0, 0)
-        //     .setDepth(10);
-
-        // 移除之前的分数动画代码
-        // this.animateScore(0, this.score);
 
         // 调整滚动文本区域的位置和大小
         const textWidth = 1100;  // 增加文本区域宽度
         const textHeight = 650;  // 增加文本区域高度
-        const padding = 20;
+        const padding = 30;
         const topMargin = 120;  // 稍微增加顶部边距，为分数显示留出更多空间
 
         // 创建滚动文本区域
         this.createScrollableText();
 
         // 添加重新开始按钮
-        const restartButton = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 250, 'Replay', {
+        const restartButton = this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height - 150, 'Retry', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '24px',
+            fontSize: '60px',
             fill: '#ffffff'
         }).setOrigin(0.5).setDepth(5);
 
@@ -288,7 +276,7 @@ class EndScene extends Phaser.Scene {
         const enemyIconY = 60 + enemyIconSize / 2;
         const enemyIcon = this.add.image(enemyIconX, enemyIconY, 'enemy-icon').setOrigin(0.5).setDepth(6);
         
-        // 创建圆形遮罩
+        // 创建圆形罩
         const enemyMask = this.make.graphics().fillCircle(enemyIconX, enemyIconY, enemyIconSize / 2);
         enemyIcon.setMask(enemyMask.createGeometryMask());
         
@@ -369,13 +357,13 @@ class EndScene extends Phaser.Scene {
     }
 
     createScrollableText() {
-        const margin = 50;  // 边距
-        const textWidth = this.sys.game.config.width / 2 + 300;  // 增加文本宽度
-        const textHeight = this.sys.game.config.height / 2;  // 将高度设置为屏幕高度的一半
-        const scrollBarWidth = 20;
-        const cornerRadius = 20;
-        const leftOffset = 0;  // 向左偏移量
-        const topMargin = margin;  // 将顶部边距设置为 margin，使答案框贴在顶部
+        const margin = 30;  // 边距
+        const textWidth = this.sys.game.config.width / 2 + 500;  // 文本区域宽度
+        const textHeight = this.sys.game.config.height / 2 + 200;  // 文本区域高度
+        const scrollBarWidth = 50;
+        const cornerRadius = 50;
+        const leftOffset = 0;
+        const topMargin = margin;
 
         // 创建背景
         const background = this.add.graphics();
@@ -400,151 +388,131 @@ class EndScene extends Phaser.Scene {
             cornerRadius
         );
 
-        // 创建文本
-        const content = this.questions.map((question, index) => {
+        // 创建一个容器来存放所有文本
+        const textContainer = this.add.container(margin + 10 - leftOffset, topMargin + 10);
+        textContainer.setDepth(6);
+
+        // 获取所有行
+        const lines = this.questions.map((question, index) => {
             const answers = this.answers[index];
             const userAnswer = this.userAnswers[index];
-            return `Q${index + 1}: ${question}\n` + 
-                   answers.map((answer, i) => {
-                       const isCorrect = i === 0;
-                       const isUserAnswer = userAnswer === i;
-                       const prefix = isCorrect ? '✓' : '✗';
-                       let answerText = `     ${answer} ${prefix}`; // 在答案前添加五个空格
-                       if (isUserAnswer) {
-                           answerText += ' (Your Answer)';
-                       }
-                       return answerText;
-                   }).join('\n') + '\n';
-        }).join('\n');
+            return [`Q${index + 1}: ${question}`].concat(
+                answers.map((answer, i) => {
+                    const isCorrect = i === 0;
+                    const isUserAnswer = userAnswer === i;
+                    const prefix = isCorrect ? '✓' : '✗';
+                    let answerText = `       ${answer} ${prefix}`;
+                    if (isUserAnswer) {
+                        answerText += ' (Your Answer)';
+                    }
+                    return {
+                        text: answerText,
+                        isCorrect: isCorrect
+                    };
+                })
+            );
+        }).flat();
 
-        const text = this.add.text(
-            margin + 10 - leftOffset,
-            topMargin + 10,
-            content,
-            {
+        // 创建文本对象
+        let currentY = 0;
+        const lineHeight = 80;  // 减小行高
+
+        lines.forEach((line, index) => {
+            const text = this.add.text(0, currentY, typeof line === 'string' ? line : line.text, {
                 fontFamily: '"Jost", sans-serif',
-                fontSize: '30px',
-                color: '#ffffff',
-                wordWrap: { width: textWidth - 40 },
-                lineSpacing: 5,
-                align: 'left'
-            }
-        ).setDepth(6);
+                fontSize: '48px',  // 减小字体大小
+                color: typeof line === 'string' ? '#ffffff' : (line.isCorrect ? '#00FF00' : '#ffffff'),
+                wordWrap: { 
+                    width: textWidth - 60
+                }
+            });
+            textContainer.add(text);
+            currentY += lineHeight + 5;
+        });
 
-        text.setMask(mask.createGeometryMask());
+        // 设置遮罩
+        textContainer.setMask(mask.createGeometryMask());
 
-        // 创建滚动条
-        const scrollBar = this.add.graphics();
-        scrollBar.fillStyle(0xcccccc, 1);
-        scrollBar.fillRoundedRect(
-            margin + textWidth - scrollBarWidth - leftOffset,
+        // 创建滚动条背景
+        const scrollBarBg = this.add.graphics();
+        scrollBarBg.fillStyle(0x666666, 0.6);
+        scrollBarBg.fillRoundedRect(
+            margin - leftOffset + textWidth - scrollBarWidth,
             topMargin,
             scrollBarWidth,
             textHeight,
-            scrollBarWidth / 2
+            5
         );
-        scrollBar.setDepth(6);
+        scrollBarBg.setDepth(6);
 
-        // 创建滚动滑块
+        // 创建滚动条滑块并设置为可交互
         const scrollThumb = this.add.graphics();
         scrollThumb.fillStyle(0xffffff, 1);
-        scrollThumb.fillRoundedRect(
-            margin + textWidth - scrollBarWidth - leftOffset,
-            topMargin,
-            scrollBarWidth,
-            100,
-            scrollBarWidth / 2
-        );
+        const thumbHeight = Math.max((textHeight / currentY) * textHeight, 50);
+        scrollThumb.fillRoundedRect(0, 0, scrollBarWidth - 4, thumbHeight, 3);
         scrollThumb.setDepth(7);
+        scrollThumb.x = margin - leftOffset + textWidth - scrollBarWidth + 2;
+        scrollThumb.y = topMargin + 2;
 
-        // 创建一个透明的交互区，覆盖整个滚动条
-        const hitArea = new Phaser.Geom.Rectangle(
+        // 使滑块可交互
+        scrollThumb.setInteractive(new Phaser.Geom.Rectangle(0, 0, scrollBarWidth - 4, thumbHeight), Phaser.Geom.Rectangle.Contains);
+        this.input.setDraggable(scrollThumb);
+
+        // 处理拖拽
+        let isDragging = false;
+        let startY = 0;
+
+        scrollThumb.on('pointerdown', function (pointer) {
+            isDragging = true;
+            startY = pointer.y - scrollThumb.y;
+        });
+
+        this.input.on('pointermove', function (pointer) {
+            if (isDragging) {
+                // 计算新的滑块位置
+                let newY = Phaser.Math.Clamp(
+                    pointer.y - startY,
+                    topMargin + 2,
+                    topMargin + textHeight - thumbHeight - 2
+                );
+                scrollThumb.y = newY;
+
+                // 计算内容的滚动位置
+                const scrollProgress = (newY - (topMargin + 2)) / (textHeight - thumbHeight - 4);
+                const contentY = topMargin + 10 - (maxScroll * scrollProgress);
+                textContainer.y = contentY;
+            }
+        });
+
+        this.input.on('pointerup', function () {
+            isDragging = false;
+        });
+
+        // 创建滚动区域的交互区域
+        const hitAreaGraphics = this.add.graphics();
+        hitAreaGraphics.setInteractive(new Phaser.Geom.Rectangle(
             margin - leftOffset,
             topMargin,
             textWidth,
             textHeight
-        );
-        const hitAreaGraphics = this.add.graphics({ fillStyle: { color: 0xffffff, alpha: 0 } });
-        hitAreaGraphics.fillRectShape(hitArea);
-        hitAreaGraphics.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+        ), Phaser.Geom.Rectangle.Contains);
 
-        // 置拖动
-        this.input.setDraggable(hitAreaGraphics);
+        // 计算最大滚动距离
+        const maxScroll = Math.max(0, currentY - textHeight);
 
-        // 创建悬停提示文本
-        const hoverText = this.add.text(0, 0, 'Scroll', {
-            fontFamily: '"IM Fell DW Pica", serif',
-            fontSize: '20px',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { x: 5, y: 5 }
-        });
-        hoverText.setVisible(false);
-        hoverText.setDepth(8);
-
-        // 计算滚动条的 X 坐标
-        const scrollBarX = margin + textWidth - scrollBarWidth - leftOffset;
-
-        // 添加鼠标悬停效果
-        hitAreaGraphics.on('pointerover', (pointer) => {
-            this.input.setDefaultCursor('pointer');
-            hoverText.setVisible(true);
-            hoverText.setPosition(scrollBarX + scrollBarWidth + 10, pointer.y);
-        });
-
-        hitAreaGraphics.on('pointermove', (pointer) => {
-            if (hoverText.visible) {
-                hoverText.setPosition(scrollBarX + scrollBarWidth + 10, pointer.y);
-            }
-        });
-
-        hitAreaGraphics.on('pointerout', () => {
-            this.input.setDefaultCursor('default');
-            hoverText.setVisible(false);
-        });
-
-        // 滚动逻辑
-        let isDragging = false;
-        const maxY = topMargin + textHeight - 100;
-        const minY = topMargin;
-
-        hitAreaGraphics.on('drag', (pointer, dragX, dragY) => {
-            isDragging = true;
-            const newY = Phaser.Math.Clamp(dragY, minY, maxY);
-            scrollThumb.clear();
-            scrollThumb.fillStyle(0xffffff, 1);
-            scrollThumb.fillRoundedRect(
-                margin + textWidth - scrollBarWidth - leftOffset,
-                newY,
-                scrollBarWidth,
-                100,
-                scrollBarWidth / 2
+        // 更新滚动条位置
+        hitAreaGraphics.on('wheel', (pointer, deltaX, deltaY, deltaZ) => {
+            const newY = Phaser.Math.Clamp(
+                textContainer.y - deltaY,
+                topMargin + 10 - maxScroll,
+                topMargin + 10
             );
-            const scrollPercentage = (newY - minY) / (maxY - minY);
-            text.y = topMargin + 10 - (text.height - textHeight) * scrollPercentage;
-        });
+            textContainer.y = newY;
 
-        hitAreaGraphics.on('dragend', () => {
-            isDragging = false;
-        });
-
-        // 鼠标滚轮滚动
-        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-            if (!isDragging) {
-                text.y -= deltaY;
-                text.y = Phaser.Math.Clamp(text.y, -(text.height - textHeight) + topMargin + 10, topMargin + 10);
-                const scrollPercentage = (topMargin + 10 - text.y) / (text.height - textHeight);
-                const newY = minY + (maxY - minY) * scrollPercentage;
-                scrollThumb.clear();
-                scrollThumb.fillStyle(0xffffff, 1);
-                scrollThumb.fillRoundedRect(
-                    margin + textWidth - scrollBarWidth - leftOffset,
-                    newY,
-                    scrollBarWidth,
-                    100,
-                    scrollBarWidth / 2
-                );
-            }
+            // 更新滑块位置
+            const scrollProgress = (newY - (topMargin + 10)) / (-maxScroll);
+            const thumbY = topMargin + 2 + (scrollProgress * (textHeight - thumbHeight - 4));
+            scrollThumb.y = thumbY;
         });
     }
 
