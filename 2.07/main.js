@@ -191,7 +191,7 @@ class MainScene extends Phaser.Scene {
         // 创建敌人分数数值文本（放在标题下方）
         this.enemyScoreText = this.add.text(enemyIconX, enemyIconY + enemyIconSize / 2 + 70, '0', {
             fontFamily: '"Press Start 2P", cursive',
-            fontSize: '90px', // 分数字��可以大一些
+            fontSize: '90px', // 分数字��以大一些
             fill: '#ffffff',
             align: 'center'
         }).setOrigin(0.5, 0).setDepth(7);
@@ -607,7 +607,7 @@ class MainScene extends Phaser.Scene {
         // 更新旗子位置（仅当旗子可见时
         if (this.playerFlag && this.playerFlag.visible) {
             this.playerFlag.x = this.bug.x;
-            // y坐标由补间动画处理
+            // y坐标���补间动画处理
         }
 
         // 移除或註釋掉這部分代碼
@@ -736,23 +736,34 @@ class MainScene extends Phaser.Scene {
         const moveDistance = 200;  // 前进距离
         const returnDistance = moveDistance * 0.3;  // 返回距离（原距离的30%）
 
-        // 创建移动和跳跃动画
+        // 记录当前的 Y 坐标
+        const currentY = this.bug.y;
+
+        // 创建移动动画
         this.tweens.add({
             targets: this.bug,
             x: this.bug.x + moveDistance,  // 向前移动
-            y: this.bug.y,    // 向上
+            y: currentY,    // 保持 Y 坐标不变
             duration: 1000,
             ease: 'Power2',
             onComplete: () => {
-                // 在移动完成后，返回一小段距离并落回原来的高度
+                // 在移动完成后，返回一小段距离
                 this.tweens.add({
                     targets: this.bug,
                     x: this.bug.x - returnDistance,  // 返回30%的距离
-                    y: this.bug.y,      // 落回原来的高度
+                    y: currentY,      // 保持 Y 坐标不变
                     duration: 1000,
                     ease: 'Power1'
                 });
             }
+        });
+
+        // 暂时禁用重力
+        this.bug.body.setAllowGravity(false);
+
+        // 在动画完成后重新启用重力
+        this.time.delayedCall(2000, () => {
+            this.bug.body.setAllowGravity(true);
         });
     }
 
