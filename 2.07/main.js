@@ -32,6 +32,7 @@ class MainScene extends Phaser.Scene {
         this.dragonRoarSound = null;
         this.bugScore = 0;
         this.enemyBugScore = 0;
+        this.dragon = null; // 添加这行
     }
 
     create() {
@@ -190,8 +191,9 @@ class MainScene extends Phaser.Scene {
 
         // 创建陨石粒子系统
         this.createMeteors();
+        this.startMeteors(); // 启动陨石动画
 
-        // 创建玩家旗子，但初始设置为不可见
+        // 创建玩��旗子，但初始设置为不可见
         this.createPlayerFlag();
         this.playerFlag.setVisible(false);
 
@@ -279,6 +281,9 @@ class MainScene extends Phaser.Scene {
         //     fontSize: '24px',
         //     fill: '#ffffff'
         // }).setOrigin(0.5, 0).setDepth(7);
+
+        // 停止龙的动画
+        this.stopDragonAnimation();
     }
 
     setupBugs() {
@@ -588,14 +593,13 @@ class MainScene extends Phaser.Scene {
     }
 
     answer(button) {
-        // 禁用按钮，防止次点击
+        // 禁用按钮，防止多次点击
         this.button1.disableInteractive();
         this.button2.disableInteractive();
 
         if (button === this.correctAnswer) {
             // 正确答案的处理
             this.bugScore++;
-            console.log("正确答案！");
             this.updateScore(this.bugScore);
             this.showCorrectFeedback(button);
             this.moveBugForward();
@@ -614,7 +618,6 @@ class MainScene extends Phaser.Scene {
         } else {
             // 错误答案的处理
             this.enemyBugScore++;
-            console.log("错误答案！");
             this.updateEnemyScore(this.enemyBugScore);
             this.showWrongFeedback(button);
             this.pauseFootsteps();  // 暂停脚步声
@@ -624,8 +627,9 @@ class MainScene extends Phaser.Scene {
             // 播放错误答案音效
             this.sound.play('you_are_wrong');
 
-            this.stopMeteors(); // 停止陨石动画
-            this.stopDragonAnimation(); // 停止龙的动画
+            // 启动陨石动画
+            this.startMeteors(); // 恢复陨石动画
+            this.stopDragonAnimation(); // 停止龙的画
         }
 
         // 显示旗子
@@ -759,21 +763,21 @@ class MainScene extends Phaser.Scene {
             rotate: 0
         });
 
-        // 默认暂停陨石效果
-        this.meteorEmitter.stop();
-    }
-
-    // 暂停陨石发射
-    stopMeteors() {
-        if (this.meteorEmitter) {
-            this.meteorEmitter.stop();
-        }
+        // 默认��动陨石效果
+        this.startMeteors();
     }
 
     // 启动陨石发射
     startMeteors() {
         if (this.meteorEmitter) {
             this.meteorEmitter.start();
+        }
+    }
+
+    // 暂停陨石发射
+    stopMeteors() {
+        if (this.meteorEmitter) {
+            this.meteorEmitter.stop();
         }
     }
 
@@ -989,7 +993,7 @@ class MainScene extends Phaser.Scene {
             });
         });
 
-        // 添加一些视觉反馈
+        // ���加一些视觉反馈
         this.cameras.main.shake(250, 0.02);
         this.bug.setTint(0xff0000);  // 将 bug 变红
         this.time.delayedCall(250, () => {
@@ -1110,8 +1114,14 @@ class MainScene extends Phaser.Scene {
     }
 
     stopDragonAnimation() {
-        if (this.dragon) {
+        if (this.dragon && this.dragon.anims) {
             this.dragon.anims.pause(); // 暂停龙的动画
+        }
+    }
+
+    resumeDragonAnimation() {
+        if (this.dragon && this.dragon.anims) {
+            this.dragon.anims.resume(); // 恢复龙的动画
         }
     }
 }
