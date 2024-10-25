@@ -4,7 +4,7 @@ class EndScene extends Phaser.Scene {
     }
 
     init(data) {
-        console.log("EndScene init method called with data:", data);
+        //console.log("EndScene init method called with data:", data);
         this.bugScore = data.bugScore;
         this.enemyBugScore = data.enemyBugScore;
         this.score = data.score; // 确保这行存在
@@ -247,9 +247,9 @@ class EndScene extends Phaser.Scene {
         this.anims.create({
             key: 'run_enemyBug',
             frames: this.anims.generateFrameNames('enemyBug', {
-                prefix: 'Comp 3_',
+                prefix: 'Comp 19_',
                 start: 0,
-                end: 11,
+                end: 10,
                 zeroPad: 5,
                 suffix: '.png'
             }),
@@ -260,7 +260,7 @@ class EndScene extends Phaser.Scene {
         this.anims.create({
             key: 'burn_enemyBug',
             frames: this.anims.generateFrameNames('enemyBugBurn', {
-                prefix: 'Comp 4_',
+                prefix: 'Comp 21_',
                 start: 0,
                 end: 13,
                 zeroPad: 5,

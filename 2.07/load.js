@@ -7,29 +7,19 @@ class LoadScene extends Phaser.Scene {
 		// 开始加载资源
 		console.log('Preload started');
 		
-		this.load.image('bird', '../assets/bird.png');
 		this.load.spritesheet('bugRun', '../assets/bugbug-running.png', { 
 			frameWidth: 170, 
 			frameHeight: 247, 
 			startFrame: 0, 
 			endFrame: 10 
 		});
-		this.load.spritesheet('bugAction', '../assets/bug.png', { 
-			frameWidth: 240, 
-			frameHeight: 247, 
-			startFrame: 13, 
-			endFrame: 19 
-		});
 		// 加载 bugbug 精灵图集
 		this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
 		this.load.atlas('enemyBug', '../assets/enemy-sprite.png', '../assets/enemy-sprite.json');
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
-		this.load.spritesheet('tree', '../assets/tree3.png', { frameWidth: 158, frameHeight: 199 });
-		this.load.spritesheet('grass', '../assets/grass.png', { frameWidth: 512, frameHeight: 128 });
 		this.load.image('bg', '../assets/bg-world-1.png');
 		this.load.image('midGround', '../assets/space-map-mid-ground.png');
-		this.load.image('button', '../assets/button.png');
 		this.load.image('tick', '../assets/tick.png');
 		this.load.image('cross', '../assets/cross.png');
 		this.load.image('correct', '../assets/correct.png');
@@ -51,12 +41,6 @@ class LoadScene extends Phaser.Scene {
 		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
 		// 加载新的dragon sprite sheet
 		this.load.atlas('dragon', '../assets/dragon-sprite.png', '../assets/dragon-sprite.json');
-		this.load.spritesheet('fireball', '../assets/fireball.png', { 
-			frameWidth: 176, // 根据你的实际图片调整
-			frameHeight: 147 // 根据的实际图片调整
-		});
-		//this.load.image('fireball', '../assets/fireball.png');
-		
 		// 加载 enemyBug 的燃烧 sprite sheet
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.image('castle', '../assets/castle.png');  // 确保路径正确
@@ -66,13 +50,8 @@ class LoadScene extends Phaser.Scene {
 		this.load.image('user-icon', '../assets/bugbug-icon.png');
 		this.load.image('enemy-icon', '../assets/enemy-icon.png');
 		this.load.image('rotate-ipad', '../assets/rotate-ipad.png');
-		console.log('Audio files added to load queue');
-		
-		console.log('Preload completed');
-		
 		// 加载新的地面图片
 		this.load.image('new-ground', '../assets/tile-ground.png');
-		
 		// 加载 logo 图片
 		this.load.image('logo', '../assets/run-bugbug-logotext.png');
 	}
@@ -80,7 +59,6 @@ class LoadScene extends Phaser.Scene {
 	create() {
 		// 添加一个短暂的延迟，确保所有资源都完全准备好
 		this.time.delayedCall(500, () => {
-			console.log('LoadScene create method called');
 			this.scene.start('MenuScene');
 		});
 	}

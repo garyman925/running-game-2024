@@ -238,12 +238,12 @@ class MainScene extends Phaser.Scene {
         this.createDragon();
 
         // 創火球動畫
-        this.anims.create({
-            key: 'fireball_anim',
-            frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 5 }),
-            frameRate: 10,
-            repeat: -1
-        });
+        // this.anims.create({
+        //     key: 'fireball_anim',
+        //     frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 5 }),
+        //     frameRate: 10,
+        //     repeat: -1
+        // });
 
         // 设置 midGroundSpeed 为 0
         this.midGroundSpeed = 0;
@@ -326,7 +326,7 @@ class MainScene extends Phaser.Scene {
             frames: this.anims.generateFrameNames('enemyBug', {
                 prefix: 'Comp 19_',
                 start: 0,
-                end: 11,
+                end: 10,
                 zeroPad: 5,
                 suffix: '.png'
             }),
@@ -335,11 +335,11 @@ class MainScene extends Phaser.Scene {
         });
 
         // 创建 enemyBug 的失动画（如果需要的话）
-        this.anims.create({
-            key: 'fail_enemyBug',
-            frames: [{ key: 'enemyBug', frame: 'Comp 3_00006.png' }],  // 使用适当的帧
-            frameRate: 30
-        });
+        // this.anims.create({
+        //     key: 'fail_enemyBug',
+        //     frames: [{ key: 'enemyBug', frame: 'Comp 21_00006.png' }],  // 使用适当的帧
+        //     frameRate: 30
+        // });
 
         // 增加敌人虫子的大小
         this.enemyBug.play('run_enemyBug');
@@ -635,7 +635,7 @@ class MainScene extends Phaser.Scene {
 
             // 启动陨石动画
             this.startMeteors(); // 恢复陨石动画
-            this.stopDragonAnimation(); // 停止龙的画
+            //this.stopDragonAnimation(); // 停止龙的画
         }
 
         // 显示旗子
