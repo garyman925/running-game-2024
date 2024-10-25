@@ -324,7 +324,7 @@ class MainScene extends Phaser.Scene {
         this.anims.create({
             key: 'run_enemyBug',
             frames: this.anims.generateFrameNames('enemyBug', {
-                prefix: 'Comp 3_',
+                prefix: 'Comp 19_',
                 start: 0,
                 end: 11,
                 zeroPad: 5,
@@ -350,7 +350,7 @@ class MainScene extends Phaser.Scene {
         this.anims.create({
             key: 'burn_enemyBug',
             frames: this.anims.generateFrameNames('enemyBugBurn', {
-                prefix: 'Comp 4_',
+                prefix: 'Comp 21_',
                 start: 0,
                 end: 13,
                 zeroPad: 5,
