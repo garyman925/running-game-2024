@@ -1,7 +1,7 @@
 <?php
 // 模擬從數據庫獲取角色設置
 //$character = get_character_from_database();  // 這裡替換為實際的數據庫查詢
-$character = 'daris';
+$character = 'bolster';
 
 // 模擬從數據庫獲取的數據
 $gameData = [
