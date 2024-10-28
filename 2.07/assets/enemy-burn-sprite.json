@@ -1,0 +1,124 @@
+{"frames": {
+
+"Comp 21_00000.png":
+{
+	"frame": {"x":1268,"y":1,"w":118,"h":215},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":28,"y":25,"w":118,"h":215},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00001.png":
+{
+	"frame": {"x":1388,"y":1,"w":118,"h":215},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":28,"y":25,"w":118,"h":215},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00002.png":
+{
+	"frame": {"x":1027,"y":1,"w":119,"h":219},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":28,"y":21,"w":119,"h":219},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00003.png":
+{
+	"frame": {"x":1148,"y":1,"w":118,"h":219},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":29,"y":21,"w":118,"h":219},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00004.png":
+{
+	"frame": {"x":1635,"y":1,"w":124,"h":207},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":24,"y":33,"w":124,"h":207},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00005.png":
+{
+	"frame": {"x":1508,"y":1,"w":125,"h":207},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":24,"y":33,"w":125,"h":207},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00006.png":
+{
+	"frame": {"x":249,"y":1,"w":138,"h":237},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":19,"y":3,"w":138,"h":237},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00007.png":
+{
+	"frame": {"x":389,"y":1,"w":138,"h":237},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":19,"y":3,"w":138,"h":237},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00008.png":
+{
+	"frame": {"x":529,"y":1,"w":119,"h":237},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":30,"y":3,"w":119,"h":237},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00009.png":
+{
+	"frame": {"x":650,"y":1,"w":119,"h":237},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":30,"y":3,"w":119,"h":237},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00010.png":
+{
+	"frame": {"x":1,"y":1,"w":122,"h":240},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":0,"w":122,"h":240},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00011.png":
+{
+	"frame": {"x":125,"y":1,"w":122,"h":240},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":0,"w":122,"h":240},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00012.png":
+{
+	"frame": {"x":771,"y":1,"w":126,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":22,"y":11,"w":126,"h":229},
+	"sourceSize": {"w":168,"h":245}
+},
+"Comp 21_00013.png":
+{
+	"frame": {"x":899,"y":1,"w":126,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":22,"y":11,"w":126,"h":229},
+	"sourceSize": {"w":168,"h":245}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "enemy-burn-sprite.png",
+	"format": "RGBA8888",
+	"size": {"w":1760,"h":242},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:7f6ed078056d3764ef906b84c0ec91bf:5c5cb333c58e72ddd6665c14ce392bae:373a467910d7a478e62ffdedd447de79$"
+}
+}

@@ -4,11 +4,11 @@ class LoadScene extends Phaser.Scene {
 	}
 
 	preload() {
-		console.log('LoadScene preload - Current character:', gameConfig.currentCharacter);
+		//console.log('LoadScene preload - Current character:', gameConfig.currentCharacter);
 		
 		// 獲取當前選擇的角色配置
 		const character = gameConfig.characters[gameConfig.currentCharacter];
-		console.log('Loading character assets:', character);
+		//console.log('Loading character assets:', character);
 		
 		// 加載當前角色的精靈圖集
 		this.load.atlas('character', character.sprite, character.atlas);
@@ -16,48 +16,45 @@ class LoadScene extends Phaser.Scene {
 		// 加載當前角色的圖標
 		this.load.image('user-icon', character.icon);
 		
-		// 加载 bugbug 精灵图集
-		//this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
-		//this.load.atlas('bitbit', '../assets/bitbit-sprite.png', '../assets/bitbit.json');
 		
-		this.load.atlas('enemyBug', '../assets/enemy-sprite.png', '../assets/enemy-sprite.json');
-		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
-		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
-		this.load.image('bg', '../assets/bg-world-1.png');
-		this.load.image('midGround', '../assets/space-map-mid-ground.png');
-		this.load.image('tick', '../assets/tick.png');
-		this.load.image('cross', '../assets/cross.png');
-		this.load.image('correct', '../assets/correct.png');
-		this.load.image('wrong', '../assets/wrong.png');
-		this.load.audio('bgm', '../audio/bgm.mp3');
-		this.load.audio('fail', '../audio/felldown2.wav');
-		this.load.audio('endbgm', '../audio/complete2.mp3');
-		this.load.audio('running', '../audio/run.wav');
-		this.load.audio('aruready', '../audio/aruready.wav');
-		this.load.audio('yeah', '../audio/yeah.mp3');
-		this.load.audio('step', '../audio/step.wav');
-		this.load.audio('footsteps', '../audio/footsteps.mp3');
-		this.load.audio('you_are_correct', '../audio/you_are_correct.mp3');
-		this.load.audio('you_are_wrong', '../audio/you_are_wrong.mp3');
-		this.load.audio('you_lose', '../audio/you_lose.mp3');
-		this.load.audio('you_are_the_winner', '../audio/you_are_the_winner.mp3');
-		this.load.image('meteor', '../assets/meteor-3.png');
-		this.load.image('star', '../assets/star.png');  // 确保你有一个星星的图片资源
-		this.load.image('flag', '../assets/flag.png');  // 确保路径正确
+		this.load.atlas('enemyBug', 'assets/enemy-sprite.png', 'assets/enemy-sprite.json');
+		this.load.atlas('enemyBugBurn', 'assets/enemy-burn-sprite.png', 'assets/enemy-burn-sprite.json');
+		this.load.spritesheet('ground', 'assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
+		this.load.image('bg', 'assets/bg-world-1.png');
+		this.load.image('midGround', 'assets/space-map-mid-ground.png');
+		this.load.image('tick', 'assets/tick.png');
+		this.load.image('cross', 'assets/cross.png');
+		this.load.image('correct', 'assets/correct.png');
+		this.load.image('wrong', 'assets/wrong.png');
+		this.load.audio('bgm', 'audio/bgm.mp3');
+		this.load.audio('fail', 'audio/felldown2.wav');
+		this.load.audio('endbgm', 'audio/complete2.mp3');
+		this.load.audio('running', 'audio/run.wav');
+		this.load.audio('aruready', 'audio/aruready.wav');
+		this.load.audio('yeah', 'audio/yeah.mp3');
+		this.load.audio('step', 'audio/step.wav');
+		this.load.audio('footsteps', 'audio/footsteps.mp3');
+		this.load.audio('you_are_correct', 'audio/you_are_correct.mp3');
+		this.load.audio('you_are_wrong', 'audio/you_are_wrong.mp3');
+		this.load.audio('you_lose', 'audio/you_lose.mp3');
+		this.load.audio('you_are_the_winner', 'audio/you_are_the_winner.mp3');
+		this.load.image('meteor', 'assets/meteor-3.png');
+		this.load.image('star', 'assets/star.png');  // 确保你有一个星星的图片资源
+		this.load.image('flag', 'assets/flag.png');  // 确保路径正确
 		// 加载新的dragon sprite sheet
-		this.load.atlas('dragon', '../assets/dragon-sprite.png', '../assets/dragon-sprite.json');
+		this.load.atlas('dragon', 'assets/dragon-sprite.png', 'assets/dragon-sprite.json');
 		// 加载 enemyBug 的燃烧 sprite sheet
-		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
-		this.load.image('castle', '../assets/castle.png');  // 确保路径正确
-		//this.load.audio('dragon_roar', '../audio/dragon.mp3');
-		this.load.audio('endscene-bgm', '../audio/endscene-bgm.mp3');
-		this.load.audio('dang', '../audio/dang.mp3');
-		this.load.image('enemy-icon', '../assets/enemy-icon.png');
-		this.load.image('rotate-ipad', '../assets/rotate-ipad.png');
+		this.load.atlas('enemyBugBurn', 'assets/enemy-burn-sprite.png', 'assets/enemy-burn-sprite.json');
+		this.load.image('castle', 'assets/castle.png');  // 确保路径正确
+		//this.load.audio('dragon_roar', 'audio/dragon.mp3');
+		this.load.audio('endscene-bgm', 'audio/endscene-bgm.mp3');
+		this.load.audio('dang', 'audio/dang.mp3');
+		this.load.image('enemy-icon', 'assets/enemy-icon.png');
+		this.load.image('rotate-ipad', 'assets/rotate-ipad.png');
 		// 加载新的地面图片
-		this.load.image('new-ground', '../assets/tile-ground.png');
+		this.load.image('new-ground', 'assets/tile-ground.png');
 		// 加载 logo 图片
-		this.load.image('logo', '../assets/run-bugbug-logotext.png');
+		this.load.image('logo', 'assets/run-bugbug-logotext.png');
 	}
 
 	create() {

@@ -42,10 +42,38 @@ function get_character_from_database() {
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Runrun Bug</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    
+    <!-- 添加 Google Fonts 連結，包含 IM Fell DW Pica 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <style>        
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- 添加字體預加載 -->
+    <style>
+        @font-face {
+            font-family: 'Press Start 2P';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2) format('woff2');
+        }
+
+        @font-face {
+            font-family: 'IM Fell DW Pica';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/imfelldwpica/v16/2sDGZGRQotv9nbn2qSl0TxXVYNw9ZA.woff2) format('woff2');
+        }
+        
+        /* 添加一個隱藏的元素來預加載字體 */
+        .font-preload {
+            font-family: 'Press Start 2P', 'IM Fell DW Pica';
+            position: absolute;
+            left: -100px;
+            visibility: hidden;
+        }
+        
         html, body {
             margin: 0;
             padding: 0;
@@ -60,6 +88,8 @@ function get_character_from_database() {
             left: 50%;
             transform: translate(-50%, -50%);
         }
+
+        
     </style>
     
     <!-- 將 PHP 數據傳遞給 JavaScript -->
@@ -82,39 +112,54 @@ function get_character_from_database() {
 
     <!-- 遊戲腳本 -->
     <script src="config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <!-- phaser 3.55.2 -->
+    <script src="phaser.min.js"></script>
     <script src="load.js"></script>
     <script src="menu.js"></script>
     <script src="main.js"></script>
     <script src="end.js"></script>
 </head>
 <body>
+    <!-- 添加預加載元素 -->
+    <div class="font-preload">.</div>
+    
     <div id="game"></div>
     <script>
         document.fonts.ready.then(function() {
             console.log('Fonts are loaded');
             
-            var config = {
-                type: Phaser.WEBGL,
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    parent: 'game',
-                    width: 1920,
-                    height: 1200,
-                    autoCenter: Phaser.Scale.CENTER_BOTH
+            // 使用 WebFontLoader 確保字體加載
+            WebFont.load({
+                google: {
+                    families: ['Press Start 2P', 'IM Fell DW Pica:400,700']
                 },
-                physics: {
-                    default: 'arcade',
-                    arcade: {
-                        gravity: { y: 800 },
-                        debug: false
-                    }
-                },
-                scene: [LoadScene, MenuScene, MainScene, EndScene]
-            };
+                active: function() {
+                    console.log('WebFont loaded');
+                    var config = {
+                        type: Phaser.WEBGL,
+                        scale: {
+                            mode: Phaser.Scale.FIT,
+                            parent: 'game',
+                            width: 1920,
+                            height: 1200,
+                            autoCenter: Phaser.Scale.CENTER_BOTH
+                        },
+                        physics: {
+                            default: 'arcade',
+                            arcade: {
+                                gravity: { y: 800 },
+                                debug: false
+                            }
+                        },
+                        scene: [LoadScene, MenuScene, MainScene, EndScene]
+                    };
 
-            var game = new Phaser.Game(config);
+                    var game = new Phaser.Game(config);
+                }
+            });
         });
     </script>
+    <!-- 添加 WebFontLoader -->
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 </body>
 </html>

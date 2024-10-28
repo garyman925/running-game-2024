@@ -1,0 +1,44 @@
+{"frames": {
+
+"dragon_1.png":
+{
+	"frame": {"x":1497,"y":1,"w":383,"h":601},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":383,"h":601},
+	"sourceSize": {"w":383,"h":601}
+},
+"dragon_2.png":
+{
+	"frame": {"x":1068,"y":1,"w":427,"h":601},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":427,"h":601},
+	"sourceSize": {"w":427,"h":601}
+},
+"dragon_3.png":
+{
+	"frame": {"x":1,"y":1,"w":579,"h":767},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":579,"h":767},
+	"sourceSize": {"w":579,"h":767}
+},
+"dragon_4.png":
+{
+	"frame": {"x":582,"y":1,"w":484,"h":727},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":484,"h":727},
+	"sourceSize": {"w":484,"h":727}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "dragon-sprite.png",
+	"format": "RGBA8888",
+	"size": {"w":1881,"h":769},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:0b68aa6f3da0cda16c06b05c10c4c0ad:0e63d7c637db3b465cc194b2d06edd0c:d8d550bb0b27ac5a3d93fb940fa49a31$"
+}
+}

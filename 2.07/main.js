@@ -597,7 +597,7 @@ class MainScene extends Phaser.Scene {
             this.updateScore(this.bugScore);
             this.showCorrectFeedback(button);
             
-            // 先移动虫子，在移动完成后播放成功动画
+            // 先移动虫子，在移动完后播放成功动画
             this.tweens.add({
                 targets: this.bug,
                 x: this.bug.x + 200,  // 向前移动
@@ -940,8 +940,6 @@ class MainScene extends Phaser.Scene {
         this.dragon.setScale(1.2);  // 調整大小，可能需要根據實際情況調整
         this.dragon.setDepth(2.5);  // 設置深度在中層背景之後，但在地面之前
 
-        // 播放飛行動畫
-        this.dragon.play('dragon_fly');
 
         // 添加飛龍的上下動動畫
         this.tweens.add({
@@ -957,7 +955,7 @@ class MainScene extends Phaser.Scene {
         this.dragon.setFlipX(true);
 
         // 添加這行來檢查龍的大小
-        console.log('Dragon size:', this.dragon.width, this.dragon.height);
+        //console.log('Dragon size:', this.dragon.width, this.dragon.height);
     }
 
     // 新增方法：隐藏答案按钮和文本
@@ -1163,4 +1161,5 @@ var mid = "test_user_123";
 var article_id = "game_domain_001";
 var gcenter_id = "center_domain_001";
 var limit = 10;
+
 
