@@ -1,16 +1,6 @@
 class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
-        // 移除這些硬編碼的數據
-        /*
-        this.questions = [
-            "What is the capital of France?",
-            "What is the capital of Japan?",
-            ...
-        ];
-        this.answers = [...];
-        this.qIds = [1,2,3,4,5,6,7,8];
-        */
         
         // 改為使用 PHP 傳來的數據
         this.questions = window.gameData.questions;
@@ -39,11 +29,6 @@ class MainScene extends Phaser.Scene {
         
         // 设置物理系统
         this.physics.world.setBounds(0, 0, this.sys.game.config.width, this.sys.game.config.height);
-
-        // 创建背景
-        // this.bg = this.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'bg');
-        // this.bg.setScale(Math.max(this.sys.game.config.width / this.bg.width, this.sys.game.config.height / this.bg.height));
-        // this.bg.setDepth(0);
 
         // 创建变暗的遮罩
         this.darkMask = this.add.rectangle(0, 0, this.sys.game.config.width, this.sys.game.config.height, 0x78276B, 0.5);
@@ -216,7 +201,7 @@ class MainScene extends Phaser.Scene {
         this.midGroundSpeed = this.initialMidGroundSpeed;
         this.groundSpeed = this.initialGroundSpeed;
 
-        // 創建龍的動畫（只保留一個動畫，命名為dragon_fly）
+        // 創建龍的（只保留一個動畫，命名為dragon_fly）
         this.anims.create({
             key: 'dragon_fly',
             frames: this.anims.generateFrameNames('dragon', {
@@ -233,13 +218,6 @@ class MainScene extends Phaser.Scene {
         // 創建龍（確保這裡只調用一次）
         this.createDragon();
 
-        // 創火球動畫
-        // this.anims.create({
-        //     key: 'fireball_anim',
-        //     frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 5 }),
-        //     frameRate: 10,
-        //     repeat: -1
-        // });
 
         // 设置 midGroundSpeed 为 0
         this.midGroundSpeed = 0;
@@ -304,6 +282,20 @@ class MainScene extends Phaser.Scene {
             }),
             frameRate: 30,
             repeat: 0
+        });
+
+        // 創建成功動畫
+        this.anims.create({
+            key: 'success',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'jump_',  // 使用您的精靈圖集中對應的前綴
+                start: 0,
+                end: 11,  // 根據您的精靈圖集調整幀數
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 30,
+            repeat: 3  // 只播放一次
         });
 
         // 增加主角虫子的大小
@@ -604,7 +596,31 @@ class MainScene extends Phaser.Scene {
             this.bugScore++;
             this.updateScore(this.bugScore);
             this.showCorrectFeedback(button);
-            this.moveBugForward();
+            
+            // 先移动虫子，在移动完成后播放成功动画
+            this.tweens.add({
+                targets: this.bug,
+                x: this.bug.x + 200,  // 向前移动
+                duration: 1000,
+                ease: 'Power2',
+                onComplete: () => {
+                    // 播放成功动画
+                    this.bug.play('success');
+                    this.bug.once('animationcomplete', () => {
+                        // 成功动画完成后恢复跑步动画
+                        this.bug.play('run');
+                        
+                        // 返回一小段距离
+                        this.tweens.add({
+                            targets: this.bug,
+                            x: this.bug.x - 60,  // 返回30%的距离
+                            duration: 1000,
+                            ease: 'Power1'
+                        });
+                    });
+                }
+            });
+            
             this.createStarEffect();
             
             // 播放正确答案音效

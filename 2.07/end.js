@@ -4,13 +4,9 @@ class EndScene extends Phaser.Scene {
     }
 
     init(data) {
-        //console.log("EndScene init method called with data:", data);
         this.bugScore = data.bugScore;
         this.enemyBugScore = data.enemyBugScore;
         this.score = data.score; // 确保这行存在
-        console.log("After assignment in init - Bug Score:", this.bugScore);
-        console.log("After assignment in init - Enemy Bug Score:", this.enemyBugScore);
-        console.log("After assignment in init - Score:", this.score);
         this.bugPosition = data.bugPosition;
         this.enemyBugPosition = data.enemyBugPosition;
         this.groundPosition = data.groundPosition;
@@ -21,9 +17,6 @@ class EndScene extends Phaser.Scene {
     }
 
     create() {
-        //console.log("EndScene create method called");
-        //console.log("In create - Bug Score:", this.bugScore);
-        //console.log("In create - Enemy Bug Score:", this.enemyBugScore);
         // 停止 MainScene 的景音乐
         this.sound.stopByKey('bgm');
 
@@ -91,30 +84,70 @@ class EndScene extends Phaser.Scene {
         this.bug.setScale(1.5);
         this.enemyBug.setScale(1.5);
 
-        // 根据分数决定虫子的行为和播放音效
+        // 創建動畫
+        this.anims.create({
+            key: 'run',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'run_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 60,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'success',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'jump_',
+                start: 0,
+                end: 11,
+                zeroPad: 5,
+                suffix: '.png'
+            }),
+            frameRate: 30,
+            repeat: -1  // 設置為無限循環
+        });
+
+        // 根據分數決定虫子的行為
         if (this.bugScore > this.enemyBugScore) {
-            // 主角虫子跑到城堡前
+            // 主角虫子先跑到城堡前
+            this.bug.play('run');
             this.tweens.add({
                 targets: this.bug,
                 x: this.sys.game.config.width * 0.7,
                 duration: 2000,
                 ease: 'Linear',
                 onComplete: () => {
-                    this.bug.play('idle_bug');
+                    // 到達後播放無限循環的成功動畫
+                    this.bug.play('success');
                     // 播放胜利音效
                     this.sound.play('you_are_the_winner');
                 }
             });
-            this.bug.play('run_bug');
 
             // 对手虫子播放燃烧动画
             this.enemyBug.play('burn_enemyBug');
         } else {
-            // 如果主角虫子没赢，两只虫子都播放普通动画
-            this.bug.play('run_bug');
+            // 即使失敗也先移動到指定位置
+            this.bug.play('run');
+            this.tweens.add({
+                targets: this.bug,
+                x: this.sys.game.config.width * 0.5,  // 移動到畫面中間
+                duration: 2000,
+                ease: 'Linear',
+                onComplete: () => {
+                    // 到達後播放無限循環的成功動畫
+                    this.bug.play('success');
+                    // 播放失敗音效
+                    this.sound.play('you_lose');
+                }
+            });
+
+            // 对手虫子播放普通动画
             this.enemyBug.play('run_enemyBug');
-            // 播放失败音效
-            this.sound.play('you_lose');
         }
 
         // 创建陨石效果

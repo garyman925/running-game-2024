@@ -5,11 +5,6 @@ const gameConfig = {
         bugbug: {
             sprite: '../assets/bugbug-sprite.png',
             atlas: '../assets/bugbug-sprite.json',
-            // running: {
-            //     spritesheet: '../assets/bugbug-running.png',
-            //     frameWidth: 170,
-            //     frameHeight: 247
-            // },
             icon: '../assets/bugbug/bugbug-icon.png'
         },
         //2
