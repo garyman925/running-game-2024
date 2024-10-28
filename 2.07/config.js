@@ -3,8 +3,8 @@ const gameConfig = {
     characters: {
         //1
         bugbug: {
-            sprite: 'assets/bugbug-sprite.png',
-            atlas: 'assets/bugbug-sprite.json',
+            sprite: 'assets/bugbug/bugbug-sprite.png',
+            atlas: 'assets/bugbug/bugbug.json',
             icon: 'assets/bugbug/bugbug-icon.png'
         },
         //2
@@ -32,10 +32,10 @@ const gameConfig = {
             icon: 'assets/daris/daris-icon.png'
         },
         //6
-        twisty: {
-            sprite: 'assets/twisty/twisty-sprite.png',
-            atlas: 'assets/twisty/twisty.json',
-            icon: 'assets/twisty/twisty-icon.png'
+        twist: {
+            sprite: 'assets/twist/twist-sprite.png',
+            atlas: 'assets/twist/twist.json',
+            icon: 'assets/twist/twist-icon.png'
         },
         //7
         ava: {
