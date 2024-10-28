@@ -1102,25 +1102,25 @@ class MainScene extends Phaser.Scene {
     }
 
     // 新增方法即跳转到 EndScene 进行调试
-    debugEndScene() {
-        // 停止所有声音
-        //this.sound.stopAll();
+    // debugEndScene() {
+    //     // 停止所有声音
+    //     //this.sound.stopAll();
 
-        // 准备一些模拟数据
-        const debugData = {
-            score: 5,  // 模拟分
-            bugPosition: this.bug.y,
-            enemyBugPosition: this.enemyBug.y,
-            groundPosition: this.ground.y,
-            midGroundPosition: this.midGround.y,
-            questions: this.questions,
-            answers: this.answers,
-            userAnswers: [0, 1, 0, 1, 0]  // 模拟用户答案
-        };
+    //     // 准备一些模拟数据
+    //     const debugData = {
+    //         score: 5,  // 模拟分
+    //         bugPosition: this.bug.y,
+    //         enemyBugPosition: this.enemyBug.y,
+    //         groundPosition: this.ground.y,
+    //         midGroundPosition: this.midGround.y,
+    //         questions: this.questions,
+    //         answers: this.answers,
+    //         userAnswers: [0, 1, 0, 1, 0]  // 模拟用户答案
+    //     };
 
-        // 立即跳转到 EndScene
-        this.scene.start('EndScene', debugData);
-    }
+    //     // 立即跳转到 EndScene
+    //     this.scene.start('EndScene', debugData);
+    // }
 
     pauseFootsteps() {
         if (this.footstepsSound) {

@@ -1,188 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Runrun Bug</title>
-    <!-- 修改 Google Fonts 加载方式 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- 添加字体加载检查 -->
-    <style>        
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
+var config = {
+    type: Phaser.WEBGL,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        parent: 'game',
+        width: 1920,
+        height: 1200,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 800 },
+            debug: false
         }
-        #game {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        #orientation-warning {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: black;
-            font-size: 36px;
-            display: none;
-            text-align: center;
-            font-family: 'IM Fell DW Pica', serif;
-            width: 80%;
-            max-width: 600px;
-            background: #fff;
-            padding: 60px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        #orientation-warning img {
-            width: 150px;
-            height: 150px;
-            margin-bottom: 30px;
-            animation: rotate 2s infinite linear;
-        }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(90deg); }
-        }
-        
-        /* 添加字体预加载 */
-        .font-preload {
-            position: absolute;
-            left: -9999px;
-            visibility: hidden;
-        }
-        .font-preload-im-fell {
-            font-family: 'IM Fell DW Pica', serif;
-        }
-        .font-preload-press-start {
-            font-family: 'Press Start 2P', cursive;
-        }
-    </style>
-    <!-- 確保 config.js 在其他遊戲腳本之前加載 -->
-    <script src="config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
-    <script src="load.js"></script>
-    <script src="menu.js"></script>
-    <script src="main.js"></script>
-    <script src="end.js"></script>
-</head>
-<body>
-    <!-- 添加字体预加载元素 -->
-    <div class="font-preload font-preload-im-fell">.</div>
-    <div class="font-preload font-preload-press-start">.</div>
-    
-    <div id="game"></div>
-    <div id="orientation-warning">
-        <img src="../assets/rotate-ipad.png" alt="Rotate device">
-        <div>Please rotate your device to landscape mode for the best experience.</div>
-    </div>
-    <script>
-    // 在页面加载时立即检查设备方向
-    document.addEventListener('DOMContentLoaded', function() {
-        checkOrientation();
-        initGame();
-    });
-
-    // 监听方向变化 - 添加多个事件监听
-    window.addEventListener('orientationchange', function() {
-        // 在 Safari 中，需要一个短暂的延迟来确保获取正确的窗口尺寸
-        setTimeout(checkOrientation, 100);
-    });
-
-    // 添加 resize 事件监听，因为在某些设备上 orientationchange 可能不会触发
-    window.addEventListener('resize', function() {
-        checkOrientation();
-    });
-
-    // 检查方向的函数
-    function checkOrientation() {
-        const warning = document.getElementById('orientation-warning');
-        
-        // 使用多种方法检测设备方向
-        const isPortrait = 
-            window.innerHeight > window.innerWidth || // 使用窗口尺寸
-            (window.orientation !== undefined && (window.orientation === 0 || window.orientation === 180)); // 使用方向角度
-        
-        if (isPortrait) {
-            warning.style.display = 'block';
-        } else {
-            warning.style.display = 'none';
-        }
-    }
-
-    // 初始化游戏的函数保持不变
-    function initGame() {
-        // 确保字体已加载
-        document.fonts.ready.then(function() {
-            console.log('Fonts are loaded');
-            
-            var config = {
-                type: Phaser.WEBGL,
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    parent: 'game',
-                    width: 1920,
-                    height: 1200,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                    orientation: Phaser.Scale.LANDSCAPE
-                },
-                render: {
-                    antialias: true,         // 保持抗锯齿开启
-                    pixelArt: false,
-                    roundPixels: false,      // 关闭像素四舍五入以保持抗锯齿效果
-                    powerPreference: 'high-performance',
-                    batchSize: 1024,         // 降低批处理大小
-                    clearBeforeRender: true,
-                    maxTextures: 8,          // 限制最大纹理数量
-                    maxLights: 0,            // 禁用光源
-                    mipmapFilter: 'LINEAR'   // 使用线性过滤
-                },
-                physics: {
-                    default: 'arcade',
-                    arcade: {
-                        gravity: { y: 800 },
-                        debug: false,
-                        fps: 30,             // 降低物理引擎帧率
-                        timeScale: 1,
-                        skipQuadTree: true,  // 跳过四叉树检查以提高性能
-                        tileBias: 8
-                    }
-                },
-                pipeline: {
-                    enableMultiPipeline: false  // 禁用多管线渲染
-                },
-                input: {
-                    activePointers: 1,       // 减少多点触控支持
-                    smoothFactor: 0,
-                    touch: {
-                        capture: true,
-                        dragThreshold: 20,
-                        tapThreshold: 200
-                    }
-                },
-                audio: {
-                    disableWebAudio: false,
-                    noAudio: false
-                },
-                scene: [LoadScene, MenuScene, MainScene, EndScene],
-                backgroundColor: '#000000',
-                autoMobilePipeline: false,   // 禁用自动移动管线
-                banner: false,
-                transparent: false
-            };
-
-            var game = new Phaser.Game(config);
-        });
-    }
-    </script>
-</body>
-</html>
+    },
+    canvas: {
+        willReadFrequently: true  // 添加這行
+    },
+    scene: [LoadScene, MenuScene, MainScene, EndScene]
+};
