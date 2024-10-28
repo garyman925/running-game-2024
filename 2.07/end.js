@@ -82,7 +82,7 @@ class EndScene extends Phaser.Scene {
         this.darkMask.setDepth(1);
 
         // 创建虫子
-        this.bug = this.add.sprite(this.sys.game.config.width * 0.3, this.bugPosition, 'bugbug');
+        this.bug = this.add.sprite(this.sys.game.config.width * 0.3, this.bugPosition, 'character');
         this.enemyBug = this.add.sprite(this.sys.game.config.width * 0.2, this.enemyBugPosition, 'enemyBug');
         this.bug.setDepth(4);
         this.enemyBug.setDepth(4);
@@ -220,8 +220,8 @@ class EndScene extends Phaser.Scene {
         // 创建动画
         this.anims.create({
             key: 'run_bug',
-            frames: this.anims.generateFrameNames('bugbug', {
-                prefix: 'Comp 1_',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'run_',  // 改為 'run_'
                 start: 0,
                 end: 11,
                 zeroPad: 5,
@@ -233,8 +233,8 @@ class EndScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'idle_bug',
-            frames: this.anims.generateFrameNames('bugbug', {
-                prefix: 'Comp 1_',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'run_',  // 使用 run_ 的第一幀作為靜止狀態
                 start: 0,
                 end: 0,
                 zeroPad: 5,

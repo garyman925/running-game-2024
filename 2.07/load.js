@@ -4,17 +4,22 @@ class LoadScene extends Phaser.Scene {
 	}
 
 	preload() {
-		// 开始加载资源
-		console.log('Preload started');
+		console.log('LoadScene preload - Current character:', gameConfig.currentCharacter);
 		
-		this.load.spritesheet('bugRun', '../assets/bugbug-running.png', { 
-			frameWidth: 170, 
-			frameHeight: 247, 
-			startFrame: 0, 
-			endFrame: 10 
-		});
+		// 獲取當前選擇的角色配置
+		const character = gameConfig.characters[gameConfig.currentCharacter];
+		console.log('Loading character assets:', character);
+		
+		// 加載當前角色的精靈圖集
+		this.load.atlas('character', character.sprite, character.atlas);
+		
+		// 加載當前角色的圖標
+		this.load.image('user-icon', character.icon);
+		
 		// 加载 bugbug 精灵图集
-		this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
+		//this.load.atlas('bugbug', '../assets/bugbug-sprite.png', '../assets/bugbug-sprite.json');
+		//this.load.atlas('bitbit', '../assets/bitbit-sprite.png', '../assets/bitbit.json');
+		
 		this.load.atlas('enemyBug', '../assets/enemy-sprite.png', '../assets/enemy-sprite.json');
 		this.load.atlas('enemyBugBurn', '../assets/enemy-burn-sprite.png', '../assets/enemy-burn-sprite.json');
 		this.load.spritesheet('ground', '../assets/space-map-ground.png', { frameWidth: 128, frameHeight: 190 });
@@ -47,7 +52,6 @@ class LoadScene extends Phaser.Scene {
 		//this.load.audio('dragon_roar', '../audio/dragon.mp3');
 		this.load.audio('endscene-bgm', '../audio/endscene-bgm.mp3');
 		this.load.audio('dang', '../audio/dang.mp3');
-		this.load.image('user-icon', '../assets/bugbug-icon.png');
 		this.load.image('enemy-icon', '../assets/enemy-icon.png');
 		this.load.image('rotate-ipad', '../assets/rotate-ipad.png');
 		// 加载新的地面图片

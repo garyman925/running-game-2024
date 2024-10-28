@@ -1,38 +1,34 @@
 class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
+        // 移除這些硬編碼的數據
+        /*
         this.questions = [
             "What is the capital of France?",
             "What is the capital of Japan?",
-            "What is the capital of China?",
-            "What is the capital of Korea?",
-            "What is the capital of Vietnam?",
-            "What is the capital of Thailand?",
-            "What is the capital of Indonesia?",
-            "What is the capital of Malaysia?"
+            ...
         ];
-        this.answers = [
-            ["Paris", "London"],
-            ["Tokyo", "Seoul"],
-            ["Beijing", "Shanghai"],
-            ["Seoul", "Tokyo"],
-            ["Hanoi", "Bangkok"],
-            ["Jakarta", "Bandung"],
-            ["Bangkok", "Phuket"],
-            ["Jakarta", "Bandung"]
-        ];
+        this.answers = [...];
         this.qIds = [1,2,3,4,5,6,7,8];
-        this.initialMidGroundSpeed = 0.8;  // 增加初始速度
-        this.maxMidGroundSpeed = 3.0;  // 增加最大速度
-        this.initialGroundSpeed = 1;  // 初始地面速度
-        this.maxGroundSpeed = 4;  // 最大地面速度
+        */
+        
+        // 改為使用 PHP 傳來的數據
+        this.questions = window.gameData.questions;
+        this.answers = window.gameData.answers;
+        this.qIds = window.gameData.qIds;
+
+        // 其他設置保持不變
+        this.initialMidGroundSpeed = 0.8;
+        this.maxMidGroundSpeed = 3.0;
+        this.initialGroundSpeed = 1;
+        this.maxGroundSpeed = 4;
         this.currentQuestionIndex = 0;
         this.meteorEmitter = null;
         this.footstepsSound = null;
         this.dragonRoarSound = null;
         this.bugScore = 0;
         this.enemyBugScore = 0;
-        this.dragon = null; // 添加这行
+        this.dragon = null;
     }
 
     create() {
@@ -108,7 +104,7 @@ class MainScene extends Phaser.Scene {
         const bugStartX = this.sys.game.config.width * 0.2;
         
         // 调整虫子的 Y 坐标，使其更高
-        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 300, 'bug');  // 从 -300 改为 -400
+        this.bug = this.physics.add.sprite(bugStartX, groundTop + bugOffset - 300, 'character');  // 从 -300 改为 -400
         this.enemyBug = this.physics.add.sprite(bugStartX - 50, groundTop + bugOffset - 120, 'enemyBug');  // 保持不变
 
         this.bug.setDepth(4);
@@ -272,47 +268,47 @@ class MainScene extends Phaser.Scene {
     }
 
     setupBugs() {
-        // 设置 bug 的物理属性
+        // 設置 bug 的物理屬性
         this.bug.setCollideWorldBounds(true);
         this.bug.setBounce(0.2);
-        this.bug.setGravityY(800);  // 从 800 降到 400，减轻重力
+        this.bug.setGravityY(800);
 
-        // 设置 enemyBug 的物理属性
+        // 設置 enemyBug 的物理屬性
         this.enemyBug.setCollideWorldBounds(true);
         this.enemyBug.setBounce(0.2);
-        this.enemyBug.setGravityY(800);  // 从 800 降到 400，减轻重力
+        this.enemyBug.setGravityY(800);
 
-        // 创建跑步动画
+        // 創建跑步動畫 - 使用當前選擇的角色
         this.anims.create({
-            key: 'run_bug',
-            frames: this.anims.generateFrameNames('bugbug', {
-                prefix: 'Comp 1_',
+            key: 'run',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'run_',  // 改為 'run_'
                 start: 0,
                 end: 11,
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 30,  // 从 60 降到 30
+            frameRate: 30,
             repeat: -1
         });
 
-        // 创建跌倒动画
+        // 創建跌倒動畫
         this.anims.create({
-            key: 'fall_bug',
-            frames: this.anims.generateFrameNames('bugbug', {
-                prefix: 'Comp 2_',
+            key: 'fall',
+            frames: this.anims.generateFrameNames('character', {
+                prefix: 'fall_',  // 改為 'fall_'
                 start: 0,
                 end: 6,
                 zeroPad: 5,
                 suffix: '.png'
             }),
-            frameRate: 30,  // 从 15 降到 12
+            frameRate: 30,
             repeat: 0
         });
 
         // 增加主角虫子的大小
-        this.bug.play('run_bug');
-        this.bug.setScale(1.4);  // 从 0.8 增加到 1.2
+        this.bug.play('run');
+        this.bug.setScale(1.4);
         this.bug.setOrigin(0.5, 0.4);
 
         // 更新 enemyBug 的设置
@@ -778,7 +774,7 @@ class MainScene extends Phaser.Scene {
             alpha: { start: 1, end: 0 },
             lifespan: { min: 3000, max: 6000 },
             quantity: 1,
-            frequency: 2000,  // 从 1000 增加到 2000，减少生成频率
+            frequency: 2000,  // 从 1000 增加到 2000，减少生成率
             blendMode: 'ADD',
             maxParticles: 5,  // 限制最大粒子数量
             rotate: 0
@@ -995,18 +991,18 @@ class MainScene extends Phaser.Scene {
     // 新增方法：播放fall_bug动画
     playFallBugAnimation() {
         console.log('Starting fall_bug animation');
-        this.bug.play('fall_bug');
+        this.bug.play('fall');
         
         this.bug.once('animationcomplete', () => {
             console.log('fall_bug animation completed');
             // 设置动画停最后
             this.bug.anims.stopOnFrame(this.bug.anims.currentAnim.frames[this.bug.anims.currentAnim.frames.length - 1]);
             
-            // 在最后一帧停留约1秒
+            // 在最后一帧停留1秒
             this.time.delayedCall(1000, () => {
                 console.log('Resetting to run_bug animation');
                 // 1秒后重置为run_bug画
-                this.bug.play('run_bug');
+                this.bug.play('run');
                 this.resumeFootsteps();  // 恢复脚步声
             });
         });
@@ -1151,19 +1147,4 @@ var mid = "test_user_123";
 var article_id = "game_domain_001";
 var gcenter_id = "center_domain_001";
 var limit = 10;
-
-var questions = [
-    "What is the capital of France?",
-    "Which planet is known as the Red Planet?",
-    "What is the largest mammal in the world?"
-];
-var qIds = [1, 2, 3];
-var answers = [
-    ["Paris", "London"],
-    ["Mars", "Venus"],
-    ["Blue Whale", "African Elephant"]
-];
-
-
-
 
