@@ -1,7 +1,7 @@
 <?php
 // 模擬從數據庫獲取角色設置
 //$character = get_character_from_database();  // 這裡替換為實際的數據庫查詢
-$character = 'bolster';
+$character = 'twist';
 
 // 模擬從數據庫獲取的數據
 $gameData = [
@@ -105,37 +105,59 @@ function get_character_from_database() {
     <script src="end.js"></script>
 
     <script>
+        // 添加全局错误处理
+        window.addEventListener('error', function(e) {
+            console.error('游戏错误:', e.message);
+        });
+
         // 等待字體加載
         WebFont.load({
             google: {
                 families: ['Press Start 2P', 'IM Fell DW Pica:400,700']
             },
             active: function() {
-                // 字體加載完成後初始化遊戲
-                var config = {
-                    type: Phaser.WEBGL,
-                    scale: {
-                        mode: Phaser.Scale.FIT,
-                        parent: 'game',
-                        width: 1920,
-                        height: 1200,
-                        autoCenter: Phaser.Scale.CENTER_BOTH
-                    },
-                    physics: {
-                        default: 'arcade',
-                        arcade: {
-                            gravity: { y: 800 },
-                            debug: false
-                        }
-                    },
-                    scene: [LoadScene, MenuScene, MainScene, EndScene]
-                };
+                try {
+                    // 字體加載完成後初始化遊戲
+                    var config = {
+                        type: Phaser.CANVAS,  // 改用 CANVAS 渲染器来避免 WebGL 问题
+                        scale: {
+                            mode: Phaser.Scale.FIT,
+                            parent: 'game',
+                            width: 1920,
+                            height: 1200,
+                            autoCenter: Phaser.Scale.CENTER_BOTH
+                        },
+                        backgroundColor: '#000000',
+                        render: {
+                            pixelArt: false,
+                            antialias: true,
+                            clearBeforeRender: true
+                        },
+                        physics: {
+                            default: 'arcade',
+                            arcade: {
+                                gravity: { y: 800 },
+                                debug: false
+                            }
+                        },
+                        scene: [LoadScene, MenuScene, MainScene, EndScene]
+                    };
 
-                var game = new Phaser.Game(config);
+                    var game = new Phaser.Game(config);
+
+                    // 添加游戏实例就绪检查
+                    game.events.once('ready', function() {
+                        console.log('游戏初始化完成');
+                    });
+
+                } catch (error) {
+                    console.error('游戏初始化错误:', error);
+                }
             },
             inactive: function() {
-                console.warn('Font loading failed');
-            }
+                console.error('字体加载失败');
+            },
+            timeout: 5000  // 添加超时设置
         });
     </script>
 </body>
